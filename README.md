@@ -37,11 +37,8 @@ void loop() {
 }
 ```
 
-## How it looks
-<p align="center" style="display:inline;">
-<img src="img/screenshot1.png" alt="Screenshot" style="height:850px;"/>
-<img src="img/screenshot2.png" alt="Screenshot" style="height:850px;"/>
-</p>
+## Demo
+![Screen Recording 2025-03-02 at 08 26 48](https://github.com/user-attachments/assets/77b92946-ed00-470f-ad9b-a70e98503e44)
 
 ## The Begin function
 ```cpp
