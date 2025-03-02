@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="A better looking OTA web updater." />
+        <title>PrettyOTA</title>
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cpath d='M0 0 C168.96 0 337.92 0 512 0 C512 168.96 512 337.92 512 512 C343.04 512 174.08 512 0 512 C0 343.04 0 174.08 0 0 Z ' fill='%23454545' transform='translate(0,0)'/%3E%3Cpath d='M0 0 C1.66886513 -0.01073296 1.66886513 -0.01073296 3.3714447 -0.02168274 C5.20401573 -0.02571609 5.20401573 -0.02571609 7.0736084 -0.02983093 C8.36025894 -0.03640213 9.64690948 -0.04297333 10.97254944 -0.04974365 C15.24775953 -0.07078987 19.52296993 -0.08115923 23.79821777 -0.09111023 C25.27592487 -0.09516016 26.75363178 -0.09927716 28.2313385 -0.10346031 C35.18801577 -0.12252776 42.14468244 -0.13674513 49.10138083 -0.14507228 C57.0901786 -0.15479524 65.07869563 -0.1809773 73.06739473 -0.22157317 C79.26388141 -0.25196106 85.46028882 -0.26656311 91.65684843 -0.26985329 C95.34580667 -0.27218179 99.0344657 -0.28084647 102.7233429 -0.30631447 C137.36794139 -0.53278858 164.91799494 5.5743998 190.64196777 30.14717102 C202.15263717 42.00414995 209.99022914 56.33125968 214.64196777 72.14717102 C214.96036621 73.17197571 215.27876465 74.1967804 215.60681152 75.25263977 C221.16875044 96.29573586 218.29071423 119.45273981 209.64196777 139.14717102 C209.2114209 140.14361633 208.78087402 141.14006165 208.33728027 142.16670227 C198.16158017 164.09907282 178.32486782 182.71689533 155.64196777 191.14717102 C136.96499146 197.94241134 119.01254901 198.43706473 99.32946777 198.34248352 C97.02063114 198.33874494 94.7117929 198.33590197 92.4029541 198.33390808 C86.37955199 198.32633811 80.35624913 198.306748 74.33288574 198.28450012 C68.1650934 198.2638973 61.99728474 198.25487574 55.82946777 198.24482727 C43.7669246 198.22349473 31.7044545 198.18944072 19.64196777 198.14717102 C19.64473315 198.75824455 19.64749853 199.36931808 19.65034771 199.998909 C19.71669257 214.88952198 19.76628965 229.78012063 19.79740429 244.67084503 C19.81285228 251.87199218 19.83390202 259.07304046 19.86828613 266.27412415 C19.89825208 272.55291961 19.91755781 278.83164345 19.92423326 285.11050844 C19.92813341 288.4330475 19.93884564 291.75533476 19.95915794 295.07781982 C19.98096635 298.79311723 19.98393318 302.50799168 19.98254395 306.2233429 C19.99332977 307.31666931 20.0041156 308.40999573 20.01522827 309.53645325 C19.98668905 316.59996217 19.47354948 322.74690345 14.77478027 328.38935852 C8.91085747 333.15807395 4.68575219 335.6823257 -3.02209473 335.45185852 C-9.13142234 334.6549897 -13.07115863 331.89975403 -16.79553223 327.08467102 C-19.82718403 322.78088195 -20.48431312 319.49431622 -20.50520325 314.259552 C-20.51235855 313.03010864 -20.51951385 311.80066528 -20.52688599 310.53396606 C-20.52972623 309.16911341 -20.53243796 307.80426049 -20.53503418 306.43940735 C-20.54129994 305.00368587 -20.54794684 303.56796601 -20.5549469 302.13224792 C-20.57597918 297.41457751 -20.58634962 292.6969068 -20.59631348 287.97920227 C-20.60036157 286.35389883 -20.60447851 284.72859556 -20.60866356 283.10329247 C-20.6277147 275.46586921 -20.64194496 267.82845561 -20.65027553 260.19101316 C-20.66004312 251.38200082 -20.68635032 242.57324009 -20.72677642 233.76431638 C-20.7569664 226.95144624 -20.7717472 220.1386481 -20.77505654 213.32571238 C-20.77740408 209.25873347 -20.78632536 205.19202336 -20.81151772 201.12511635 C-20.83485362 197.29600175 -20.83900978 193.46733188 -20.82875633 189.63816452 C-20.82826217 188.23696981 -20.83454738 186.83575281 -20.84831238 185.43462563 C-20.92563804 177.09329546 -20.94482987 170.05187225 -14.94604969 163.63732624 C-10.32433853 159.5014489 -6.01446741 157.89779851 0.10884094 157.89561462 C1.19484589 157.89023178 2.28085083 157.88484894 3.39976501 157.87930298 C4.58159866 157.88342697 5.76343231 157.88755096 6.9810791 157.89179993 C8.23382629 157.88817947 9.48657349 157.88455902 10.77728271 157.88082886 C13.49902313 157.87393448 16.22051595 157.87054542 18.94223976 157.87277603 C23.26113651 157.87562009 27.57987105 157.86121244 31.89872742 157.84379578 C44.17924526 157.79688575 56.45975296 157.77286532 68.74035645 157.76631165 C75.5258536 157.76253772 82.31116768 157.74431717 89.09658641 157.71121728 C92.67863918 157.69445174 96.2603593 157.68508803 99.84244728 157.69415665 C123.64023383 157.74907386 143.22540991 156.78231736 161.39196777 139.51826477 C172.0182947 128.32003483 177.91951793 113.58942994 177.59899902 98.06611633 C176.74951585 81.86002779 170.81968728 68.0384454 159.64196777 56.14717102 C145.90076894 45.01734025 132.37002541 40.83762768 114.82946777 40.87593079 C112.94723511 40.86809067 112.94723511 40.86809067 111.02697754 40.86009216 C108.31457018 40.84988603 105.60241546 40.84313797 102.89001465 40.84221077 C98.59371965 40.84025657 94.29758299 40.82213095 90.00134277 40.80145264 C79.33374388 40.75245305 68.66610243 40.72140019 57.99841309 40.70014954 C49.69787076 40.68359254 41.39746583 40.66069857 33.09701538 40.61712879 C28.83353274 40.59545466 24.57031184 40.58728483 20.30677795 40.58952153 C17.02261837 40.58745205 13.73857111 40.5660713 10.45446777 40.54780579 C9.28536865 40.55238297 8.11626953 40.55696014 6.91174316 40.56167603 C-0.51449357 40.49613753 -7.70013934 40.06615733 -13.69787598 35.27998352 C-18.37756926 29.39890198 -20.8919494 25.14956753 -20.66271973 17.48310852 C-19.86585091 11.37378091 -17.11061523 7.43404462 -12.29553223 3.70967102 C-8.1807513 0.81115932 -5.00959232 0.02211398 0 0 Z ' fill='%232CB3A6' transform='translate(155.3580322265625,89.85282897949219)'/%3E%3C/svg%3E" />
+        <script type="module" crossorigin>            
+            var md5 = (function() {
+                var MD5 = function (d) {
+                    return M(V(Y(X(d), 8 * d.length)))
+                }
+                function M (d) {
+                    for (var _, m = '0123456789abcdef', f = '', r = 0; r < d.length; r++) {
+                        _ = d.charCodeAt(r)
+                        f += m.charAt(_ >>> 4 & 15) + m.charAt(15 & _)
+                    }
+                    return f
+                }
+                function X (d) {
+                    for (var _ = Array(d.length >> 2), m = 0; m < _.length; m++) {
+                        _[m] = 0
+                    }
+                    for (m = 0; m < 8 * d.length; m += 8) {
+                        _[m >> 5] |= (255 & d.charCodeAt(m / 8)) << m % 32
+                    }
+                    return _
+                }
+                function V (d) {
+                    for (var _ = '', m = 0; m < 32 * d.length; m += 8) _ += String.fromCharCode(d[m >> 5] >>> m % 32 & 255)
+                    return _
+                }
+                function Y (d, _) {
+                    d[_ >> 5] |= 128 << _ % 32
+                    d[14 + (_ + 64 >>> 9 << 4)] = _
+                    for (var m = 1732584193, f = -271733879, r = -1732584194, i = 271733878, n = 0; n < d.length; n += 16) {
+                        var h = m
+                        var t = f
+                        var g = r
+                        var e = i
+                        f = md5ii(f = md5ii(f = md5ii(f = md5ii(f = md5hh(f = md5hh(f = md5hh(f = md5hh(f = md5gg(f = md5gg(f = md5gg(f = md5gg(f = md5ff(f = md5ff(f = md5ff(f = md5ff(f, r = md5ff(r, i = md5ff(i, m = md5ff(m, f, r, i, d[n + 0], 7, -680876936), f, r, d[n + 1], 12, -389564586), m, f, d[n + 2], 17, 606105819), i, m, d[n + 3], 22, -1044525330), r = md5ff(r, i = md5ff(i, m = md5ff(m, f, r, i, d[n + 4], 7, -176418897), f, r, d[n + 5], 12, 1200080426), m, f, d[n + 6], 17, -1473231341), i, m, d[n + 7], 22, -45705983), r = md5ff(r, i = md5ff(i, m = md5ff(m, f, r, i, d[n + 8], 7, 1770035416), f, r, d[n + 9], 12, -1958414417), m, f, d[n + 10], 17, -42063), i, m, d[n + 11], 22, -1990404162), r = md5ff(r, i = md5ff(i, m = md5ff(m, f, r, i, d[n + 12], 7, 1804603682), f, r, d[n + 13], 12, -40341101), m, f, d[n + 14], 17, -1502002290), i, m, d[n + 15], 22, 1236535329), r = md5gg(r, i = md5gg(i, m = md5gg(m, f, r, i, d[n + 1], 5, -165796510), f, r, d[n + 6], 9, -1069501632), m, f, d[n + 11], 14, 643717713), i, m, d[n + 0], 20, -373897302), r = md5gg(r, i = md5gg(i, m = md5gg(m, f, r, i, d[n + 5], 5, -701558691), f, r, d[n + 10], 9, 38016083), m, f, d[n + 15], 14, -660478335), i, m, d[n + 4], 20, -405537848), r = md5gg(r, i = md5gg(i, m = md5gg(m, f, r, i, d[n + 9], 5, 568446438), f, r, d[n + 14], 9, -1019803690), m, f, d[n + 3], 14, -187363961), i, m, d[n + 8], 20, 1163531501), r = md5gg(r, i = md5gg(i, m = md5gg(m, f, r, i, d[n + 13], 5, -1444681467), f, r, d[n + 2], 9, -51403784), m, f, d[n + 7], 14, 1735328473), i, m, d[n + 12], 20, -1926607734), r = md5hh(r, i = md5hh(i, m = md5hh(m, f, r, i, d[n + 5], 4, -378558), f, r, d[n + 8], 11, -2022574463), m, f, d[n + 11], 16, 1839030562), i, m, d[n + 14], 23, -35309556), r = md5hh(r, i = md5hh(i, m = md5hh(m, f, r, i, d[n + 1], 4, -1530992060), f, r, d[n + 4], 11, 1272893353), m, f, d[n + 7], 16, -155497632), i, m, d[n + 10], 23, -1094730640), r = md5hh(r, i = md5hh(i, m = md5hh(m, f, r, i, d[n + 13], 4, 681279174), f, r, d[n + 0], 11, -358537222), m, f, d[n + 3], 16, -722521979), i, m, d[n + 6], 23, 76029189), r = md5hh(r, i = md5hh(i, m = md5hh(m, f, r, i, d[n + 9], 4, -640364487), f, r, d[n + 12], 11, -421815835), m, f, d[n + 15], 16, 530742520), i, m, d[n + 2], 23, -995338651), r = md5ii(r, i = md5ii(i, m = md5ii(m, f, r, i, d[n + 0], 6, -198630844), f, r, d[n + 7], 10, 1126891415), m, f, d[n + 14], 15, -1416354905), i, m, d[n + 5], 21, -57434055), r = md5ii(r, i = md5ii(i, m = md5ii(m, f, r, i, d[n + 12], 6, 1700485571), f, r, d[n + 3], 10, -1894986606), m, f, d[n + 10], 15, -1051523), i, m, d[n + 1], 21, -2054922799), r = md5ii(r, i = md5ii(i, m = md5ii(m, f, r, i, d[n + 8], 6, 1873313359), f, r, d[n + 15], 10, -30611744), m, f, d[n + 6], 15, -1560198380), i, m, d[n + 13], 21, 1309151649), r = md5ii(r, i = md5ii(i, m = md5ii(m, f, r, i, d[n + 4], 6, -145523070), f, r, d[n + 11], 10, -1120210379), m, f, d[n + 2], 15, 718787259), i, m, d[n + 9], 21, -343485551)
+                        m = safeadd(m, h)
+                        f = safeadd(f, t)
+                        r = safeadd(r, g)
+                        i = safeadd(i, e)
+                    }
+                    return [m, f, r, i]
+                }
+                function md5cmn (d, _, m, f, r, i) {
+                    return safeadd(bitrol(safeadd(safeadd(_, d), safeadd(f, i)), r), m)
+                }
+                function md5ff (d, _, m, f, r, i, n) {
+                    return md5cmn(_ & m | ~_ & f, d, _, r, i, n)
+                }
+                function md5gg (d, _, m, f, r, i, n) {
+                    return md5cmn(_ & f | m & ~f, d, _, r, i, n)
+                }
+                function md5hh (d, _, m, f, r, i, n) {
+                    return md5cmn(_ ^ m ^ f, d, _, r, i, n)
+                }
+                function md5ii (d, _, m, f, r, i, n) {
+                    return md5cmn(m ^ (_ | ~f), d, _, r, i, n)
+                }
+                function safeadd (d, _) {
+                    var m = (65535 & d) + (65535 & _)
+                    return (d >> 16) + (_ >> 16) + (m >> 16) << 16 | 65535 & m
+                }
+                function bitrol (d, _) {
+                    return d << _ | d >>> 32 - _
+                }
+                function MD5Unicode(buffer){
+                    if (!(buffer instanceof Uint8Array)) {
+                        buffer = new TextEncoder().encode(typeof buffer==='string' ? buffer : JSON.stringify(buffer));
+                    }
+                    var binary = [];
+                    var bytes = new Uint8Array(buffer);
+                    for (var i = 0, il = bytes.byteLength; i < il; i++) {
+                        binary.push(String.fromCharCode(bytes[i]));
+                    }
+                    return MD5(binary.join(''));
+                }
+
+                return MD5Unicode;
+            })();
+            const hashFromFile = async (l) => new Promise((resolve, reject) => {
+                let str = "";
+                let reader = new FileReader();
+                reader.onload = function (c) {
+                    let data = new Uint8Array(c.target.result);
+                    str = md5(data);
+                    resolve(str);
+                };
+                reader.readAsArrayBuffer(l);
+            });
+            async function runUpdate(file) {
+                hideElement("uploadColumn");
+                hideElement("settingsColumn");
+                hideElement("rollbackButtonColumn");
+                hideElement("boardColumn");
+                showElement("progressColumn");
+                const otaMode = document.getElementById("otaMode").value;
+                const reboot = document.getElementById("rebootCheckboxInput").checked;
+                try {
+                    setProgressTitle("Starting OTA Process");
+                    let fileHash = await hashFromFile(file);
+                    const response = await fetch(`/ota/start?mode=${otaMode}&hash=${fileHash}&reboot=${reboot}`);
+                    if (!response.ok)
+                        throw new Error("Start OTA process failed");
+                    let xhr = new XMLHttpRequest();
+                    xhr.upload.addEventListener(
+                        "progress",
+                        function (r) {
+                            let percentage = Math.round((r.loaded / r.total) * 100);
+                            document.getElementById("progressBar").style.width = percentage + "%";
+                            document.getElementById("progressValue").innerHTML = percentage + "%";
+                        },
+                        !1
+                    );
+                    xhr.upload.onprogress = function (r) {
+                        if (r.lengthComputable) {
+                            let percentage = Math.round((r.loaded / r.total) * 100);
+                            document.getElementById("progressBar").style.width = percentage + "%";
+                            document.getElementById("progressValue").innerHTML = percentage + "%";
+                        }
+                    };
+                    xhr.onreadystatechange = async function () {
+                        if (xhr.readyState == 4) {
+                            if (xhr.status == 200) {
+                                document.getElementById("progressBar").style.width = "100%";
+                                document.getElementById("progressBar").innerHTML = "100%";
+                                hideElement("progressColumn");
+                                showElement("successColumn");
+                                setSuccessMessage("Update Successful");
+                                await waitForServerReboot();
+                            } else if (xhr.status == 400) {
+                                document.getElementById("progressBar").style.width = "100%";
+                                document.getElementById("progressBar").innerHTML = "100%";
+                                hideElement("progressColumn");
+                                showElement("errorColumn");
+                                setErrorTitle("Upload failed");
+                                setErrorReason(xhr.responseText);
+                            } else {
+                                document.getElementById("progressBar").style.width = "100%";
+                                document.getElementById("progressBar").innerHTML = "100%";
+                                hideElement("progressColumn");
+                                showElement("errorColumn");
+                                setErrorTitle("Upload failed");
+                                setErrorReason("Server returned status code " + xhr.status);
+                            }
+                        }
+                    };
+                    const formData = new FormData();
+                    formData.append("file", file, file.name);
+                    xhr.open("POST", "/ota/upload");
+                    xhr.send(formData);
+                    setProgressTitle("Uploading " + file.name);
+                } catch (e) {
+                    hideElement("progressColumn");
+                    showElement("errorColumn");
+                    setErrorTitle("Upload failed");
+                    setErrorReason(e.message);
+                }
+            }
+            
+            function onFileInput(files) {
+                hideCustomAlert();
+                if (files.length > 1) {
+                    showCustomAlert("Only a single .bin file can be uploaded at once.");
+                    return !1;
+                }
+                if (files[0].name.split(".").pop() != "bin") {
+                    showCustomAlert("Only .bin files can be uploaded.");
+                    return !1;
+                }
+                runUpdate(files[0]);
+            }
+            document.getElementById("rollbackButton").addEventListener("click", async function (e) {
+                hideElement("uploadColumn");
+                hideElement("settingsColumn");
+                hideElement("rollbackButtonColumn");
+                hideElement("boardColumn");
+                hideCustomAlert();
+                let xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = async function () {
+                    if (xhr.readyState == 4) {
+                        if (xhr.status == 200) {
+                            showElement("successColumn");
+                            setSuccessMessage("Rollback Successful");
+                            await waitForServerReboot(true);
+                        } else if (xhr.status == 400) {
+                            showElement("errorColumn");
+                            setErrorTitle("Rollback failed");
+                            setErrorReason(xhr.responseText);
+                        } else {
+                            showElement("errorColumn");
+                            setErrorTitle("Rollback failed");
+                            setErrorReason("Server returned status code " + xhr.status);
+                        }
+                    }
+                };
+                xhr.open("POST", "/ota/rollback");
+                xhr.send();
+            });
+            document.getElementById("rebootCheckboxInput").addEventListener("click", function (e) {
+                localStorage.setItem("reboot_checkbox", document.getElementById("rebootCheckboxInput").checked);
+            });
+            
+            let dropArea = document.getElementById("dropzone");
+            dropArea.addEventListener("dragover", dragOverHandler, false);
+            dropArea.addEventListener("drop", dropHandler, false);
+            dropArea.addEventListener("dragenter", dropHighlight, false);
+            dropArea.addEventListener("dragover", dropHighlight, false);
+            dropArea.addEventListener("dragleave", dropUnhighlight, false);
+            dropArea.addEventListener("drop", dropUnhighlight, false);
+            dropArea.addEventListener("click", function (e) {
+                document.getElementById("fileInput").click();
+            });
+            function dropHighlight(e) {
+                dropArea.classList.add("dropzone-highlight");
+            }
+            function dropUnhighlight(e) {
+                dropArea.classList.remove("dropzone-highlight");
+            }
+            function dropHandler(e) {
+                e.preventDefault();
+                let files = e.dataTransfer.files;
+
+                onFileInput(files);
+            }
+            function dragOverHandler(e) {
+                e.preventDefault();
+            }
+            
+            function showElement(e) {
+                document.getElementById(e).classList.remove("hidden");
+            }
+            function hideElement(e) {
+                document.getElementById(e).classList.add("hidden");
+            }
+            function setProgressTitle(e) {
+                document.getElementById("progressTitle").innerHTML = e;
+            }
+            function setSuccessMessage(e) {
+                document.getElementById("successMessage").innerHTML = e;
+            }
+            function setErrorTitle(e) {
+                document.getElementById("errorTitle").innerHTML = e;
+            }
+            function setErrorReason(e) {
+                document.getElementById("errorReason").innerHTML = e;
+            }
+            function showCustomAlert(msg) {
+                document.getElementById("notificationMessage").innerText = msg;
+                document.getElementById("notificationBar").classList.add("show");
+            }
+            function hideCustomAlert() {
+                document.getElementById("notificationBar").classList.remove("show");
+            }
+            function resetView() {
+                window.location.reload();
+            }
+
+            async function queryInfo() {
+                document.getElementById("rollbackButton").classList.add("button-disable");
+                let xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4) {
+                        if (xhr.status == 200) {
+                            let jsonObj = JSON.parse(this.responseText);
+                            document.getElementById("firmware_version_text").innerText = jsonObj.firmwareVersion;
+                            //document.getElementById("project_name_text").innerText = jsonObj.projectName;
+                            //document.getElementById("build_time_text").innerText = jsonObj.buildDate + " at " + jsonObj.buildTime;
+                            document.getElementById("build_time_text").innerText = jsonObj.buildDate;
+                            if (jsonObj.rollbackPossible) {
+                                document.getElementById("rollbackButton").classList.remove("button-disable");
+                                document.getElementById("rollback_text").style = "color:#00ff00;";
+                                document.getElementById("rollback_text").innerText = "Yes";
+                            } else {
+                                document.getElementById("rollback_text").style = "color:#ff5f5f;";
+                                document.getElementById("rollback_text").innerText = "No";
+                            }
+                        } else if (xhr.status == 400) {
+                            console.log("queryInfo: Server returned " + xhr.responseText);
+                        } else {
+                            console.log("queryInfo: Server returned status code " + xhr.status);
+                        }
+                    }
+                };
+                xhr.open("GET", "/ota/queryInfo", true);
+                xhr.send();
+            }
+            async function waitForServerReboot(force = false) {
+                const reboot = document.getElementById("rebootCheckboxInput").checked;
+                if(!reboot && !force) {
+                    document.getElementById("rebootMessage").innerHTML = "Auto reboot is disabled. Please reboot manually to use new firmware.";
+                    hideElement("loaderReboot");
+                    return;
+                }
+                const sleep = ms => new Promise(r => setTimeout(r, ms));
+                const interval = 1500;
+                const attempts = 10;
+                let count = 1;
+                let success = false;
+                await sleep(4000);
+                while (count < attempts) {
+                    await sleep(interval);
+                    try {
+                        const xhttp = new XMLHttpRequest();
+                        xhttp.onloadend = function() {
+                            count = attempts;
+                            success = true;
+                            document.getElementById("rebootMessage").innerHTML = "Reboot has finished, server is running.";
+                            hideElement("loaderReboot");
+                        }
+                        xhttp.onerror = function() {
+                            count++;
+                        }
+                        xhttp.open("GET", "/ota/rebootCheck");
+                        xhttp.send();
+                    }
+                    catch {
+                        count++;
+                    }
+                }
+                if(!success) {
+                    document.getElementById("rebootMessage").innerHTML = "Could not reconnect. Reboot could have failed or the new firmware does not boot correctly.";
+                    hideElement("loaderReboot");
+                }
+            }
+            
+            window.onFileInput = onFileInput;
+            window.resetView = resetView;
+            window.hideCustomAlert = hideCustomAlert;
+            window.onload = () => {
+                if (!("reboot_checkbox" in localStorage))
+                    localStorage.setItem("reboot_checkbox", true);
+                
+                document.getElementById("rebootCheckboxInput").checked = localStorage.getItem("reboot_checkbox") == "true";
+                queryInfo();
+            };
+        </script>
+        <style>
+            html {
+                line-height: 1.5;
+                tab-size: 4;
+                /*font-family: system-ui, Helvetica Neue;*/
+                font-family:sans-serif;
+                font-feature-settings: normal;
+                font-variation-settings: normal;
+            }
+            body {
+                margin: 0px;
+                background-color: #191919;
+                color: #e6e6e6;
+            }
+            .footer {
+                position: fixed;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                height: 28px;
+                line-height: 2px;
+                background-color: #313131;
+                color: #898989;
+                text-align: center;
+                font-size: 13px;
+            }
+            .mainDiv {
+                display: flex;
+                margin-top: 3rem;
+                margin-bottom: 4rem;
+                flex-direction: column;
+                align-items: center;
+            }
+            .headerRow {
+                border-bottom: 1px solid rgba(230, 230, 230, 0.11);
+                margin-left: 15px;
+                margin-right: 15px;
+            }
+            .loader {
+                width: 50px;
+                aspect-ratio: 1;
+                display: grid;
+                border: 4px solid #0000;
+                border-radius: 50%;
+                border-right-color: #30b4a7;
+                animation: l15 1s infinite linear;
+                margin-top: 15px;
+                margin-bottom: 25px;
+            }
+            .loader::before,
+            .loader::after {
+                content: "";
+                grid-area: 1/1;
+                margin: 2px;
+                border: inherit;
+                border-radius: 50%;
+                animation: l15 2s infinite;
+            }
+            .loader::after {
+                margin: 8px;
+                animation-duration: 3s;
+            }
+            @keyframes l15 {
+                100% {
+                    transform: rotate(1turn);
+                }
+            }
+            .loaderReboot {
+                position: fixed;
+                width: 13px;
+                height: 13px;
+                padding: 4px;
+                margin-top: 5px;
+                margin-left: -32px;
+                aspect-ratio: 1;
+                border-radius: 50%;
+                background: #25b09b;
+                --_m: 
+                conic-gradient(#0000 10%,#000),
+                linear-gradient(#000 0 0) content-box;
+                -webkit-mask: var(--_m);
+                  mask: var(--_m);
+                -webkit-mask-composite: source-out;
+                  mask-composite: subtract;
+                animation: l3 1s infinite linear;
+            }
+            @keyframes l3 {
+                to{
+                    transform: rotate(1turn);
+                }
+            }
+            .uploadColumn {
+                margin-top: 40px;
+                margin-bottom: 35px;
+            }
+            .dropzone {
+                width: 340px;
+                height: 140px;
+                border: 1px dashed rgba(230, 230, 230, 0.2);
+                border-radius: 12px;
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+                text-align: center;
+                transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+                transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+                transition-duration: 300ms;
+                cursor: pointer;
+            }
+            .dropzone:hover {
+                border-color: rgba(230, 230, 230, 0.72);
+            }
+            .dropzone-highlight {
+                border-color: rgb(48, 180, 166, 1.0) !important;
+            }
+            .dropzoneText {
+                margin: 40px;
+            }
+            .dropzoneText2 {
+                color: #7c7c7c;
+            }
+            .columnHeader {
+                display: flex;
+                flex-direction: row;
+                gap: 0.25rem;
+                justify-content: center;
+                align-items: center;
+                font-size: 0.75rem;
+                line-height: 1rem;
+                text-transform: uppercase;
+                user-select: none;
+                margin-top: 1px;
+            }
+            .columnHeaderText {
+                margin-top: 1rem;
+                margin-bottom: 7px;
+                color: #b0b0b0;
+            }
+            .column {
+                width: 340px;
+                border: 1px solid rgba(230, 230, 230, 0.2);
+                border-radius: 12px;
+                margin-top: 25px;
+            }
+            .columnContent {
+                display: flex;
+                flex-direction: column;
+                line-height: 0.6;
+                margin-top: 15px;
+                margin-left: 15px;
+                margin-bottom: 8px;
+                width: 305px;
+            }
+            .columnContentEntry {
+                display: flex;
+                flex-direction: row;
+                gap: 1rem;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .columnContentValue {
+                color: #b0b0b0;
+            }
+            select {
+                color: #e6e6e6;
+                background: #242424;
+                display: block;
+                padding-top: 0.25rem;
+                padding-bottom: 0.25rem;
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+                border: 1px solid rgb(36, 36, 36);
+                border-radius: 0.5rem;
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+                appearance: none;
+            }
+            select:hover {
+                border-color: #006bff;
+                --ring-color: #006bff;
+            }
+            #rebootCheckboxInput {
+                display: none;
+            }
+            .toggleSwitch {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                width: 39px;
+                height: 21px;
+                background-color: rgb(57, 65, 88);
+                border-radius: 50px;
+                cursor: pointer;
+                transition-duration: 0.15s;
+            }
+            .toggleSwitch::after {
+                content: "";
+                position: absolute;
+                height: 6px;
+                width: 6px;
+                left: 3px;
+                background-color: #e6e6e6;
+                border-radius: 50%;
+                transition-duration: 0.2s;
+                box-shadow: 5px 2px 7px rgba(8, 8, 8, 0.26);
+                border: 5px solid #e6e6e6;
+            }
+            #rebootCheckboxInput:checked + .toggleSwitch::after {
+                transform: translateX(17px);
+                transition-duration: 0.15s;
+                background-color: #e6e6e6;
+            }
+            #rebootCheckboxInput:checked + .toggleSwitch {
+                background-color: #006bff;
+                transition-duration: 0.15s;
+            }
+            .statusColumn {
+                display: flex;
+                margin-top: 30px;
+                flex-direction: column;
+                align-items: center;
+            }
+            .statusTitleText {
+                margin-top: 15px;
+                margin-bottom: 5px;
+            }
+            .detailText {
+                font-size: 0.875rem;
+                color: #b0b0b0;
+                margin-top: 5px;
+                margin-bottom: 5px;
+            }
+            .waitForReboot {
+                margin-left: 30px;
+                margin-top: 15px;
+            }
+            .goBackButton {
+                display: flex;
+                background: #ffffff00;
+                color: #e4e6eb;
+                cursor: pointer;
+                width: 120px;
+                height: 42px;
+                font-size: 13px;
+                border: #2d5fec 0.2em solid;
+                border-radius: 11px;
+                align-items: center;
+                transition: all 0.35s ease;
+                margin-top: 35px;
+            }
+            .goBackButton:hover {
+                background-color: #2d5fec;
+            }
+            .goBackButton > svg {
+                width: 35px;
+                transition: transform 0.3s ease-in-out;
+                scale: 1.3;
+            }
+            .goBackButton:hover svg {
+                transform: translateX(-5px);
+            }
+            .goBackButton:active {
+                transform: scale(0.95);
+            }
+            .rollbackButton {
+                display: flex;
+                background: #ffffff00;
+                color: #e4e6eb;
+                cursor: pointer;
+                width: 200px;
+                height: 47px;
+                font-size: 15px;
+                border: #2d5fec 0.2em solid;
+                border-radius: 11px;
+                align-items: center;
+                transition: all 0.35s ease;
+                margin-top: 10px;
+            }
+            .rollbackButton:hover {
+                background-color: #2d5fec;
+            }
+            .rollbackButton > svg {
+                position: absolute;
+                width: 42px;
+                transition: transform 0.5s ease-in-out;
+                scale: 1.2;
+            }
+            .rollbackButton:hover #svg_rotate {
+                transform: rotate(-180deg);
+            }
+            .rollbackButton:active {
+                transform: scale(0.95);
+            }
+            .rollbackButtonText {
+                margin-left: 44px;
+            }
+            .progressBarContainer {
+                display: flex;
+                flex-direction: row;
+                gap: 1rem;
+                align-items: center;
+                width: 280px;
+            }
+            .progressBar {
+                border-radius: 9999px;
+                width: 100%;
+                height: 0.625rem;
+                background-color: #e5e7eb;
+                background: #242526;
+            }
+            .progressBarInside {
+                border-radius: 9999px;
+                height: 0.625rem;
+                background-color: #2563eb;
+            }
+            .notificationBar {
+                position: absolute;
+                top: 0px;
+                height: 38px;
+                line-height: 38px;
+                width: 80%;
+                background: #cc3445;
+                text-align: center;
+                color: #ffffff;
+                font-family: sans-serif;
+                font-size: 14px;
+                font-weight: lighter;
+                display: inline-block;
+                visibility: hidden;
+                opacity: 0;
+                transition: opacity 250ms ease-in, visibility 0ms ease-in 250ms;
+                border-radius: 10px;
+                
+                .x {
+                    border: none;
+                    background: none;
+                    position: absolute;
+                    top: 4px;
+                    right: 20px;
+                    cursor: pointer;
+                    transform-origin: center;
+                    transition: all 0.2s ease-in-out;
+                    &:hover {
+                        color: #fafafa;
+                        transform: scale(1.2);
+                    }
+                }
+            }
+            .notificationBar.show {
+                visibility: visible;
+                opacity: 1;
+                transition-delay: 0ms;
+            }
+            .hidden {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="mainDiv">
+            <!-- Logo -->
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="340px" height="69px" viewBox="0 0 27190 5630">
+                <path d="M6340 773a194 194 0 00-40 320c62 57 60 57 755 57 700 0 706 0 830 60a590 590 0 01 4 1053c-135 66-140 67-857 67-904 0-801-113-802 886v730l23 45a194 194 0 00 320 40c57-63 57-65 57-709V2730h503c703 0 812-18 1038-170a990 990 0 00-167-1733c-174-74-143-71-920-75l-700-3-44 24m7240 10c-30 16-51 37-67 67l-24 44 4 1200c3 1340-3 1224 72 1421 193 513 927 848 930 424 0-118-36-163-165-204a648 648 0 01-413-419c-20-59-21-84-25-719l-3-657h235a1880 1880 0 00 263-10c127-49 142-230 26-310-36-25-40-25-280-28l-243-3v-342c0-373-3-390-61-444-55-50-174-60-250-20m1490-3c-20 10-48 34-60 52l-24 33-3 1175c-4 1366-6 1333 108 1560 240 478 890 727 890 340 0-112-40-164-156-204a631 631 0 01-430-456c-17-60-19-119-19-700v-635l245-5c305-6 360-31 360-167 0-152-63-182-377-183H15370l-3-364c-3-410 0-396-84-443-52-30-162-31-216-3m-3560 756c-1460 227-1404 2434 65 2605 588 68 1356-430 1104-717-94-108-205-95-336 40a871 871 0 01-1495-422l-8-32H11840c1215 0 1140 14 1139-216 0-766-715-1376-1473-1258m-1601 30c-480 131-830 523-932 1039-21 106-33 1239-14 1330 40 190 290 225 371 50 17-37 19-77 19-600 0-712 6-762 100-961a864 864 0 01 600-485c123-33 180-96 180-200 0-163-123-228-324-173m6520 10a242 242 0 00-126 110c-41 84-50 60 440 1179l450 1030-162 380c-216 507-210 646 31 645 122 0 143-33 340-497a13328 13328 0 01 206-473c4-14 208-498 453-1075 258-610 447-1068 450-1092 20-176-228-283-345-150-18 20-156 336-392 895-341 807-365 860-377 835-158-368-732-1670-750-1700-40-69-140-108-219-86m-4890 360c-334 71-695 442-695 714 0 5 326 9 865 9h865l-7-33c-87-459-576-787-1028-690" fill="#2cb4a4" fill-rule="evenodd"/>
+                <path d="M2330 599a154420 154420 0 01-773 446 32852 32852 0 01-497 287l-380 220c-170 98-176 108-98 155l554 320 60 33 205-123c170-102 326-194 410-242a161187 161187 0 00 554-320c138-76 778-445 784-451 13-12-616-388-668-400a720 720 0 00-151 75m17974 117C18947 900 18380 2630 19344 3637c872 911 2374 555 2780-660 402-1202-586-2430-1820-2261m1995 57a193 193 0 00-56 304c68 78-9 73 1118 73h1006l44-23a200 200 0 00-2-357c-37-20-66-20-1052-20h-1014l-44 23m3296-9a250 250 0 00-108 108 264260 264260 0 00-1220 2988 205 205 0 00 114 220c62 32 1550 30 1617-1 110-54 140-206 60-304-64-77-40-75-697-75-520 0-583-2-577-15 14-39 938-2290 940-2292 1-2 233 559 516 1245 641 1558 571 1405 655 1443 142 65 310-50 292-200-7-60-1210-3004-1246-3051-57-74-246-110-346-66m-22450 288c-127 75-150 88-620 358a590130 590130 0 00-1030 595C1228 2160 1260 2090 1260 2517v362l58 32 130 76c115 70 107 94 108-317l2-355 98-59 141-82a40360 40360 0 00 445-255 726790 726790 0 00 1242-717c94-54 98-48-81-151-146-85-113-85-258 0m17240 60c-1055 143-1498 1463-753 2244 798 836 2172 247 2172-930 0-792-674-1416-1419-1314M3450 1347l-485 280a478065 478065 0 00-1117 644c-153 85-153 81-17 158l289 166c405 234 334 218 510 116 74-43 153-89 175-100A113105 113105 0 01 3846 2010c580-332 596-343 563-375-8-7-90-57-184-110-440-252-500-287-510-296-20-20-57-3-265 118m19836 208c-20 7-51 26-67 40-63 60-60-2-57 1245l3 1135 23 33c92 128 277 120 349-17l23-44V2826c0-1257 5-1164-73-1233-58-50-128-64-200-38M474 1743c-3 6-4 516-3 1131l3 1120 180 104a27377 27377 0 00 300 172c5 5 102 60 215 125a116150 116150 0 01 1070 617c150 87 173 98 193 87 22-13 27-2223 4-2250-6-10-106-70-222-136a26643 26643 0 01-468-270c-92-56-87-75-87 385 0 217 0 396-3 398-5 5-500-277-510-290-3-6-7-198-7-427v-417l-88-50-122-70c-20-10-102-58-183-106-256-149-262-151-272-123m3840 59-165 96a40221 40221 0 00-522 300 112703 112703 0 00-688 400 6501 6501 0 00-432 255c-18 29-10 2235 9 2245 22 13 36 7 173-73a51094 51094 0 01 630-365 250144 250144 0 01 1090-628c25-13 50-30 58-35 24-20 12-2261-13-2264-11-1-74 30-140 69" fill="#ededed" fill-rule="evenodd"/>
+            </svg>
+            
+            <!-- Upload column -->
+            <div id="uploadColumn" class="uploadColumn">
+                <!-- Drop zone -->
+                <form>
+                    <div id="dropzone" class="dropzone">
+                        <p class="dropzoneText">Drag and drop here<br /><span class="dropzoneText2">or<br />click to select (.bin) file</span></p>
+                        <input type="file" id="fileInput" class="hidden" accept=".bin, .bin.gz" onchange="onFileInput(files)" />
+                    </div>
+                </form>
+            </div>
+
+            <!-- Progress column -->
+            <div id="progressColumn" class="statusColumn hidden">
+                <div class="loader"></div>
+                <p id="progressTitle" class="detailText"></p>
+                <div class="progressBarContainer">
+                    <div class="progressBar">
+                        <div id="progressBar" class="progressBarInside" style="width: 0%"></div>
+                    </div>
+                    <p id="progressValue" class="detailText">0%</p>
+                </div>
+            </div>
+
+            <!-- Success column -->
+            <div id="successColumn" class="statusColumn hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 538 537" width="60px" height="60px" version="1.1">
+                    <path fill="#0fc93b" stroke="none" fill-rule="evenodd" d="M 233.085 2.036 C -14.768 35.915, -85.223 363.031, 126.652 496.197 C 295.933 602.593, 525.799 486.284, 536.708 288.715 C 537.035 282.784, 537.685 277.695, 538.152 277.406 C 539.372 276.652, 539.226 258, 538 258 C 537.434 258, 536.992 255.071, 536.982 251.250 C 536.945 237.633, 532.042 209.988, 526.311 191.084 C 488.066 64.926, 362.980 -15.719, 233.085 2.036 M 252 53.661 C 70.486 71.365, -11.158 285.417, 113.467 416.864 C 238.518 548.760, 462.949 472.177, 482.930 290.789 C 497.452 158.962, 382.507 40.933, 252 53.661 M 300.500 230.599 C 261.450 269.850, 229.053 301.972, 228.506 301.982 C 227.959 301.992, 213.446 287.940, 196.255 270.755 L 164.997 239.509 146.251 258.256 L 127.505 277.002 178.004 327.501 L 228.503 378.001 319.496 287.004 L 410.488 196.008 392.004 177.504 C 381.838 167.327, 373.066 159.053, 372.510 159.118 C 371.955 159.182, 339.550 191.349, 300.500 230.599 M 0.365 268.500 C 0.368 274, 0.536 276.122, 0.738 273.216 C 0.941 270.311, 0.939 265.811, 0.734 263.216 C 0.528 260.622, 0.363 263, 0.365 268.500" />
+                </svg>
+                <p id="successMessage" class="statusTitleText">Update Successful</p>
+                <div class="waitForReboot">
+                    <span id="loaderReboot" class="loaderReboot"></span>
+                    <p id="rebootMessage" class="detailText">Rebooting device...</p>
+                </div>
+                <button onclick="resetView()" type="button" class="goBackButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m12 19-7-7 7-7" />
+                        <path d="M19 12H5" />
+                    </svg>
+                    Go Back
+                </button>
+            </div>
+
+            <!-- Error column -->
+            <div id="errorColumn" class="statusColumn hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 538 537" width="60px" height="60px" version="1.1">
+                    <path fill="#ff2222" stroke="none" fill-rule="evenodd" d="M 245 0.663 C 19.260 22.766, -80.448 293.706, 77.480 455.869 C 234.007 616.593, 513.757 521.166, 535.888 299.500 C 536.437 294, 537.413 284.240, 538.056 277.811 C 538.920 269.171, 538.940 263.955, 538.130 257.811 C 537.528 253.240, 536.535 244.325, 535.924 238 C 522.229 96.258, 387.900 -13.329, 245 0.663 M 249.457 53.984 C 79.723 71.944, -4.448 265.960, 99.342 400 C 216.194 550.907, 457.573 484.562, 482.454 294.699 C 500.044 160.463, 383.273 39.824, 249.457 53.984 M 177.662 176.838 L 158.839 195.680 195.170 231.830 L 231.500 267.980 195.202 304.293 L 158.904 340.606 175.323 357.053 C 184.354 366.099, 192.942 374.606, 194.407 375.958 L 197.073 378.417 233 342.500 L 268.927 306.583 271.563 309.042 C 273.012 310.394, 289.273 326.462, 307.697 344.750 C 326.122 363.038, 341.494 378, 341.858 378 C 342.222 378, 350.837 369.674, 361.002 359.497 L 379.485 340.995 343.244 304.744 L 307.003 268.493 343.246 232.251 L 379.488 196.008 360.502 177.002 L 341.515 157.995 305.257 194.242 L 269 230.490 232.743 194.242 L 196.485 157.995 177.662 176.838 M 0.320 268 C 0.320 271.575, 0.502 273.038, 0.723 271.250 C 0.945 269.462, 0.945 266.538, 0.723 264.750 C 0.502 262.962, 0.320 264.425, 0.320 268" />
+                </svg>
+                <p id="errorTitle" class="statusTitleText">Update failed</p>
+                <p id="errorReason" class="detailText">Please try again</p>
+                <button onclick="resetView()" type="button" class="goBackButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m12 19-7-7 7-7" />
+                        <path d="M19 12H5" />
+                    </svg>
+                    Go Back
+                </button>
+            </div>
+
+            <!-- Board info column -->
+            <div id="boardColumn" class="column">
+                <div class="columnHeader">
+                    <p class="columnHeaderText">Board info</p>
+                </div>
+                <div class="headerRow"></div>
+                <div class="columnContent">
+                    <div class="columnContentEntry">
+                        <p>Firmware version</p>
+                        <span id="firmware_version_text" class="columnContentValue"></span>
+                    </div>
+                    <div class="columnContentEntry">
+                        <p>Build date</p>
+                        <span id="build_time_text" class="columnContentValue"></span>
+                    </div>
+                    <div class="columnContentEntry">
+                        <p>Rollback possible</p>
+                        <span id="rollback_text" class="columnContentValue"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings column -->
+            <div id="settingsColumn" class="column">
+                <div class="columnHeader">
+                    <p class="columnHeaderText">Settings</p>
+                </div>
+                <div class="headerRow"></div>
+                <div class="columnContent">
+                    <div class="columnContentEntry">
+                        <p>OTA Mode</p>
+                        <select id="otaMode">
+                            <option value="fr" selected>Firmware</option>
+                            <option value="fs">File system</option>
+                        </select>
+                    </div>
+                    <div class="columnContentEntry">
+                        <p>Reboot after update</p>
+                        <input type="checkbox" id="rebootCheckboxInput" />
+                        <label for="rebootCheckboxInput" class="toggleSwitch"></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rollback button -->
+            <div id="rollbackButtonColumn" class="statusColumn">
+                <form>
+                    <button id="rollbackButton" name="rollbackButton" type="button" class="rollbackButton">
+                        <svg width="20px" height="20px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="white" stroke="white">
+                            <path d="M513 203.1c-19.3 0-35 15.7-35 35v294.2c0 12.5 6.7 24 17.5 30.3L651 652.7c5.5 3.2 11.6 4.7 17.5 4.7 12.1 0 23.8-6.3 30.3-17.5 9.7-16.7 4-38.1-12.8-47.8l-138.1-80v-274c0.1-19.3-15.6-35-34.9-35z" />
+                        </svg>
+                        <svg id="svg_rotate" width="20px" height="20px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="white" stroke="white">
+                            <path d="M966.2 428.3c-11.3-61.3-34.3-118.6-68.3-170.2-32.9-49.9-74.6-92.4-123.9-126.4-49.4-34-104-57.8-162.3-70.7-60.4-13.4-122.1-14.4-183.4-3.1-96.9 17.8-183.8 65.1-250.6 135.3V96c0-19.3-15.7-35-35-35s-35 15.7-35 35v175.5c0 19.3 15.7 35 35 35h177.1c19.3 0 35-15.7 35-35s-15.7-35-35-35h-86.6c55.9-56.8 127.8-95.1 207.7-109.9 102.9-19 207.1 3.3 293.3 62.6 86.2 59.4 144.1 148.7 163.1 251.7 19 102.9-3.3 207.1-62.6 293.3-59.3 86.3-148.7 144.2-251.6 163.2-24 4.4-48 6.6-71.9 6.6-78.6 0-155.3-23.7-221.4-69.2-86.3-59.4-144.2-148.8-163.2-251.7-6.7-36.6-8.3-73.7-4.6-110.4 1.9-19.2-12.1-36.4-31.3-38.3-19.2-1.9-36.4 12.1-38.3 31.3-4.3 43.2-2.5 87 5.4 130.1 11.3 61.3 34.3 118.6 68.3 170.2 32.9 49.9 74.6 92.4 123.9 126.4 49.4 34 104 57.8 162.3 70.7 32.7 7.2 65.9 10.9 99.1 10.9 28.1 0 56.2-2.6 84.3-7.8 61.3-11.3 118.6-34.3 170.2-68.3 49.9-32.9 92.4-74.6 126.4-123.9 34-49.4 57.8-104 70.7-162.3 13.5-60.4 14.5-122.1 3.2-183.4z" />
+                        </svg>
+                        <span class="rollbackButtonText">Rollback Firmware</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Notification Bar -->
+            <div id="notificationBar" class="notificationBar">
+                <button onclick="hideCustomAlert()" class="x">
+                    <svg width="25" height="25" viewbox="0 0 40 40">
+                        <path d="M 10,10 L 30,30 M 30,10 L 10,30" stroke="white" stroke-width="3" />
+                    </svg>
+                </button>
+                <span id="notificationMessage"></span>
+            </div>
+            <!-- Main div end -->
+        </div>
+        <!-- Footer -->
+        <div class="footer">
+            <p>PrettyOTA - Version 0.1 Beta</p>
+        </div>
+    </body>
+</html>
