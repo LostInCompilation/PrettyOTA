@@ -1,5 +1,5 @@
 <p align="center">
-<img src="logo.svg" alt="Screenshot" style="height:100px;"/>
+<img src="img/logo.svg" alt="Screenshot" style="height:100px;"/>
 </p>
 
 ### <center>A modern looking OTA update server with easy rollback</center>
@@ -12,7 +12,6 @@
 - If needed enable **authentication** (username and password login)
 
 ## Usage
-Just one line of code:
 ```cpp
 #include <WiFi.h>
 #include "PrettyOTA.hpp"
@@ -40,8 +39,8 @@ void loop() {
 
 ## How it looks
 <p align="center" style="display:inline;">
-<img src="screenshot1.png" alt="Screenshot" style="height:850px;"/>
-<img src="screenshot2.png" alt="Screenshot" style="height:850px;"/>
+<img src="img/screenshot1.png" alt="Screenshot" style="height:850px;"/>
+<img src="img/screenshot2.png" alt="Screenshot" style="height:850px;"/>
 </p>
 
 ## The Begin function
@@ -102,5 +101,4 @@ void setup() {
     server.begin();
 }
 ```
-
 
