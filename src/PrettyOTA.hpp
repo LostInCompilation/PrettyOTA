@@ -24,25 +24,26 @@ License:    See LICENSE.md
 #include <vector>
 #include <esp_ota_ops.h>
 
-
 class PrettyOTA
 {
 private:
     // UUID generation
-    using UUID = uint8_t[16];
-    void GenerateUUID(UUID out_uuid);
-    String UUIDToString(const UUID uuid);
+    using UUID_t = uint8_t[16];
+    void GenerateUUID(UUID_t out_uuid) const;
+    String UUIDToString(const UUID_t uuid) const;
 
 private:
     // Constants
-    static const uint32_t m_TaskStackSizeHandleRebootRequest = 2048;
-    static const uint8_t m_MaxNumLoggedInClients = 8;
+    static const uint8_t  MAX_NUM_LOGGED_IN_CLIENTS = 4;
+    static const uint32_t TASK_STACK_SIZE_HANDLE_REBOOT_REQUEST = 2048;
+    static const uint8_t  TASK_PRIORITY_HANDLE_REBOOT_REQUEST = 3;
 
     // Website code
-    static const uint8_t PRETTY_OTA_WEBSITE_DATA[14145];
-    static const uint8_t PRETTY_OTA_LOGIN_DATA[8680];
+    static const uint8_t PRETTY_OTA_WEBSITE_DATA[12889];
+    static const uint8_t PRETTY_OTA_LOGIN_DATA[6549];
 
-    bool        m_AutoReboot = true;
+    // Variables
+    bool        m_AutoRebootEnabled = true;
     bool        m_RequestReboot = false;
     uint32_t    m_RebootRequestTime = 0;
     uint32_t    m_WrittenBytes = 0;
@@ -54,9 +55,7 @@ private:
     uint8_t             m_NumLoggedInClients = 0;
 
     using SessionIDString_t = char[47];
-    std::array<SessionIDString_t, m_MaxNumLoggedInClients> m_AuthenticatedSessionIDs;
-
-    bool IsAuthenticated(const AsyncWebServerRequest* const request);
+    SessionIDString_t m_AuthenticatedSessionIDs[MAX_NUM_LOGGED_IN_CLIENTS];
 
     // User callbacks
     std::function<void()> m_OnStartUpdate = nullptr;
@@ -64,16 +63,21 @@ private:
     std::function<void(bool successful)> m_OnEndUpdate = nullptr;
 
     static void HandleRebootRequest(void* parameter);
+    bool IsAuthenticated(const AsyncWebServerRequest* const request) const;
 
 public:
     PrettyOTA() = default;
 
-    void Begin(AsyncWebServer* const server, const char* const username = "", const char* const password = "", bool passwordIsMD5Hash = false);
+    bool Begin(AsyncWebServer* const server, const char* const username = "", const char* const password = "", bool passwordIsMD5Hash = false);
 
+    void SetAuthenticationDetails(const char* const username, const char* const password, bool passwordIsMD5Hash = false);
     void EnableAuthetication(bool enable) { m_AuthenticationEnabled = enable; }
-    void SetAuthenticationDetails(const char* const username, const char* const password, bool passwordIsMD5Hash);
 
+    // Set user callbacks
     void OnStart(std::function<void()> func) { m_OnStartUpdate = func; }
     void OnProgress(std::function<void(uint32_t currentSize, uint32_t totalSize)> func) { m_OnProgressUpdate = func; }
     void OnEnd(std::function<void(bool successful)> func) { m_OnEndUpdate = func; }
+
+    // Use built in callbacks that print info to the serial monitor
+    void UseDefaultCallbacks();
 };

@@ -5,9 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="A better looking OTA web updater." />
         <title>PrettyOTA</title>
-        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' xmlns:v='https://vecta.io/nano'%3E%3Cpath d='M0 0h512v512H0V0z' fill='%23454545'/%3E%3Cpath d='M155.358 89.853l3.371-.022 3.702-.008 3.899-.02 12.826-.041 4.433-.012 20.87-.042 23.966-.077 18.589-.048 11.066-.036C292.726 89.32 320.276 95.427 346 120c11.511 11.857 19.348 26.184 24 42l.965 3.105c5.562 21.043 2.684 44.2-5.965 63.895l-1.305 3.02C353.52 253.952 333.683 272.57 311 281c-18.677 6.795-36.629 7.29-56.312 7.195l-6.927-.009-18.07-.049-18.503-.04L175 288l.008 1.852.147 44.672.071 21.603.056 18.836.035 9.967.023 11.146.033 3.313c-.029 7.064-.542 13.21-5.24 18.853-5.864 4.769-10.089 7.293-17.797 7.063-6.109-.797-10.049-3.552-13.773-8.367-3.032-4.304-3.689-7.59-3.71-12.825l-.022-3.726-.008-4.095-.02-4.307-.041-14.153-.012-4.876-.042-22.912-.077-26.427-.048-20.439-.036-12.201-.017-11.487-.02-4.204c-.077-8.341-.097-15.383 5.902-21.797 4.622-4.136 8.932-5.74 15.055-5.742l3.291-.016 3.581.012 3.796-.011 8.165-.008 12.956-.029 36.842-.077 20.356-.055 10.746-.017c23.798.055 43.383-.912 61.55-18.176 10.626-11.198 16.528-25.929 16.207-41.452-.849-16.206-6.779-30.028-17.957-41.919-13.741-11.13-27.272-15.31-44.812-15.271l-3.802-.016-8.137-.018-12.889-.041-32.003-.101-24.901-.083-12.79-.028-9.852-.042-3.543.014c-7.426-.066-14.612-.496-20.61-5.282-4.68-5.881-7.194-10.13-6.965-17.797.797-6.109 3.552-10.049 8.367-13.773 4.115-2.899 7.286-3.688 12.296-3.71z' fill='%232cb3a6'/%3E%3C/svg%3E" />
-        <script type="module" crossorigin>
-            const sleep = ms => new Promise(r => setTimeout(r, ms));
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cpath d='M0 0 C168.96 0 337.92 0 512 0 C512 168.96 512 337.92 512 512 C343.04 512 174.08 512 0 512 C0 343.04 0 174.08 0 0 Z ' fill='%23454545' transform='translate(0,0)'/%3E%3Cpath d='M0 0 C1.66886513 -0.01073296 1.66886513 -0.01073296 3.3714447 -0.02168274 C5.20401573 -0.02571609 5.20401573 -0.02571609 7.0736084 -0.02983093 C8.36025894 -0.03640213 9.64690948 -0.04297333 10.97254944 -0.04974365 C15.24775953 -0.07078987 19.52296993 -0.08115923 23.79821777 -0.09111023 C25.27592487 -0.09516016 26.75363178 -0.09927716 28.2313385 -0.10346031 C35.18801577 -0.12252776 42.14468244 -0.13674513 49.10138083 -0.14507228 C57.0901786 -0.15479524 65.07869563 -0.1809773 73.06739473 -0.22157317 C79.26388141 -0.25196106 85.46028882 -0.26656311 91.65684843 -0.26985329 C95.34580667 -0.27218179 99.0344657 -0.28084647 102.7233429 -0.30631447 C137.36794139 -0.53278858 164.91799494 5.5743998 190.64196777 30.14717102 C202.15263717 42.00414995 209.99022914 56.33125968 214.64196777 72.14717102 C214.96036621 73.17197571 215.27876465 74.1967804 215.60681152 75.25263977 C221.16875044 96.29573586 218.29071423 119.45273981 209.64196777 139.14717102 C209.2114209 140.14361633 208.78087402 141.14006165 208.33728027 142.16670227 C198.16158017 164.09907282 178.32486782 182.71689533 155.64196777 191.14717102 C136.96499146 197.94241134 119.01254901 198.43706473 99.32946777 198.34248352 C97.02063114 198.33874494 94.7117929 198.33590197 92.4029541 198.33390808 C86.37955199 198.32633811 80.35624913 198.306748 74.33288574 198.28450012 C68.1650934 198.2638973 61.99728474 198.25487574 55.82946777 198.24482727 C43.7669246 198.22349473 31.7044545 198.18944072 19.64196777 198.14717102 C19.64473315 198.75824455 19.64749853 199.36931808 19.65034771 199.998909 C19.71669257 214.88952198 19.76628965 229.78012063 19.79740429 244.67084503 C19.81285228 251.87199218 19.83390202 259.07304046 19.86828613 266.27412415 C19.89825208 272.55291961 19.91755781 278.83164345 19.92423326 285.11050844 C19.92813341 288.4330475 19.93884564 291.75533476 19.95915794 295.07781982 C19.98096635 298.79311723 19.98393318 302.50799168 19.98254395 306.2233429 C19.99332977 307.31666931 20.0041156 308.40999573 20.01522827 309.53645325 C19.98668905 316.59996217 19.47354948 322.74690345 14.77478027 328.38935852 C8.91085747 333.15807395 4.68575219 335.6823257 -3.02209473 335.45185852 C-9.13142234 334.6549897 -13.07115863 331.89975403 -16.79553223 327.08467102 C-19.82718403 322.78088195 -20.48431312 319.49431622 -20.50520325 314.259552 C-20.51235855 313.03010864 -20.51951385 311.80066528 -20.52688599 310.53396606 C-20.52972623 309.16911341 -20.53243796 307.80426049 -20.53503418 306.43940735 C-20.54129994 305.00368587 -20.54794684 303.56796601 -20.5549469 302.13224792 C-20.57597918 297.41457751 -20.58634962 292.6969068 -20.59631348 287.97920227 C-20.60036157 286.35389883 -20.60447851 284.72859556 -20.60866356 283.10329247 C-20.6277147 275.46586921 -20.64194496 267.82845561 -20.65027553 260.19101316 C-20.66004312 251.38200082 -20.68635032 242.57324009 -20.72677642 233.76431638 C-20.7569664 226.95144624 -20.7717472 220.1386481 -20.77505654 213.32571238 C-20.77740408 209.25873347 -20.78632536 205.19202336 -20.81151772 201.12511635 C-20.83485362 197.29600175 -20.83900978 193.46733188 -20.82875633 189.63816452 C-20.82826217 188.23696981 -20.83454738 186.83575281 -20.84831238 185.43462563 C-20.92563804 177.09329546 -20.94482987 170.05187225 -14.94604969 163.63732624 C-10.32433853 159.5014489 -6.01446741 157.89779851 0.10884094 157.89561462 C1.19484589 157.89023178 2.28085083 157.88484894 3.39976501 157.87930298 C4.58159866 157.88342697 5.76343231 157.88755096 6.9810791 157.89179993 C8.23382629 157.88817947 9.48657349 157.88455902 10.77728271 157.88082886 C13.49902313 157.87393448 16.22051595 157.87054542 18.94223976 157.87277603 C23.26113651 157.87562009 27.57987105 157.86121244 31.89872742 157.84379578 C44.17924526 157.79688575 56.45975296 157.77286532 68.74035645 157.76631165 C75.5258536 157.76253772 82.31116768 157.74431717 89.09658641 157.71121728 C92.67863918 157.69445174 96.2603593 157.68508803 99.84244728 157.69415665 C123.64023383 157.74907386 143.22540991 156.78231736 161.39196777 139.51826477 C172.0182947 128.32003483 177.91951793 113.58942994 177.59899902 98.06611633 C176.74951585 81.86002779 170.81968728 68.0384454 159.64196777 56.14717102 C145.90076894 45.01734025 132.37002541 40.83762768 114.82946777 40.87593079 C112.94723511 40.86809067 112.94723511 40.86809067 111.02697754 40.86009216 C108.31457018 40.84988603 105.60241546 40.84313797 102.89001465 40.84221077 C98.59371965 40.84025657 94.29758299 40.82213095 90.00134277 40.80145264 C79.33374388 40.75245305 68.66610243 40.72140019 57.99841309 40.70014954 C49.69787076 40.68359254 41.39746583 40.66069857 33.09701538 40.61712879 C28.83353274 40.59545466 24.57031184 40.58728483 20.30677795 40.58952153 C17.02261837 40.58745205 13.73857111 40.5660713 10.45446777 40.54780579 C9.28536865 40.55238297 8.11626953 40.55696014 6.91174316 40.56167603 C-0.51449357 40.49613753 -7.70013934 40.06615733 -13.69787598 35.27998352 C-18.37756926 29.39890198 -20.8919494 25.14956753 -20.66271973 17.48310852 C-19.86585091 11.37378091 -17.11061523 7.43404462 -12.29553223 3.70967102 C-8.1807513 0.81115932 -5.00959232 0.02211398 0 0 Z ' fill='%232CB3A6' transform='translate(155.3580322265625,89.85282897949219)'/%3E%3C/svg%3E" />
+        <script type="module" crossorigin>            
             var md5 = (function() {
                 var MD5 = function (d) {
                     return M(V(Y(X(d), 8 * d.length)))
@@ -97,9 +96,8 @@
             async function runUpdate(file) {
                 hideElement("uploadColumn");
                 hideElement("settingsColumn");
+                hideElement("rollbackButtonColumn");
                 hideElement("boardColumn");
-                hideElement("buttonColumn");
-                await sleep(270);
                 showElement("progressColumn");
                 const otaMode = document.getElementById("otaMode").value;
                 const reboot = document.getElementById("rebootCheckboxInput").checked;
@@ -132,15 +130,13 @@
                                 document.getElementById("progressBar").style.width = "100%";
                                 document.getElementById("progressBar").innerHTML = "100%";
                                 hideElement("progressColumn");
-                                await sleep(270);
                                 showElement("successColumn");
                                 setSuccessMessage("Update Successful");
-                                await waitForServerRebootShowResult();
+                                await waitForServerReboot();
                             } else if (xhr.status == 400) {
                                 document.getElementById("progressBar").style.width = "100%";
                                 document.getElementById("progressBar").innerHTML = "100%";
                                 hideElement("progressColumn");
-                                await sleep(270);
                                 showElement("errorColumn");
                                 setErrorTitle("Upload failed");
                                 setErrorReason(xhr.responseText);
@@ -148,7 +144,6 @@
                                 document.getElementById("progressBar").style.width = "100%";
                                 document.getElementById("progressBar").innerHTML = "100%";
                                 hideElement("progressColumn");
-                                await sleep(270);
                                 showElement("errorColumn");
                                 setErrorTitle("Upload failed");
                                 setErrorReason("Server returned status code " + xhr.status);
@@ -162,12 +157,12 @@
                     setProgressTitle("Uploading " + file.name);
                 } catch (e) {
                     hideElement("progressColumn");
-                    await sleep(270);
                     showElement("errorColumn");
                     setErrorTitle("Upload failed");
                     setErrorReason(e.message);
                 }
             }
+            
             function onFileInput(files) {
                 hideCustomAlert();
                 if (files.length > 1) {
@@ -181,18 +176,18 @@
                 runUpdate(files[0]);
             }
             document.getElementById("rollbackButton").addEventListener("click", async function (e) {
-                hideCustomAlert();
                 hideElement("uploadColumn");
                 hideElement("settingsColumn");
+                hideElement("rollbackButtonColumn");
                 hideElement("boardColumn");
-                hideElement("buttonColumn");
+                hideCustomAlert();
                 let xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = async function () {
                     if (xhr.readyState == 4) {
                         if (xhr.status == 200) {
                             showElement("successColumn");
                             setSuccessMessage("Rollback Successful");
-                            await waitForServerRebootShowResult(true);
+                            await waitForServerReboot(true);
                         } else if (xhr.status == 400) {
                             showElement("errorColumn");
                             setErrorTitle("Rollback failed");
@@ -207,33 +202,10 @@
                 xhr.open("POST", "/ota/rollback");
                 xhr.send();
             });
-            document.getElementById("rebootButton").addEventListener("click", async function (e) {
-                hideCustomAlert();
-                showElement("manualWaitForReboot");
-                let xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = async function () {
-                    if (xhr.readyState == 4) {
-                        if (xhr.status == 200) {
-                            const isRebooted = await waitForServerReboot();
-                            hideElement("manualWaitForReboot");
-                            if(isRebooted) {
-                                showCustomAlert("Reboot successful", true);
-                            } else {
-                                showCustomAlert("Could not reconnect. Reboot could have failed or the new firmware does not behave correctly.");
-                            }
-                        } else {
-                            hideElement("manualWaitForReboot");
-                            showCustomAlert("Sending reboot request failed. Server returned status code: " + xhr.status);
-                        }
-                    }
-                };
-                xhr.open("POST", "/ota/doManualReboot");
-                xhr.send();
-            });
             document.getElementById("rebootCheckboxInput").addEventListener("click", function (e) {
                 localStorage.setItem("reboot_checkbox", document.getElementById("rebootCheckboxInput").checked);
             });
-
+            
             let dropArea = document.getElementById("dropzone");
             dropArea.addEventListener("dragover", dragOverHandler, false);
             dropArea.addEventListener("drop", dropHandler, false);
@@ -259,7 +231,7 @@
             function dragOverHandler(e) {
                 e.preventDefault();
             }
-
+            
             function showElement(e) {
                 document.getElementById(e).classList.remove("hidden");
             }
@@ -278,22 +250,11 @@
             function setErrorReason(e) {
                 document.getElementById("errorReason").innerHTML = e;
             }
-
-            var showTimeout;
-            function showCustomAlert(msg, asSuccess = false) {
+            function showCustomAlert(msg) {
                 document.getElementById("notificationMessage").innerText = msg;
-                if(asSuccess)
-                    document.getElementById("notificationBar").classList.add("notificationBarSuccess");
-                else
-                    document.getElementById("notificationBar").classList.remove("notificationBarSuccess");
                 document.getElementById("notificationBar").classList.add("show");
-                clearTimeout(showTimeout);
-                showTimeout = setTimeout(function() {
-                    document.getElementById("notificationBar").classList.remove("show");
-                }, 7000);
             }
             function hideCustomAlert() {
-                clearTimeout(showTimeout);
                 document.getElementById("notificationBar").classList.remove("show");
             }
             function resetView() {
@@ -301,22 +262,21 @@
             }
 
             async function queryInfo() {
+                document.getElementById("rollbackButton").classList.add("button-disable");
                 let xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState == 4) {
                         if (xhr.status == 200) {
                             let jsonObj = JSON.parse(this.responseText);
                             document.getElementById("firmware_version_text").innerText = jsonObj.firmwareVersion;
-                            document.getElementById("sdk_version_text").innerText = jsonObj.sdkVersion;
                             //document.getElementById("project_name_text").innerText = jsonObj.projectName;
                             //document.getElementById("build_time_text").innerText = jsonObj.buildDate + " at " + jsonObj.buildTime;
                             document.getElementById("build_time_text").innerText = jsonObj.buildDate;
                             if (jsonObj.rollbackPossible) {
-                                document.getElementById("rollbackButton").disabled = false;
+                                document.getElementById("rollbackButton").classList.remove("button-disable");
                                 document.getElementById("rollback_text").style = "color:#00ff00;";
                                 document.getElementById("rollback_text").innerText = "Yes";
                             } else {
-                                document.getElementById("rollbackButton").disabled = true;
                                 document.getElementById("rollback_text").style = "color:#ff5f5f;";
                                 document.getElementById("rollback_text").innerText = "No";
                             }
@@ -330,12 +290,19 @@
                 xhr.open("GET", "/ota/queryInfo", true);
                 xhr.send();
             }
-            async function waitForServerReboot() {
+            async function waitForServerReboot(force = false) {
+                const reboot = document.getElementById("rebootCheckboxInput").checked;
+                if(!reboot && !force) {
+                    document.getElementById("rebootMessage").innerHTML = "Auto reboot is disabled. Please reboot manually to use new firmware.";
+                    hideElement("loaderReboot");
+                    return;
+                }
+                const sleep = ms => new Promise(r => setTimeout(r, ms));
                 const interval = 1500;
                 const attempts = 10;
                 let count = 1;
                 let success = false;
-                await sleep(3100);
+                await sleep(4000);
                 while (count < attempts) {
                     await sleep(interval);
                     try {
@@ -343,6 +310,8 @@
                         xhttp.onloadend = function() {
                             count = attempts;
                             success = true;
+                            document.getElementById("rebootMessage").innerHTML = "Reboot has finished, server is running.";
+                            hideElement("loaderReboot");
                         }
                         xhttp.onerror = function() {
                             count++;
@@ -354,42 +323,34 @@
                         count++;
                     }
                 }
-                return success;
-            }
-            async function waitForServerRebootShowResult(force = false) {
-                const reboot = document.getElementById("rebootCheckboxInput").checked;
-                if(!reboot && !force) {
-                    document.getElementById("successColumnRebootMessage").innerHTML = "Auto reboot is disabled. Please reboot manually to use the new firmware.";
-                    hideElement("successColumnLoaderReboot");
-                    return;
-                }
-                document.getElementById("goBackButton").disabled = true;
-                document.getElementById("goBackButton2").disabled = true;
-                const isRebooted = await waitForServerReboot();
-                document.getElementById("goBackButton").disabled = false;
-                document.getElementById("goBackButton2").disabled = false;
-                if(isRebooted) {
-                    document.getElementById("successColumnRebootMessage").innerHTML = "Reboot has finished, server is running.";
-                    hideElement("successColumnLoaderReboot");
-                } else {
-                    document.getElementById("successColumnRebootMessage").innerHTML = "Could not reconnect. Reboot could have failed or the new firmware does not behave correctly.";
-                    hideElement("successColumnLoaderReboot");
+                if(!success) {
+                    document.getElementById("rebootMessage").innerHTML = "Could not reconnect. Reboot could have failed or the new firmware does not boot correctly.";
+                    hideElement("loaderReboot");
                 }
             }
+            
             window.onFileInput = onFileInput;
             window.resetView = resetView;
+            window.hideCustomAlert = hideCustomAlert;
             window.onload = () => {
                 if (!("reboot_checkbox" in localStorage))
                     localStorage.setItem("reboot_checkbox", true);
+                
                 document.getElementById("rebootCheckboxInput").checked = localStorage.getItem("reboot_checkbox") == "true";
                 queryInfo();
             };
         </script>
         <style>
             html {
-                font-family: sans-serif;
+                line-height: 1.5;
+                tab-size: 4;
+                /*font-family: system-ui, Helvetica Neue;*/
+                font-family:sans-serif;
+                font-feature-settings: normal;
+                font-variation-settings: normal;
             }
             body {
+                margin: 0px;
                 background-color: #191919;
                 color: #e6e6e6;
             }
@@ -399,7 +360,7 @@
                 bottom: 0;
                 width: 100%;
                 height: 28px;
-                line-height: 3px;
+                line-height: 2px;
                 background-color: #313131;
                 color: #898989;
                 text-align: center;
@@ -413,133 +374,51 @@
                 align-items: center;
             }
             .headerRow {
-                border-bottom: 1px solid #e6e6e61c;
+                border-bottom: 1px solid rgba(230, 230, 230, 0.11);
                 margin-left: 15px;
                 margin-right: 15px;
             }
-            .loaderBoxStack {
-                scale: 2.25;
-                height: 50px;
-                width: 40px;
-                margin-bottom: 55px;
-                margin-top: 47px;
+            .loader {
+                width: 50px;
+                aspect-ratio: 1;
+                display: grid;
+                border: 4px solid #0000;
+                border-radius: 50%;
+                border-right-color: #30b4a7;
+                animation: l15 1s infinite linear;
+                margin-top: 15px;
+                margin-bottom: 25px;
             }
-            .box {
-                position: relative;
-                opacity: 0;
-                left: 10px;
+            .loader::before,
+            .loader::after {
+                content: "";
+                grid-area: 1/1;
+                margin: 2px;
+                border: inherit;
+                border-radius: 50%;
+                animation: l15 2s infinite;
             }
-            .side-left {
-                position: absolute;
-                background-color: hsl(173, 60%, 22%);
-                width: 19px;
-                height: 5px;
-                transform: skew(0deg, -25deg);
-                top: 14px;
-                left: 10px;
+            .loader::after {
+                margin: 8px;
+                animation-duration: 3s;
             }
-            .side-right {
-                position: absolute;
-                background-color: hsl(173, 60%, 43%);
-                width: 19px;
-                height: 5px;
-                transform: skew(0deg, 25deg);
-                top: 14px;
-                left: -9px;
-            }
-            .side-top {
-                position: absolute;
-                background-color: hsl(173, 60%, 35%);
-                width: 20px;
-                height: 20px;
-                rotate: 45deg;
-                transform: skew(-20deg, -20deg);
-            }
-            .box-1 {
-                animation: from-left 4s infinite;
-            }
-            .box-2 {
-                animation: from-right 4s infinite;
-                animation-delay: 1s;
-            }
-            .box-3 {
-                animation: from-left 4s infinite;
-                animation-delay: 2s;
-            }
-            .box-4 {
-                animation: from-right 4s infinite;
-                animation-delay: 3s;
-            }
-            @keyframes from-left {
-                0% {
-                    z-index: 20;
-                    opacity: 0;
-                    translate: -20px -6px;
-                }
-                20% {
-                    z-index: 10;
-                    opacity: 1;
-                    translate: 0px 0px;
-                }
-                40% {
-                    z-index: 9;
-                    translate: 0px 4px;
-                }
-                60% {
-                    z-index: 8;
-                    translate: 0px 8px;
-                }
-                80% {
-                    z-index: 7;
-                    opacity: 1;
-                    translate: 0px 12px;
-                }
+            @keyframes l15 {
                 100% {
-                    z-index: 5;
-                    translate: 0px 30px;
-                    opacity: 0;
-                }
-            }
-            @keyframes from-right {
-                0% {
-                    z-index: 20;
-                    opacity: 0;
-                    translate: 20px -6px;
-                }
-                20% {
-                    z-index: 10;
-                    opacity: 1;
-                    translate: 0px 0px;
-                }
-                40% {
-                    z-index: 9;
-                    translate: 0px 4px;
-                }
-                60% {
-                    z-index: 8;
-                    translate: 0px 8px;
-                }
-                80% {
-                    z-index: 7;
-                    opacity: 1;
-                    translate: 0px 12px;
-                }
-                100% {
-                    z-index: 5;
-                    translate: 0px 30px;
-                    opacity: 0;
+                    transform: rotate(1turn);
                 }
             }
             .loaderReboot {
-                display: inline-block;
+                position: fixed;
                 width: 13px;
                 height: 13px;
-                padding: 4.5px;
-                margin-top: 2px;
+                padding: 4px;
+                margin-top: 5px;
+                margin-left: -32px;
+                aspect-ratio: 1;
                 border-radius: 50%;
                 background: #25b09b;
-                --_m:
-                conic-gradient(#0000 10%, #000),
+                --_m: 
+                conic-gradient(#0000 10%,#000),
                 linear-gradient(#000 0 0) content-box;
                 -webkit-mask: var(--_m);
                   mask: var(--_m);
@@ -554,56 +433,55 @@
             }
             .uploadColumn {
                 margin-top: 40px;
-                margin-bottom: 25px;
-                opacity: 1;
-                transition: opacity 0.25s ease-in, display 0.25s ease-in allow-discrete;
+                margin-bottom: 35px;
             }
             .dropzone {
                 width: 340px;
                 height: 140px;
-                border: 1px dashed #e6e6e633;
-                border-radius: 10px;
+                border: 1px dashed rgba(230, 230, 230, 0.2);
+                border-radius: 12px;
                 font-size: 0.875rem;
                 line-height: 1.25rem;
                 text-align: center;
-                transition: border-color 270ms ease-out;
+                transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+                transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+                transition-duration: 300ms;
                 cursor: pointer;
             }
             .dropzone:hover {
-                border-color: #e6e6e6b8;
+                border-color: rgba(230, 230, 230, 0.72);
             }
             .dropzone-highlight {
-                border-color: #30b4a6;
+                border-color: rgb(48, 180, 166, 1.0) !important;
             }
             .dropzoneText {
                 margin: 40px;
             }
-            .dropzoneTextDim {
-                color: #7e7e7e;
+            .dropzoneText2 {
+                color: #7c7c7c;
             }
             .columnHeader {
                 display: flex;
                 flex-direction: row;
+                gap: 0.25rem;
                 justify-content: center;
                 align-items: center;
-                font-size: 12px;
-                line-height: 16px;
+                font-size: 0.75rem;
+                line-height: 1rem;
                 text-transform: uppercase;
                 user-select: none;
                 margin-top: 1px;
             }
             .columnHeaderText {
-                margin-top: 16px;
+                margin-top: 1rem;
                 margin-bottom: 7px;
                 color: #b0b0b0;
             }
             .column {
                 width: 340px;
-                border: 1px solid #e6e6e633;
-                border-radius: 10px;
+                border: 1px solid rgba(230, 230, 230, 0.2);
+                border-radius: 12px;
                 margin-top: 25px;
-                opacity: 1;
-                transition: opacity 0.25s ease-in, display 0.25s ease-in allow-discrete;
             }
             .columnContent {
                 display: flex;
@@ -617,6 +495,7 @@
             .columnContentEntry {
                 display: flex;
                 flex-direction: row;
+                gap: 1rem;
                 justify-content: space-between;
                 align-items: center;
             }
@@ -626,17 +505,22 @@
             select {
                 color: #e6e6e6;
                 background: #242424;
-                padding: 4px 12px;
-                border: 1px solid #383838;
-                border-radius: 6px;
-                font-size: 14px;
-                line-height: 20px;
+                display: block;
+                padding-top: 0.25rem;
+                padding-bottom: 0.25rem;
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+                border: 1px solid rgb(36, 36, 36);
+                border-radius: 0.5rem;
+                font-size: 0.875rem;
+                line-height: 1.25rem;
                 appearance: none;
             }
             select:hover {
                 border-color: #006bff;
+                --ring-color: #006bff;
             }
-            .rebootCheckboxInput {
+            #rebootCheckboxInput {
                 display: none;
             }
             .toggleSwitch {
@@ -646,8 +530,8 @@
                 position: relative;
                 width: 39px;
                 height: 21px;
-                background-color: #394158;
-                border-radius: 25px;
+                background-color: rgb(57, 65, 88);
+                border-radius: 50px;
                 cursor: pointer;
                 transition-duration: 0.15s;
             }
@@ -660,15 +544,15 @@
                 background-color: #e6e6e6;
                 border-radius: 50%;
                 transition-duration: 0.2s;
-                box-shadow: 5px 2px 7px #08080842;
+                box-shadow: 5px 2px 7px rgba(8, 8, 8, 0.26);
                 border: 5px solid #e6e6e6;
             }
-            .rebootCheckboxInput:checked + .toggleSwitch::after {
+            #rebootCheckboxInput:checked + .toggleSwitch::after {
                 transform: translateX(17px);
                 transition-duration: 0.15s;
                 background-color: #e6e6e6;
             }
-            .rebootCheckboxInput:checked + .toggleSwitch {
+            #rebootCheckboxInput:checked + .toggleSwitch {
                 background-color: #006bff;
                 transition-duration: 0.15s;
             }
@@ -677,44 +561,32 @@
                 margin-top: 30px;
                 flex-direction: column;
                 align-items: center;
-            }            
+            }
             .statusTitleText {
                 margin-top: 15px;
                 margin-bottom: 5px;
             }
             .detailText {
-                font-size: 14px;
+                font-size: 0.875rem;
                 color: #b0b0b0;
                 margin-top: 5px;
                 margin-bottom: 5px;
-            }
-            .waitForRebootDetailText {
-                font-size: 14px;
-                color: #b0b0b0;
-                margin-top: 5px;
-                margin-bottom: 5px;
-                padding-left: 10px;
-            }
-            .successColumnWaitForReboot {
-                display: flex;
-                margin-top: 15px;
             }
             .waitForReboot {
-                display: flex;
-                margin-top: 18px;
+                margin-left: 30px;
+                margin-top: 15px;
             }
             .goBackButton {
                 display: flex;
-                background: #0e121f;
+                background: #ffffff00;
                 color: #e4e6eb;
                 cursor: pointer;
                 width: 120px;
                 height: 42px;
                 font-size: 13px;
-                border: 2px solid #2d5fec;
-                border-radius: 9px;
+                border: #2d5fec 0.2em solid;
+                border-radius: 11px;
                 align-items: center;
-                box-shadow: 0 5px 15px #00000092 !important;
                 transition: all 0.35s ease;
                 margin-top: 35px;
             }
@@ -723,7 +595,7 @@
             }
             .goBackButton > svg {
                 width: 35px;
-                transition: transform 0.3s normal;
+                transition: transform 0.3s ease-in-out;
                 scale: 1.3;
             }
             .goBackButton:hover svg {
@@ -732,27 +604,19 @@
             .goBackButton:active {
                 transform: scale(0.95);
             }
-            .goBackButton:disabled {
-                border: 1px solid #808080;
-                background-color: #383838;
-                color: #9a9a9a;
-                pointer-events: none;
-            }
             .rollbackButton {
                 display: flex;
-                background: #0e121f;
+                background: #ffffff00;
                 color: #e4e6eb;
                 cursor: pointer;
                 width: 200px;
                 height: 47px;
                 font-size: 15px;
-                border: 2px solid #2d5fec;
-                border-radius: 8px;
+                border: #2d5fec 0.2em solid;
+                border-radius: 11px;
                 align-items: center;
-                box-shadow: 0 5px 15px #00000092 !important;
-                transition: all 0.25s ease;
-                margin-bottom: 8px;
-                opacity: 1;
+                transition: all 0.35s ease;
+                margin-top: 10px;
             }
             .rollbackButton:hover {
                 background-color: #2d5fec;
@@ -760,7 +624,7 @@
             .rollbackButton > svg {
                 position: absolute;
                 width: 42px;
-                transition: transform 0.5s normal;
+                transition: transform 0.5s ease-in-out;
                 scale: 1.2;
             }
             .rollbackButton:hover #svg_rotate {
@@ -769,81 +633,30 @@
             .rollbackButton:active {
                 transform: scale(0.95);
             }
-            .rollbackButton:disabled {
-                border: 1px solid #808080;
-                background-color: #383838;
-                color: #9a9a9a;
-                pointer-events: none;
-            }
             .rollbackButtonText {
                 margin-left: 44px;
             }
-            .rebootButton {
-                display: flex;
-                background: #0e121f;
-                color: #e4e6eb;
-                cursor: pointer;
-                width: 200px;
-                height: 47px;
-                font-size: 15px;
-                border: 2px solid #2d5fec;
-                border-radius: 9px;
-                align-items: center;
-                box-shadow: 0 5px 15px #00000092 !important;
-                transition: all 0.25s ease;
-                margin-top: 8px;
-                opacity: 1;
-            }
-            .rebootButton:hover {
-                background-color: #2d5fec;
-            }
-            .rebootButton > svg {
-                position: absolute;
-                width: 43px;
-                scale: 1.14;
-            }
-            .rebootButton:active {
-                transform: scale(0.95);
-            }
-            .rebootButton:disabled {
-                border: 1px solid #808080;
-                background-color: #383838;
-                color: #9a9a9a;
-                pointer-events: none;
-            }
-            .rebootButtonText {
-                margin-left: 72px;
-            }            
             .progressBarContainer {
-                display: inline-flex;
+                display: flex;
                 flex-direction: row;
-                gap: 15px;
+                gap: 1rem;
                 align-items: center;
+                width: 280px;
             }
-            .progress {
+            .progressBar {
+                border-radius: 9999px;
+                width: 100%;
+                height: 0.625rem;
+                background-color: #e5e7eb;
                 background: #242526;
-                border-radius: 10px;
-                padding: 0px;
-                height: 10px;
-                width: 270px;
             }
-            .progress-value {
-                transition : width 0.85s normal;
-                border-radius: 10px;
-                background: #2563eb;
-                height: 10px;
-                width: 0px;
-            }
-            .progressValueText {
-                font-size: 14px;
-                color: #b0b0b0;
-                margin-top: 5px;
-                margin-bottom: 5px;
-                width: 25px;
+            .progressBarInside {
+                border-radius: 9999px;
+                height: 0.625rem;
+                background-color: #2563eb;
             }
             .notificationBar {
-                visibility: hidden;
-                position: fixed;
+                position: absolute;
                 top: 0px;
                 height: 38px;
                 line-height: 38px;
@@ -851,22 +664,37 @@
                 background: #cc3445;
                 text-align: center;
                 color: #ffffff;
+                font-family: sans-serif;
                 font-size: 14px;
                 font-weight: lighter;
+                display: inline-block;
+                visibility: hidden;
                 opacity: 0;
                 transition: opacity 250ms ease-in, visibility 0ms ease-in 250ms;
-                border-radius: 7px;
+                border-radius: 10px;
+                
+                .x {
+                    border: none;
+                    background: none;
+                    position: absolute;
+                    top: 4px;
+                    right: 20px;
+                    cursor: pointer;
+                    transform-origin: center;
+                    transition: all 0.2s ease-in-out;
+                    &:hover {
+                        color: #fafafa;
+                        transform: scale(1.2);
+                    }
+                }
             }
             .notificationBar.show {
                 visibility: visible;
                 opacity: 1;
-            }
-            .notificationBarSuccess {
-                background: #21c322;
+                transition-delay: 0ms;
             }
             .hidden {
                 display: none;
-                opacity: 0;
             }
         </style>
     </head>
@@ -877,13 +705,13 @@
                 <path d="M6340 773a194 194 0 00-40 320c62 57 60 57 755 57 700 0 706 0 830 60a590 590 0 01 4 1053c-135 66-140 67-857 67-904 0-801-113-802 886v730l23 45a194 194 0 00 320 40c57-63 57-65 57-709V2730h503c703 0 812-18 1038-170a990 990 0 00-167-1733c-174-74-143-71-920-75l-700-3-44 24m7240 10c-30 16-51 37-67 67l-24 44 4 1200c3 1340-3 1224 72 1421 193 513 927 848 930 424 0-118-36-163-165-204a648 648 0 01-413-419c-20-59-21-84-25-719l-3-657h235a1880 1880 0 00 263-10c127-49 142-230 26-310-36-25-40-25-280-28l-243-3v-342c0-373-3-390-61-444-55-50-174-60-250-20m1490-3c-20 10-48 34-60 52l-24 33-3 1175c-4 1366-6 1333 108 1560 240 478 890 727 890 340 0-112-40-164-156-204a631 631 0 01-430-456c-17-60-19-119-19-700v-635l245-5c305-6 360-31 360-167 0-152-63-182-377-183H15370l-3-364c-3-410 0-396-84-443-52-30-162-31-216-3m-3560 756c-1460 227-1404 2434 65 2605 588 68 1356-430 1104-717-94-108-205-95-336 40a871 871 0 01-1495-422l-8-32H11840c1215 0 1140 14 1139-216 0-766-715-1376-1473-1258m-1601 30c-480 131-830 523-932 1039-21 106-33 1239-14 1330 40 190 290 225 371 50 17-37 19-77 19-600 0-712 6-762 100-961a864 864 0 01 600-485c123-33 180-96 180-200 0-163-123-228-324-173m6520 10a242 242 0 00-126 110c-41 84-50 60 440 1179l450 1030-162 380c-216 507-210 646 31 645 122 0 143-33 340-497a13328 13328 0 01 206-473c4-14 208-498 453-1075 258-610 447-1068 450-1092 20-176-228-283-345-150-18 20-156 336-392 895-341 807-365 860-377 835-158-368-732-1670-750-1700-40-69-140-108-219-86m-4890 360c-334 71-695 442-695 714 0 5 326 9 865 9h865l-7-33c-87-459-576-787-1028-690" fill="#2cb4a4" fill-rule="evenodd"/>
                 <path d="M2330 599a154420 154420 0 01-773 446 32852 32852 0 01-497 287l-380 220c-170 98-176 108-98 155l554 320 60 33 205-123c170-102 326-194 410-242a161187 161187 0 00 554-320c138-76 778-445 784-451 13-12-616-388-668-400a720 720 0 00-151 75m17974 117C18947 900 18380 2630 19344 3637c872 911 2374 555 2780-660 402-1202-586-2430-1820-2261m1995 57a193 193 0 00-56 304c68 78-9 73 1118 73h1006l44-23a200 200 0 00-2-357c-37-20-66-20-1052-20h-1014l-44 23m3296-9a250 250 0 00-108 108 264260 264260 0 00-1220 2988 205 205 0 00 114 220c62 32 1550 30 1617-1 110-54 140-206 60-304-64-77-40-75-697-75-520 0-583-2-577-15 14-39 938-2290 940-2292 1-2 233 559 516 1245 641 1558 571 1405 655 1443 142 65 310-50 292-200-7-60-1210-3004-1246-3051-57-74-246-110-346-66m-22450 288c-127 75-150 88-620 358a590130 590130 0 00-1030 595C1228 2160 1260 2090 1260 2517v362l58 32 130 76c115 70 107 94 108-317l2-355 98-59 141-82a40360 40360 0 00 445-255 726790 726790 0 00 1242-717c94-54 98-48-81-151-146-85-113-85-258 0m17240 60c-1055 143-1498 1463-753 2244 798 836 2172 247 2172-930 0-792-674-1416-1419-1314M3450 1347l-485 280a478065 478065 0 00-1117 644c-153 85-153 81-17 158l289 166c405 234 334 218 510 116 74-43 153-89 175-100A113105 113105 0 01 3846 2010c580-332 596-343 563-375-8-7-90-57-184-110-440-252-500-287-510-296-20-20-57-3-265 118m19836 208c-20 7-51 26-67 40-63 60-60-2-57 1245l3 1135 23 33c92 128 277 120 349-17l23-44V2826c0-1257 5-1164-73-1233-58-50-128-64-200-38M474 1743c-3 6-4 516-3 1131l3 1120 180 104a27377 27377 0 00 300 172c5 5 102 60 215 125a116150 116150 0 01 1070 617c150 87 173 98 193 87 22-13 27-2223 4-2250-6-10-106-70-222-136a26643 26643 0 01-468-270c-92-56-87-75-87 385 0 217 0 396-3 398-5 5-500-277-510-290-3-6-7-198-7-427v-417l-88-50-122-70c-20-10-102-58-183-106-256-149-262-151-272-123m3840 59-165 96a40221 40221 0 00-522 300 112703 112703 0 00-688 400 6501 6501 0 00-432 255c-18 29-10 2235 9 2245 22 13 36 7 173-73a51094 51094 0 01 630-365 250144 250144 0 01 1090-628c25-13 50-30 58-35 24-20 12-2261-13-2264-11-1-74 30-140 69" fill="#ededed" fill-rule="evenodd"/>
             </svg>
-
+            
             <!-- Upload column -->
             <div id="uploadColumn" class="uploadColumn">
                 <!-- Drop zone -->
                 <form>
                     <div id="dropzone" class="dropzone">
-                        <p class="dropzoneText">Drag and drop here<br /><span class="dropzoneTextDim">or<br />click to select (.bin) file</span></p>
+                        <p class="dropzoneText">Drag and drop here<br /><span class="dropzoneText2">or<br />click to select (.bin) file</span></p>
                         <input type="file" id="fileInput" class="hidden" accept=".bin, .bin.gz" onchange="onFileInput(files)" />
                     </div>
                 </form>
@@ -891,35 +719,13 @@
 
             <!-- Progress column -->
             <div id="progressColumn" class="statusColumn hidden">
-                <!--<div class="loaderProgress"></div>-->
-                <div class="loaderBoxStack">
-                    <div class="box box-1">
-                        <div class="side-left"></div>
-                        <div class="side-right"></div>
-                        <div class="side-top"></div>
-                    </div>
-                    <div class="box box-2">
-                        <div class="side-left"></div>
-                        <div class="side-right"></div>
-                        <div class="side-top"></div>
-                    </div>
-                    <div class="box box-3">
-                        <div class="side-left"></div>
-                        <div class="side-right"></div>
-                        <div class="side-top"></div>
-                    </div>
-                    <div class="box box-4">
-                        <div class="side-left"></div>
-                        <div class="side-right"></div>
-                        <div class="side-top"></div>
-                    </div>
-                </div>
+                <div class="loader"></div>
                 <p id="progressTitle" class="detailText"></p>
                 <div class="progressBarContainer">
-                    <div class="progress">
-                        <div id="progressBar" class="progress-value" style="width: 0%"></div>
+                    <div class="progressBar">
+                        <div id="progressBar" class="progressBarInside" style="width: 0%"></div>
                     </div>
-                    <p id="progressValue" class="progressValueText">0%</p>
+                    <p id="progressValue" class="detailText">0%</p>
                 </div>
             </div>
 
@@ -929,12 +735,12 @@
                     <path fill="#0fc93b" stroke="none" fill-rule="evenodd" d="M 233.085 2.036 C -14.768 35.915, -85.223 363.031, 126.652 496.197 C 295.933 602.593, 525.799 486.284, 536.708 288.715 C 537.035 282.784, 537.685 277.695, 538.152 277.406 C 539.372 276.652, 539.226 258, 538 258 C 537.434 258, 536.992 255.071, 536.982 251.250 C 536.945 237.633, 532.042 209.988, 526.311 191.084 C 488.066 64.926, 362.980 -15.719, 233.085 2.036 M 252 53.661 C 70.486 71.365, -11.158 285.417, 113.467 416.864 C 238.518 548.760, 462.949 472.177, 482.930 290.789 C 497.452 158.962, 382.507 40.933, 252 53.661 M 300.500 230.599 C 261.450 269.850, 229.053 301.972, 228.506 301.982 C 227.959 301.992, 213.446 287.940, 196.255 270.755 L 164.997 239.509 146.251 258.256 L 127.505 277.002 178.004 327.501 L 228.503 378.001 319.496 287.004 L 410.488 196.008 392.004 177.504 C 381.838 167.327, 373.066 159.053, 372.510 159.118 C 371.955 159.182, 339.550 191.349, 300.500 230.599 M 0.365 268.500 C 0.368 274, 0.536 276.122, 0.738 273.216 C 0.941 270.311, 0.939 265.811, 0.734 263.216 C 0.528 260.622, 0.363 263, 0.365 268.500" />
                 </svg>
                 <p id="successMessage" class="statusTitleText">Update Successful</p>
-                <div class="successColumnWaitForReboot">
-                    <span id="successColumnLoaderReboot" class="loaderReboot"></span>
-                    <p id="successColumnRebootMessage" class="waitForRebootDetailText">Rebooting device...</p>
+                <div class="waitForReboot">
+                    <span id="loaderReboot" class="loaderReboot"></span>
+                    <p id="rebootMessage" class="detailText">Rebooting device...</p>
                 </div>
-                <button disabled id="goBackButton" onclick="resetView()" type="button" class="goBackButton">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14px" height="14px" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <button onclick="resetView()" type="button" class="goBackButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="m12 19-7-7 7-7" />
                         <path d="M19 12H5" />
                     </svg>
@@ -949,7 +755,7 @@
                 </svg>
                 <p id="errorTitle" class="statusTitleText">Update failed</p>
                 <p id="errorReason" class="detailText">Please try again</p>
-                <button id="goBackButton2" onclick="resetView()" type="button" class="goBackButton">
+                <button onclick="resetView()" type="button" class="goBackButton">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="m12 19-7-7 7-7" />
                         <path d="M19 12H5" />
@@ -968,10 +774,6 @@
                     <div class="columnContentEntry">
                         <p>Firmware version</p>
                         <span id="firmware_version_text" class="columnContentValue"></span>
-                    </div>
-                    <div class="columnContentEntry">
-                        <p>SDK version</p>
-                        <span id="sdk_version_text" class="columnContentValue"></span>
                     </div>
                     <div class="columnContentEntry">
                         <p>Build date</p>
@@ -1000,17 +802,16 @@
                     </div>
                     <div class="columnContentEntry">
                         <p>Reboot after update</p>
-                        <input type="checkbox" id="rebootCheckboxInput" class="rebootCheckboxInput" />
+                        <input type="checkbox" id="rebootCheckboxInput" />
                         <label for="rebootCheckboxInput" class="toggleSwitch"></label>
                     </div>
                 </div>
             </div>
 
-            <!-- Button column -->
-            <div id="buttonColumn" class="statusColumn">
-                <!-- Rollback button -->
+            <!-- Rollback button -->
+            <div id="rollbackButtonColumn" class="statusColumn">
                 <form>
-                    <button disabled id="rollbackButton" name="rollbackButton" type="button" class="rollbackButton">
+                    <button id="rollbackButton" name="rollbackButton" type="button" class="rollbackButton">
                         <svg width="20px" height="20px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="white" stroke="white">
                             <path d="M513 203.1c-19.3 0-35 15.7-35 35v294.2c0 12.5 6.7 24 17.5 30.3L651 652.7c5.5 3.2 11.6 4.7 17.5 4.7 12.1 0 23.8-6.3 30.3-17.5 9.7-16.7 4-38.1-12.8-47.8l-138.1-80v-274c0.1-19.3-15.6-35-34.9-35z" />
                         </svg>
@@ -1020,31 +821,22 @@
                         <span class="rollbackButtonText">Rollback Firmware</span>
                     </button>
                 </form>
-
-                <!-- Reboot button -->
-                <form>
-                    <button id="rebootButton" name="rebootButton" type="button" class="rebootButton">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 1024 1024" fill="#ff3b3b" overflow="hidden" xmlns:v="https://vecta.io/nano">
-                            <path d="M313.672 153.539a40.969 40.969 0 0 1 39.731 71.66A327.537 327.537 0 0 0 184.32 512c0 180.982 146.698 327.68 327.68 327.68S839.68 692.982 839.68 512c0-116.675-61.44-222.659-159.785-281.457a40.96 40.96 0 1 1 42.045-70.308A409.354 409.354 0 0 1 921.6 512c0 226.222-183.378 409.6-409.6 409.6S102.4 738.222 102.4 512a409.436 409.436 0 0 1 211.272-358.461zM512 102.4h0q40.96 0 40.96 40.96v409.6q0 40.96-40.96 40.96h0q-40.96 0-40.96-40.96v-409.6q0-40.96 40.96-40.96z"/>
-                        </svg>
-                        <span class="rebootButtonText">Reboot</span>
-                    </button>
-                </form>
-                <div id="manualWaitForReboot" class="waitForReboot hidden">
-                    <span id="loaderReboot" class="loaderReboot"></span>
-                    <p id="rebootMessage" class="waitForRebootDetailText">Rebooting device...</p>
-                </div>
             </div>
-            
+
             <!-- Notification Bar -->
             <div id="notificationBar" class="notificationBar">
+                <button onclick="hideCustomAlert()" class="x">
+                    <svg width="25" height="25" viewbox="0 0 40 40">
+                        <path d="M 10,10 L 30,30 M 30,10 L 10,30" stroke="white" stroke-width="3" />
+                    </svg>
+                </button>
                 <span id="notificationMessage"></span>
             </div>
+            <!-- Main div end -->
         </div>
-        
         <!-- Footer -->
         <div class="footer">
-            <p>PrettyOTA - Version 0.2 - © 2025</p>
+            <p>PrettyOTA - Version 0.1 Beta</p>
         </div>
     </body>
 </html>
