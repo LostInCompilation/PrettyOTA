@@ -39,8 +39,8 @@ private:
     static const uint8_t  TASK_PRIORITY_HANDLE_REBOOT_REQUEST = 3;
 
     // Website code
-    static const uint8_t PRETTY_OTA_WEBSITE_DATA[12889];
-    static const uint8_t PRETTY_OTA_LOGIN_DATA[6549];
+    static const uint8_t PRETTY_OTA_WEBSITE_DATA[11840];
+    static const uint8_t PRETTY_OTA_LOGIN_DATA[6105];
 
     // Variables
     bool        m_AutoRebootEnabled = true;
