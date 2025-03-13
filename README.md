@@ -2,7 +2,7 @@
 <img src="img/logo.svg" alt="Screenshot" style="height:100px;"/>
 </p>
 
-### <center>A modern looking OTA update server with easy rollback</center>
+### <center>A modern looking OTA update server for ESP32 with easy rollback</center>
 
 ## Features
 - ***Drag and drop*** firmware or filesystem .bin file to start updating
@@ -38,7 +38,7 @@ void loop() {
 ```
 
 ## Demo
-![Screen Recording 2025-03-02 at 08 26 48](https://github.com/user-attachments/assets/77b92946-ed00-470f-ad9b-a70e98503e44)
+![Screen Recording 2025-03-02 at 08 26 48](https://github.com/user-attachments/assets/c9a53a37-d7ef-4552-a188-f07b354cf8a7)
 
 ## The Begin function
 ```cpp
