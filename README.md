@@ -38,7 +38,7 @@ void loop() {
 ```
 
 ## Demo
-![Screen Recording 2025-03-02 at 08 26 48](https://github.com/user-attachments/assets/c9a53a37-d7ef-4552-a188-f07b354cf8a7)
+![Screen Recording 2025-03-02 at 08 26 48](https://github.com/user-attachments/assets/191e4082-1d72-49ef-8e65-83700b7cf4a4)
 
 ## The Begin function
 ```cpp
