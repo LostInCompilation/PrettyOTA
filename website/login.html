@@ -112,7 +112,7 @@
             document.getElementById("pwd").addEventListener("keyup", function (event) {
                 if (event.keyCode === 13)
                     document.getElementById("loginButton").click();
-            });            
+            });
             var showTimeout;
             function showCustomAlert(msg) {
                 document.getElementById("notificationMessage").innerText = msg;
@@ -120,7 +120,7 @@
                 clearTimeout(showTimeout);
                 showTimeout = setTimeout(function() {
                     document.getElementById("notificationBar").classList.remove("show");
-                }, 7000);                
+                }, 7000);
             }
             function hideCustomAlert() {
                 clearTimeout(showTimeout);
@@ -185,7 +185,7 @@
             color: #b3b3b3;
             width: 250px;
             height: 44px;
-            margin-top: 18px;            
+            margin-top: 18px;
             padding-left: 15px;
             padding-right: 15px;
             border: 0px;
@@ -285,7 +285,7 @@
     
     <!-- Footer -->
     <div class="footer">
-        <p>PrettyOTA - Version 0.1 Beta</p>
+        <p>PrettyOTA - Version 0.3</p>
     </div>
 </body>
 </html>

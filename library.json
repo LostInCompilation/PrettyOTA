@@ -1,0 +1,25 @@
+{
+    "name": "PrettyOTA",
+    "version": "0.3.0",
+    "description": "A better looking OTA web server for easy and modern looking updates and rollbacks.",
+    "keywords": "OTA, update, wifi, web update, server",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/LostInCompilation/PrettyOTA.git"
+    },
+    "authors":
+    [
+      {
+        "name": "LostInCompilation",
+        "maintainer": true
+      }
+    ],
+    "dependencies": {
+      "ESP32Async/ESPAsyncWebServer": "*",
+      "bblanchon/ArduinoJson": "*"
+    },
+    "license": "MIT",
+    "frameworks": ["espidf", "arduino"],
+    "platforms": "espressif32"
+}

@@ -18,11 +18,8 @@ License:    See LICENSE.md
 
 Stream* PrettyOTA::m_SerialMonitorStream = nullptr;
 
-// Simple serial log functions
-#define LOG_I(message) m_SerialMonitorStream->println("\033[92mInfo: " + String(message) + "\033[0m")
-#define LOG_W(message) m_SerialMonitorStream->println("\033[93mWarning: " + String(message) + "\033[0m")
-#define LOG_E(message) m_SerialMonitorStream->println("\033[97;41m Error: " + String(message) + " \033[0m")
-
+// ********************************************************
+// SHA256 helpers
 const char* const SHA256StringLookup = "0123456789abcdef";
 
 String SHA256ToString(const uint8_t hash[32])
@@ -37,17 +34,55 @@ String SHA256ToString(const uint8_t hash[32])
 }
 
 // ********************************************************
-// OTA default callbacks
-void PrettyOTA::OnOTAStart()
+// Log functions
+void PrettyOTA::LOG_I(String message)
 {
+    if (!m_SerialMonitorStream)
+        return;
+
+    m_SerialMonitorStream->println("\033[92mInfo: " + String(message) + "\033[0m");
+}
+
+void PrettyOTA::LOG_W(String message)
+{
+    if (!m_SerialMonitorStream)
+        return;
+
+    m_SerialMonitorStream->println("\033[93mWarning: " + String(message) + "\033[0m");
+}
+
+void PrettyOTA::LOG_E(String message)
+{
+    if (!m_SerialMonitorStream)
+        return;
+
+    m_SerialMonitorStream->println("\033[97;41m Error: " + String(message) + " \033[0m");
+}
+
+// ********************************************************
+// OTA default callbacks
+void PrettyOTA::OnOTAStart(UPDATE_MODE updateMode)
+{
+    if (!m_SerialMonitorStream)
+        return;
+
     m_SerialMonitorStream->println("\n\n************************************************");
     m_SerialMonitorStream->println("*                 \033[1;7m OTA UPDATE \033[0m                 *");
+
+    if(updateMode == UPDATE_MODE::FIRMWARE)
+        m_SerialMonitorStream->println("*                   \033[1mFirmware\033[0m                   *");
+    else
+        m_SerialMonitorStream->println("*                  \033[1mFilesystem\033[0m                  *");
+
     m_SerialMonitorStream->println("************************************************\n");
     m_SerialMonitorStream->println("Starting OTA update...\n");
 }
 
 void PrettyOTA::OnOTAProgress(uint32_t currentSize, uint32_t totalSize)
 {
+    if (!m_SerialMonitorStream)
+        return;
+
     static float lastPercentage = 0.0f;
     const float percentage = 100.0f * static_cast<float>(currentSize) / static_cast<float>(totalSize);
     const uint8_t numBarsToShow = static_cast<uint8_t>(percentage / 3.3333f);
@@ -71,6 +106,9 @@ void PrettyOTA::OnOTAProgress(uint32_t currentSize, uint32_t totalSize)
 
 void PrettyOTA::OnOTAEnd(bool successful)
 {
+    if (!m_SerialMonitorStream)
+        return;
+
     if (successful)
         m_SerialMonitorStream->println("Updating... [==============================] 100%");
 
@@ -84,6 +122,8 @@ void PrettyOTA::OnOTAEnd(bool successful)
     m_SerialMonitorStream->println("************************************************\n\n");
 }
 
+// ********************************************************
+// UUID helpers
 void PrettyOTA::GenerateUUID(UUID_t out_uuid) const
 {
     esp_fill_random(out_uuid, sizeof(UUID_t));
@@ -102,6 +142,7 @@ String PrettyOTA::UUIDToString(const UUID_t uuid) const
     return String(out);
 }
 
+// ********************************************************
 // Check if client is authenticated
 bool PrettyOTA::IsAuthenticated(const AsyncWebServerRequest* const request) const
 {
@@ -140,7 +181,9 @@ void PrettyOTA::SetAuthenticationDetails(const char* const username, const char*
     }
 }
 
-bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, const char* const password, bool passwordIsMD5Hash)
+// ********************************************************
+// Begin
+bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, const char* const password, bool passwordIsMD5Hash, uint16_t OTAport)
 {
     SetAuthenticationDetails(username, password, passwordIsMD5Hash);
 
@@ -231,11 +274,11 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         }
 
         // Get OTA update mode (filesystem / firmware)
-        int updateMode = U_FLASH;
+        UPDATE_MODE updateMode = UPDATE_MODE::FIRMWARE;
         if (request->hasParam("mode"))
         {
             const String value = request->getParam("mode")->value();
-            updateMode = (value == "fs" ? U_SPIFFS : U_FLASH);
+            updateMode = (value == "fs" ? UPDATE_MODE::FILESYSTEM : UPDATE_MODE::FIRMWARE);
         }
 
         // Get reboot switch
@@ -251,28 +294,28 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
             const String md5Hash = request->getParam("hash")->value();
             if (!Update.setMD5(md5Hash.c_str()))
             {
-                LOG_E("OTA: Not a valid MD5 hash for update file");
+                this->LOG_E("OTA: Not a valid MD5 hash for update file");
                 return request->send(400, "text/plain", "Not a valid MD5 hash");
             }
         }
         else
         {
-            LOG_E("OTA: No MD5 hash has been transmitted");
+            this->LOG_E("OTA: No MD5 hash has been transmitted");
             return request->send(400, "text/plain", "No MD5 hash has been transmitted");
         }
 
         // Call OnStart callback
         if (m_OnStartUpdate)
-            m_OnStartUpdate();
+            m_OnStartUpdate(updateMode);
 
         // Start update
         String errorMessage = "";
-        if (!Update.begin(UPDATE_SIZE_UNKNOWN, updateMode))
+        if (!Update.begin(UPDATE_SIZE_UNKNOWN, (updateMode == UPDATE_MODE::FIRMWARE ? U_FLASH : U_SPIFFS)))
         {
             errorMessage = String(Update.errorString()) + "\n";
 
-            LOG_E("OTA: Could not start update");
-            LOG_E(errorMessage);
+            this->LOG_E("OTA: Could not start update");
+            this->LOG_E(errorMessage);
         }
 
         request->send((Update.hasError()) ? 400 : 200, "text/plain", (Update.hasError()) ? errorMessage.c_str() : "OK");
@@ -341,7 +384,8 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         {
             if (!Update.end(true))
             {
-                LOG_E(Update.errorString());
+                // ToDo send error reply?
+                this->LOG_E(Update.errorString());
             }
         }
     });
@@ -362,22 +406,22 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         // Is a rollback possible?
         if(!Update.canRollBack())
         {
-            LOG_E("No previous firmware for rollback has been found");
+            this->LOG_E("No previous firmware for rollback has been found");
 
             return request->send(400, "text/plain", "No previous firmware for roll back has been found");
         }
 
-        LOG_I("Rolling back to previous firmware...");
+        this->LOG_I("Rolling back to previous firmware...");
 
         // Do rollback
         if(!Update.rollBack())
         {
-            LOG_E("Could not roll back to previous firmware");
+            this->LOG_E("Could not roll back to previous firmware");
             return request->send(400, "text/plain", "Could not roll back to previous firmware");
         }
         else
         {
-            LOG_I("Rollback successful");
+            this->LOG_I("Rollback successful");
 
             request->send(200);
 
@@ -444,13 +488,16 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         request->send(200);
     });
 
-    // Create background task with low priority for handling reboot request
-    const BaseType_t xReturn = xTaskCreate(HandleRebootRequest, "OTAHandleRebootRequest",
-        TASK_STACK_SIZE_HANDLE_REBOOT_REQUEST, this, TASK_PRIORITY_HANDLE_REBOOT_REQUEST, nullptr);
+    // Enable ArduinoOTA support
+    EnableArduinoOTA(password, passwordIsMD5Hash, OTAport);
+
+    // Create background task with low priority for handling reboot request and ArduinoOTA
+    const BaseType_t xReturn = xTaskCreate(BackgroundTask, "PrettyOTABackgroundTask",
+        BACKGROUND_TASK_STACK_SIZE, this, BACKGROUND_TASK_PRIORITY, nullptr);
 
     if (xReturn != pdPASS)
     {
-        LOG_E("PrettyOTA: Could not create background task for handling reboots");
+        this->LOG_E("PrettyOTA: Could not create background task for handling reboots");
 
         return false;
     }
@@ -458,17 +505,62 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
     return true;
 }
 
+void PrettyOTA::EnableArduinoOTA(const char* const password, bool passwordIsMD5Hash, uint16_t OTAport)
+{
+    ArduinoOTA.setMdnsEnabled(false);
+    ArduinoOTA.setRebootOnSuccess(true); // ToDo
+
+    // Port
+    ArduinoOTA.setPort(OTAport);
+
+    // Password
+    if (strcmp(password, "") != 0)
+    {
+        if (passwordIsMD5Hash)
+            ArduinoOTA.setPasswordHash(password);
+        else
+            ArduinoOTA.setPassword(password);
+    }
+
+    // Configure ArduinoOTA
+    ArduinoOTA.onStart([&]() {
+        const UPDATE_MODE mode = (ArduinoOTA.getCommand() == U_FLASH) ? UPDATE_MODE::FIRMWARE : UPDATE_MODE::FILESYSTEM;
+        if(m_OnStartUpdate)
+           m_OnStartUpdate(mode);
+    })
+    .onEnd([&]() {
+        if(m_OnEndUpdate)
+           m_OnEndUpdate(true);
+    })
+    .onProgress([&](unsigned int progress, unsigned int total) {
+        if(m_OnProgressUpdate)
+           m_OnProgressUpdate(progress, total);
+    })
+    .onError([&](ota_error_t error) {
+        if(m_OnEndUpdate)
+            m_OnEndUpdate(false);
+
+        if (m_SerialMonitorStream)
+            m_SerialMonitorStream->printf("ArduinoOTA error: [Code %u]", error);
+    });
+
+    ArduinoOTA.begin();
+}
+
 // Handle reboot request background task
-void PrettyOTA::HandleRebootRequest(void* parameter)
+void PrettyOTA::BackgroundTask(void* parameter)
 {
     PrettyOTA* const me = reinterpret_cast<PrettyOTA*>(parameter);
 
     while (true)
     {
+        ArduinoOTA.handle();
+
         // Check if 1 seconds have passed since reboot request
         if (me->m_RequestReboot && millis() - me->m_RebootRequestTime >= 2000)
         {
-            LOG_I("Rebooting...");
+            me->LOG_I("Rebooting...");
+
             yield();
             delay(2000);
 
@@ -477,20 +569,25 @@ void PrettyOTA::HandleRebootRequest(void* parameter)
         }
 
         yield();
-        delay(2100);
+        delay(350);
     }
 }
 
-void PrettyOTA::UseDefaultCallbacks(Stream* const serialStream)
+void PrettyOTA::UseDefaultCallbacks()
 {
-    m_SerialMonitorStream = serialStream;
+    if (!m_SerialMonitorStream)
+    {
+        // Use default Serial
+        m_SerialMonitorStream = &Serial;
+    }
+
     m_OnStartUpdate = OnOTAStart;
     m_OnProgressUpdate = OnOTAProgress;
     m_OnEndUpdate = OnOTAEnd;
 }
 
 const uint8_t PrettyOTA::PRETTY_OTA_WEBSITE_DATA[11823] = {
-    31, 139, 8, 8, 28, 8, 213, 103, 0, 3, 80, 114, 101, 116, 116, 121, 79, 84, 65, 95, 109, 105, 110, 105, 102, 121, 46, 104, 116, 109, 108, 0, 237, 125, 237, 122, 219, 70, 150, 230, 255,
+    31, 139, 8, 8, 111, 224, 213, 103, 0, 3, 80, 114, 101, 116, 116, 121, 79, 84, 65, 95, 109, 105, 110, 105, 102, 121, 46, 104, 116, 109, 108, 0, 237, 125, 237, 122, 219, 70, 150, 230, 255,
     185, 10, 132, 61, 113, 168, 49, 1, 163, 190, 240, 97, 137, 234, 73, 156, 244, 164, 119, 237, 238, 60, 237, 116, 118, 246, 201, 147, 201, 64, 36, 36, 113, 76, 17, 26, 18, 146, 227, 56,
     234, 251, 217, 219, 216, 43, 219, 247, 61, 5, 144, 0, 69, 82, 114, 58, 211, 211, 51, 189, 150, 73, 16, 133, 170, 58, 167, 206, 247, 169, 2, 10, 39, 31, 77, 171, 73, 253, 238, 186,
     12, 46, 235, 171, 249, 233, 223, 157, 240, 16, 204, 139, 197, 197, 120, 80, 46, 6, 167, 127, 23, 224, 223, 201, 101, 89, 76, 253, 79, 57, 189, 42, 235, 34, 152, 92, 22, 203, 85, 89,
@@ -784,12 +881,12 @@ const uint8_t PrettyOTA::PRETTY_OTA_WEBSITE_DATA[11823] = {
     90, 227, 107, 241, 232, 251, 214, 208, 119, 222, 235, 109, 92, 22, 217, 68, 253, 136, 112, 166, 105, 116, 25, 255, 123, 139, 104, 7, 237, 91, 1, 242, 239, 77, 89, 216, 185, 130, 250, 205,
     105, 28, 118, 46, 222, 134, 77, 139, 110, 93, 255, 251, 199, 93, 79, 91, 109, 180, 237, 3, 148, 126, 107, 163, 128, 118, 189, 250, 207, 211, 243, 126, 217, 189, 160, 254, 126, 52, 255, 187,
     206, 19, 218, 1, 159, 125, 223, 27, 208, 111, 191, 31, 166, 29, 200, 118, 249, 174, 213, 206, 118, 230, 98, 215, 91, 132, 118, 78, 82, 108, 225, 190, 117, 186, 41, 231, 16, 126, 227, 119,
-    195, 238, 34, 222, 77, 6, 253, 102, 217, 219, 79, 125, 95, 159, 126, 181, 44, 235, 250, 29, 19, 234, 48, 104, 94, 190, 194, 109, 48, 112, 246, 127, 255, 15, 60, 188, 118, 189, 20, 176,
-    131, 1, 184, 32, 207, 152, 159, 60, 227, 190, 222, 167, 255, 15, 29, 109, 181, 89, 255, 144, 0, 0
+    195, 238, 34, 222, 77, 6, 253, 102, 217, 219, 79, 125, 95, 159, 126, 181, 44, 235, 250, 29, 19, 234, 48, 104, 94, 190, 194, 5, 4, 156, 253, 223, 255, 3, 15, 175, 93, 47, 5, 236,
+    96, 0, 46, 200, 51, 230, 39, 207, 184, 175, 247, 233, 255, 3, 236, 116, 132, 221, 255, 144, 0, 0
 };
 
-const uint8_t PrettyOTA::PRETTY_OTA_LOGIN_DATA[6105] = {
-    31, 139, 8, 8, 220, 8, 211, 103, 0, 3, 108, 111, 103, 105, 110, 95, 109, 105, 110, 105, 102, 121, 46, 104, 116, 109, 108, 0, 189, 91, 253, 115, 219, 198, 153, 254, 61, 127, 5, 142, 113,
+const uint8_t PrettyOTA::PRETTY_OTA_LOGIN_DATA[6101] = {
+    31, 139, 8, 8, 247, 252, 213, 103, 0, 3, 108, 111, 103, 105, 110, 95, 109, 105, 110, 105, 102, 121, 46, 104, 116, 109, 108, 0, 189, 91, 253, 115, 219, 198, 153, 254, 61, 127, 5, 142, 113,
     108, 178, 38, 160, 253, 222, 133, 36, 170, 147, 248, 210, 73, 111, 146, 182, 211, 164, 153, 206, 100, 92, 15, 4, 66, 18, 26, 8, 208, 145, 160, 100, 215, 118, 255, 246, 123, 158, 5, 73,
     129, 140, 237, 100, 110, 110, 206, 10, 241, 177, 216, 221, 247, 235, 121, 63, 128, 221, 156, 255, 199, 178, 43, 251, 55, 119, 85, 114, 211, 223, 54, 23, 159, 157, 243, 148, 52, 69, 123, 189,
     152, 84, 237, 228, 226, 179, 4, 255, 206, 111, 170, 98, 57, 92, 198, 219, 219, 170, 47, 146, 242, 166, 88, 173, 171, 126, 49, 249, 219, 15, 127, 72, 195, 36, 57, 57, 238, 208, 22, 183,
@@ -940,6 +1037,6 @@ const uint8_t PrettyOTA::PRETTY_OTA_LOGIN_DATA[6105] = {
     127, 155, 110, 39, 83, 251, 6, 126, 65, 42, 139, 187, 197, 36, 126, 171, 58, 104, 230, 242, 244, 174, 253, 151, 236, 31, 212, 170, 183, 120, 121, 225, 251, 76, 138, 36, 158, 250, 131, 253,
     189, 31, 236, 255, 157, 68, 2, 81, 223, 216, 15, 246, 220, 162, 252, 151, 250, 186, 43, 218, 15, 168, 150, 223, 249, 38, 195, 255, 108, 130, 145, 232, 115, 108, 216, 193, 42, 99, 47, 162,
     107, 60, 222, 31, 186, 211, 159, 70, 31, 181, 18, 126, 13, 60, 112, 42, 66, 156, 120, 56, 94, 50, 222, 241, 117, 220, 126, 196, 75, 20, 225, 120, 252, 110, 165, 254, 226, 152, 253, 17,
-    38, 71, 151, 159, 237, 89, 253, 195, 176, 218, 180, 99, 112, 236, 127, 195, 66, 212, 248, 3, 217, 221, 197, 254, 255, 195, 73, 210, 228, 199, 225, 139, 23, 151, 54, 146, 175, 170, 190, 56,
-    63, 185, 59, 32, 4, 173, 197, 47, 111, 136, 7, 241, 127, 92, 250, 31, 65, 60, 241, 153, 201, 52, 0, 0
+    38, 71, 151, 159, 237, 89, 253, 195, 176, 218, 180, 99, 112, 236, 127, 195, 66, 212, 248, 3, 217, 221, 197, 254, 255, 195, 73, 210, 228, 199, 225, 139, 23, 191, 60, 159, 159, 220, 29, 208,
+    128, 194, 226, 71, 55, 132, 130, 248, 255, 44, 253, 15, 90, 172, 235, 235, 196, 52, 0, 0
 };
