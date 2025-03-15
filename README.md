@@ -82,12 +82,13 @@ Replace the IP address with the IP address of your ESP32.
 
 ### The Begin function
 ```cpp
-PrettyOTA::Begin(Server, Username, Password, IsPasswordMD5Hash);
+PrettyOTA::Begin(Server, Username, Password, IsPasswordMD5Hash, otaPort);
 ```
 - Server: `AsyncWebServer*`
 - Username: `const char*` *(Optional)*
 - Password: `const char*` *(Optional)* - Can be normal text or an MD5 hash of the password
 - IsPasswordMD5Hash: `bool` *(Optional) Default: false* - Set to `true` if the password is a MD5 hash
+- otaPort: `int` *(Optional) Default: 3232* The port for ArduinoOTA / PlatformIO OTA upload
 
 ### Callbacks
 You can define your own callbacks which get called by PrettyOTA:
@@ -103,7 +104,8 @@ const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 AsyncWebServer  server(80);
 PrettyOTA       OTA;
 
-void OnOTAStart()
+// UpdateMode is FILESYSTEM or FIRMWARE
+void OnOTAStart(UPDATE_MODE updateMode)
 {
     Serial.println("OTA update started");
 }
