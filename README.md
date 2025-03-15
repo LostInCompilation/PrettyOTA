@@ -4,6 +4,17 @@
 
 ### <center>A modern looking OTA update server for ESP32 with easy rollback</center>
 
+## Contents
+- [Features](#features)
+- [Minimal example](#minimal-example)
+- [Preview](#preview)
+- [Usage](#usage)
+    - [The Begin function](#the-begin-function)
+    - [Callbacks](#callbacks)
+    - [Use default callbacks](#use-default-callbacks)
+
+*See also: [License (zlib)](LICENSE.md)*
+
 ## Features
 - ***Drag and drop*** firmware or filesystem .bin file to start updating
 - ***Rollback*** to previous firmware with one button click
@@ -11,7 +22,10 @@
 - Automatic ***reboot*** after update/rollback
 - If needed enable **authentication** (username and password login)
 
-## Usage
+## Minimal example
+With the example code below you can access PrettyOTA at *http://192.168.x.x/update*
+Replace the IP in the URL with the IP address of your ESP32.
+
 ```cpp
 #include <WiFi.h>
 #include "PrettyOTA.hpp"
@@ -37,10 +51,12 @@ void loop() {
 }
 ```
 
-## Demo
+## Preview
 ![Screen Recording 2025-03-02 at 08 26 48](https://github.com/user-attachments/assets/191e4082-1d72-49ef-8e65-83700b7cf4a4)
 
-## The Begin function
+## Usage
+
+### The Begin function
 ```cpp
 PrettyOTA::Begin(Server, Username, Password, IsPasswordMD5Hash);
 ```
@@ -49,7 +65,7 @@ PrettyOTA::Begin(Server, Username, Password, IsPasswordMD5Hash);
 - Password: `const char*` *(Optional)* - Can be normal text or an MD5 hash of the password
 - IsPasswordMD5Hash: `bool` *(Optional) Default: false* - Set to `true` if the password is a MD5 hash
 
-## Callbacks
+### Callbacks
 You can define your own callbacks which get called by PrettyOTA:
 
 ```cpp
@@ -99,3 +115,12 @@ void setup() {
 }
 ```
 
+### Use default callbacks
+PrettyOTA provides default callbacks, which just print the update status to the SerialMonitor (or any other Stream you specify).
+
+```cpp
+// Use default callbacks and print messages to Serial (serial monitor)
+OTAUpdates.UseDefaultCallbacks(&Serial);
+```
+
+When using default callbacks you get this output on your serial monitor:
