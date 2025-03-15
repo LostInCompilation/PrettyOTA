@@ -124,3 +124,5 @@ OTAUpdates.UseDefaultCallbacks(&Serial);
 ```
 
 When using default callbacks you get this output on your serial monitor:
+
+<img width="357" alt="Screenshot 2025-03-15 at 18 18 50" src="https://github.com/user-attachments/assets/4876388d-6543-46b7-a4c2-695acf0230d0" />
