@@ -29,6 +29,7 @@ With the example code below you can access PrettyOTA at *http://192.168.x.x/upda
 Replace the IP in the URL with the IP address of your ESP32.
 
 ```cpp
+#include <Arduino.h>
 #include <WiFi.h>
 #include "PrettyOTA.hpp"
 
@@ -92,6 +93,7 @@ PrettyOTA::Begin(Server, Username, Password, IsPasswordMD5Hash);
 You can define your own callbacks which get called by PrettyOTA:
 
 ```cpp
+#include <Arduino.h>
 #include <WiFi.h>
 #include "PrettyOTA.hpp"
 
