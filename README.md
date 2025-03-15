@@ -125,7 +125,7 @@ void setup() {
     // Initialize WiFi here
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     
-    // Initialize OTA
+    // Initialize OTA and set user and password
     OTAUpdates.Begin(&server, "admin", "123");
     
     // Set callbacks
@@ -139,11 +139,11 @@ void setup() {
 ```
 
 ### Use default callbacks
-PrettyOTA provides default callbacks, which just print the update status to the SerialMonitor (or any other Stream you specify).
+PrettyOTA provides default callbacks, which just print the update status to the SerialMonitor (or any other Stream you specify with `PrettyOTA::SetSerialOutputStream(Stream*)` ).
 
 ```cpp
-// Use default callbacks and print messages to Serial (serial monitor)
-OTAUpdates.UseDefaultCallbacks(&Serial);
+// Use default callbacks
+OTAUpdates.UseDefaultCallbacks();
 ```
 
 When using default callbacks you get this output on your serial monitor:
