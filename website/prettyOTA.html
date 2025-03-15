@@ -209,21 +209,24 @@
             });
             document.getElementById("rebootButton").addEventListener("click", async function (e) {
                 hideCustomAlert();
-                showElement("manualWaitForReboot");
+                hideElement("uploadColumn");
+                hideElement("settingsColumn");
+                hideElement("boardColumn");
+                hideElement("buttonColumn");
+                await sleep(270);
+                hideElement("successColumnSVG");
+                setSuccessMessage("Rebooting");
+                showElement("successColumn");
                 let xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = async function () {
                     if (xhr.readyState == 4) {
                         if (xhr.status == 200) {
-                            const isRebooted = await waitForServerReboot();
-                            hideElement("manualWaitForReboot");
-                            if(isRebooted) {
-                                showCustomAlert("Reboot successful", true);
-                            } else {
-                                showCustomAlert("Could not reconnect. Reboot could have failed or the new firmware does not behave correctly.");
-                            }
+                            await waitForServerRebootShowResult(true);
                         } else {
-                            hideElement("manualWaitForReboot");
-                            showCustomAlert("Sending reboot request failed. Server returned status code: " + xhr.status);
+                            hideElement("successColumnLoaderReboot");
+                            document.getElementById("successColumnRebootMessage").innerHTML = "Sending reboot request failed. Server returned status code: " + xhr.status;
+                            document.getElementById("goBackButton").disabled = false;
+                            document.getElementById("goBackButton2").disabled = false;
                         }
                     }
                 };
@@ -714,7 +717,7 @@
                 border: 2px solid #2d5fec;
                 border-radius: 9px;
                 align-items: center;
-                box-shadow: 0 5px 15px #00000092 !important;
+                box-shadow: 0 5px 15px #00000092;
                 transition: all 0.35s ease;
                 margin-top: 35px;
             }
@@ -736,6 +739,7 @@
                 border: 1px solid #808080;
                 background-color: #383838;
                 color: #9a9a9a;
+                box-shadow: none;
                 pointer-events: none;
             }
             .rollbackButton {
@@ -749,7 +753,7 @@
                 border: 2px solid #2d5fec;
                 border-radius: 8px;
                 align-items: center;
-                box-shadow: 0 5px 15px #00000092 !important;
+                box-shadow: 0 5px 15px #00000092;
                 transition: all 0.25s ease;
                 margin-bottom: 8px;
                 opacity: 1;
@@ -773,6 +777,7 @@
                 border: 1px solid #808080;
                 background-color: #383838;
                 color: #9a9a9a;
+                box-shadow: none;
                 pointer-events: none;
             }
             .rollbackButtonText {
@@ -789,7 +794,7 @@
                 border: 2px solid #2d5fec;
                 border-radius: 9px;
                 align-items: center;
-                box-shadow: 0 5px 15px #00000092 !important;
+                box-shadow: 0 5px 15px #00000092;
                 transition: all 0.25s ease;
                 margin-top: 8px;
                 opacity: 1;
@@ -809,6 +814,7 @@
                 border: 1px solid #808080;
                 background-color: #383838;
                 color: #9a9a9a;
+                box-shadow: none;
                 pointer-events: none;
             }
             .rebootButtonText {
@@ -925,7 +931,7 @@
 
             <!-- Success column -->
             <div id="successColumn" class="statusColumn hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 538 537" width="60px" height="60px" version="1.1">
+                <svg id="successColumnSVG" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 538 537" width="60px" height="60px" version="1.1">
                     <path fill="#0fc93b" stroke="none" fill-rule="evenodd" d="M 233.085 2.036 C -14.768 35.915, -85.223 363.031, 126.652 496.197 C 295.933 602.593, 525.799 486.284, 536.708 288.715 C 537.035 282.784, 537.685 277.695, 538.152 277.406 C 539.372 276.652, 539.226 258, 538 258 C 537.434 258, 536.992 255.071, 536.982 251.250 C 536.945 237.633, 532.042 209.988, 526.311 191.084 C 488.066 64.926, 362.980 -15.719, 233.085 2.036 M 252 53.661 C 70.486 71.365, -11.158 285.417, 113.467 416.864 C 238.518 548.760, 462.949 472.177, 482.930 290.789 C 497.452 158.962, 382.507 40.933, 252 53.661 M 300.500 230.599 C 261.450 269.850, 229.053 301.972, 228.506 301.982 C 227.959 301.992, 213.446 287.940, 196.255 270.755 L 164.997 239.509 146.251 258.256 L 127.505 277.002 178.004 327.501 L 228.503 378.001 319.496 287.004 L 410.488 196.008 392.004 177.504 C 381.838 167.327, 373.066 159.053, 372.510 159.118 C 371.955 159.182, 339.550 191.349, 300.500 230.599 M 0.365 268.500 C 0.368 274, 0.536 276.122, 0.738 273.216 C 0.941 270.311, 0.939 265.811, 0.734 263.216 C 0.528 260.622, 0.363 263, 0.365 268.500" />
                 </svg>
                 <p id="successMessage" class="statusTitleText">Update Successful</p>
@@ -1030,10 +1036,6 @@
                         <span class="rebootButtonText">Reboot</span>
                     </button>
                 </form>
-                <div id="manualWaitForReboot" class="waitForReboot hidden">
-                    <span id="loaderReboot" class="loaderReboot"></span>
-                    <p id="rebootMessage" class="waitForRebootDetailText">Rebooting device...</p>
-                </div>
             </div>
             
             <!-- Notification Bar -->

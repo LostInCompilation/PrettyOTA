@@ -39,8 +39,10 @@ private:
     static const uint8_t  TASK_PRIORITY_HANDLE_REBOOT_REQUEST = 3;
 
     // Website code
-    static const uint8_t PRETTY_OTA_WEBSITE_DATA[11840];
+    static const uint8_t PRETTY_OTA_WEBSITE_DATA[11823];
     static const uint8_t PRETTY_OTA_LOGIN_DATA[6105];
+
+    static Stream*     m_SerialMonitorStream;
 
     // Variables
     bool        m_AutoRebootEnabled = true;
@@ -65,6 +67,11 @@ private:
     static void HandleRebootRequest(void* parameter);
     bool IsAuthenticated(const AsyncWebServerRequest* const request) const;
 
+    // Default callback functions
+    static void OnOTAStart();
+    static void OnOTAProgress(uint32_t currentSize, uint32_t totalSize);
+    static void OnOTAEnd(bool successful);
+
 public:
     PrettyOTA() = default;
 
@@ -79,5 +86,5 @@ public:
     void OnEnd(std::function<void(bool successful)> func) { m_OnEndUpdate = func; }
 
     // Use built in callbacks that print info to the serial monitor
-    void UseDefaultCallbacks();
+    void UseDefaultCallbacks(Stream* const serialStream);
 };
