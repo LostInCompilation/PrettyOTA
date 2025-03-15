@@ -27,6 +27,7 @@ License:    See LICENSE.md
 
 class PrettyOTA
 {
+public:
     enum class UPDATE_MODE : uint8_t
     {
         FIRMWARE = 0,

@@ -105,7 +105,7 @@ AsyncWebServer  server(80);
 PrettyOTA       OTA;
 
 // UpdateMode is FILESYSTEM or FIRMWARE
-void OnOTAStart(UPDATE_MODE updateMode)
+void OnOTAStart(PrettyOTA::UPDATE_MODE updateMode)
 {
     Serial.println("OTA update started");
 }

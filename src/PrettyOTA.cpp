@@ -507,7 +507,8 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
 
 void PrettyOTA::EnableArduinoOTA(const char* const password, bool passwordIsMD5Hash, uint16_t OTAport)
 {
-    ArduinoOTA.setMdnsEnabled(false);
+    ArduinoOTA.setMdnsEnabled(false); // ToDO
+    //MDNS.enableArduino(_port, (_password.length() > 0));
     ArduinoOTA.setRebootOnSuccess(true); // ToDo
 
     // Port
