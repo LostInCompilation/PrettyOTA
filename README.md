@@ -8,6 +8,7 @@
 - [Features](#features)
 - [Minimal example](#minimal-example)
 - [Preview](#preview)
+- [PlatformIO](#platformio)
 - [Usage](#usage)
     - [The Begin function](#the-begin-function)
     - [Callbacks](#callbacks)
@@ -21,6 +22,7 @@
 - ***Show info*** about board (Firmware version, build time)
 - Automatic ***reboot*** after update/rollback
 - If needed enable **authentication** (username and password login)
+- Support for ArduinoOTA to directly upload OTA inside PlatformIO
 
 ## Minimal example
 With the example code below you can access PrettyOTA at *http://192.168.x.x/update*
@@ -53,6 +55,27 @@ void loop() {
 
 ## Preview
 ![Screen Recording 2025-03-02 at 08 26 48](https://github.com/user-attachments/assets/191e4082-1d72-49ef-8e65-83700b7cf4a4)
+
+## PlatformIO
+
+To use this library with PlatformIO, simply search for PrettyOTA inside PlatformIO Library Manager.
+
+Additionally you must add this line to your `platformio.ini`:
+
+```ini
+lib_compat_mode = strict
+```
+
+### OTA upload directly inside PlatformIO
+
+If you dont want to use the web interface of PrettyOTA, you can directly upload the firmware OTA with PlatformIO. Just change the `platformio.ini` file like usual for OTA uploads and add the following:
+
+```ini
+upload_protocol = espota
+upload_port = 192.168.x.x
+```
+
+Replace the IP address with the IP address of your ESP32.
 
 ## Usage
 
