@@ -1,6 +1,6 @@
 {
     "name": "PrettyOTA",
-    "version": "0.3.5",
+    "version": "0.3.6",
     "description": "A modern looking OTA web interface easy updates and rollbacks. Also directly supports PlatformIO OTA upload",
     "keywords": "OTA, update, wifi, web update, server, website, upgrade",
     "headers": "PrettyOTA.h",
@@ -40,6 +40,7 @@
         "exclude": [
             "img",
             ".github",
+            ".gitignore",
             "website"
         ]
     },
