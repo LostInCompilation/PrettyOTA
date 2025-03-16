@@ -13,7 +13,7 @@
     - [The Begin function](#the-begin-function)
     - [Callbacks](#callbacks)
     - [Use default callbacks](#use-default-callbacks)
-- [Help, I'm getting compilation errors](#help-i-m-getting-compilation-errors)
+- [Help, I'm getting compilation errors](#help-i-get-compilation-errors)
 
 *See also: [License (zlib)](LICENSE.md)*
 
@@ -158,7 +158,7 @@ When using default callbacks you get this output on your serial monitor:
 
 <img width="357" alt="Screenshot 2025-03-15 at 18 18 50" src="https://github.com/user-attachments/assets/4876388d-6543-46b7-a4c2-695acf0230d0" />
 
-## Help, I'm getting compilation errors
+## Help I get compilation errors
 
 If you get the following error when compiling:
 ```
