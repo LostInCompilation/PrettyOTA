@@ -36,6 +36,13 @@
         "base": "examples/callbacks",
         "files": ["callbacks.ino"]
     }],
+    "export": {
+        "exclude": [
+            "img",
+            ".github",
+            "website"
+        ]
+    },
     "license": "MIT",
     "frameworks": ["espidf", "arduino"],
     "platforms": "espressif32"
