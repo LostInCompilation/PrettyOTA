@@ -37,14 +37,14 @@ const char* WIFI_SSID     = "YOUR_SSID";
 const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 
 AsyncWebServer  server(80);
-PrettyOTA       OTA;
+PrettyOTA       OTAUpdates;
 
 void setup() {
     // Initialize WiFi
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     
     // Initialize OTA
-    OTA.Begin(&server);
+    OTAUpdates.Begin(&server);
     
     // Start web server
     server.begin();
@@ -102,7 +102,7 @@ const char* WIFI_SSID     = "YOUR_SSID";
 const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 
 AsyncWebServer  server(80);
-PrettyOTA       OTA;
+PrettyOTA       OTAUpdates;
 
 // UpdateMode is FILESYSTEM or FIRMWARE
 void OnOTAStart(PrettyOTA::UPDATE_MODE updateMode)
@@ -139,6 +139,9 @@ void setup() {
     
     // Start web server
     server.begin();
+}
+
+void loop() {
 }
 ```
 

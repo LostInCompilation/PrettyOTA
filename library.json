@@ -1,6 +1,6 @@
 {
     "name": "PrettyOTA",
-    "version": "0.3.0",
+    "version": "0.3.2",
     "description": "A better looking OTA web server for easy and modern looking updates and rollbacks.",
     "keywords": "OTA, update, wifi, web update, server",
     "repository":
@@ -19,6 +19,20 @@
       "ESP32Async/ESPAsyncWebServer": "*",
       "bblanchon/ArduinoJson": "*"
     },
+    "build": {
+        "libCompatMode": "strict"
+    },
+    "examples": [
+    {
+        "name": "Minimal",
+        "base": "examples/minimal",
+        "files": ["minimal.ino"]
+    },
+    {
+        "name": "Callbacks",
+        "base": "examples/callbacks",
+        "files": ["callbacks.ino"]
+    }],
     "license": "MIT",
     "frameworks": ["espidf", "arduino"],
     "platforms": "espressif32"
