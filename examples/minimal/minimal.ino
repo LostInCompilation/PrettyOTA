@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include "PrettyOTA.hpp"
+#include <PrettyOTA.h>
 
 const char* WIFI_SSID     = "YOUR_SSID";
 const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";

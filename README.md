@@ -13,6 +13,7 @@
     - [The Begin function](#the-begin-function)
     - [Callbacks](#callbacks)
     - [Use default callbacks](#use-default-callbacks)
+- [Help, I'm getting compilation errors](#help-i-m-getting-compilation-errors)
 
 *See also: [License (zlib)](LICENSE.md)*
 
@@ -31,7 +32,7 @@ Replace the IP in the URL with the IP address of your ESP32.
 ```cpp
 #include <Arduino.h>
 #include <WiFi.h>
-#include "PrettyOTA.hpp"
+#include <PrettyOTA.h>
 
 const char* WIFI_SSID     = "YOUR_SSID";
 const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
@@ -61,7 +62,7 @@ void loop() {
 
 To use this library with PlatformIO, simply search for PrettyOTA inside PlatformIO Library Manager.
 
-Additionally you must add this line to your `platformio.ini`:
+⚠️ **Important:** You must add this line to your `platformio.ini`:
 
 ```ini
 lib_compat_mode = strict
@@ -96,7 +97,7 @@ You can define your own callbacks which get called by PrettyOTA:
 ```cpp
 #include <Arduino.h>
 #include <WiFi.h>
-#include "PrettyOTA.hpp"
+#include <PrettyOTA.h>
 
 const char* WIFI_SSID     = "YOUR_SSID";
 const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
@@ -156,3 +157,16 @@ OTAUpdates.UseDefaultCallbacks();
 When using default callbacks you get this output on your serial monitor:
 
 <img width="357" alt="Screenshot 2025-03-15 at 18 18 50" src="https://github.com/user-attachments/assets/4876388d-6543-46b7-a4c2-695acf0230d0" />
+
+## Help, I'm getting compilation errors
+
+If you get the following error when compiling:
+```
+'ip_addr_t' {aka 'struct ip_addr'} has no member named 'addr'; did you mean 'u_addr'?
+```
+
+You must add this line to your `platformio.ini`:
+
+```ini
+lib_compat_mode = strict
+```
