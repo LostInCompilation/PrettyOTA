@@ -40,7 +40,8 @@ const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 AsyncWebServer  server(80);
 PrettyOTA       OTAUpdates;
 
-void setup() {
+void setup()
+{
     // Initialize WiFi
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     
@@ -51,7 +52,8 @@ void setup() {
     server.begin();
 }
 
-void loop() {
+void loop()
+{
 }
 ```
 
@@ -124,7 +126,8 @@ void OnOTAEnd(bool successful)
         Serial.println("OTA update failed");
 }
 
-void setup() {
+void setup()
+{
     Serial.begin(9600);
     
     // Initialize WiFi here
@@ -142,7 +145,8 @@ void setup() {
     server.begin();
 }
 
-void loop() {
+void loop()
+{
 }
 ```
 
