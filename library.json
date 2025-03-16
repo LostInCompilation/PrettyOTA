@@ -1,8 +1,9 @@
 {
     "name": "PrettyOTA",
-    "version": "0.3.2",
-    "description": "A better looking OTA web server for easy and modern looking updates and rollbacks.",
-    "keywords": "OTA, update, wifi, web update, server",
+    "version": "0.3.3",
+    "description": "A modern looking OTA web interface easy updates and rollbacks. Also directly supports PlatformIO OTA upload",
+    "keywords": "OTA, update, wifi, web update, server, website, upgrade",
+    "headers": "PrettyOTA.h",
     "repository":
     {
       "type": "git",
@@ -15,11 +16,13 @@
         "maintainer": true
       }
     ],
-    "dependencies": {
+    "dependencies":
+    {
       "ESP32Async/ESPAsyncWebServer": "*",
       "bblanchon/ArduinoJson": "*"
     },
-    "build": {
+    "build":
+    {
         "libCompatMode": "strict"
     },
     "examples": [

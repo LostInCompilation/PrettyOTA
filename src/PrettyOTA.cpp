@@ -14,7 +14,7 @@ License:    See LICENSE.md
 
 */
 
-#include "PrettyOTA.hpp"
+#include "PrettyOTA.h"
 
 Stream* PrettyOTA::m_SerialMonitorStream = nullptr;
 
