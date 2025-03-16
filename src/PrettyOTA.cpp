@@ -507,12 +507,24 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
 
 void PrettyOTA::EnableArduinoOTA(const char* const password, bool passwordIsMD5Hash, uint16_t OTAport)
 {
-    ArduinoOTA.setMdnsEnabled(false); // ToDO
-    //MDNS.enableArduino(_port, (_password.length() > 0));
+    ArduinoOTA.setPort(OTAport);
     ArduinoOTA.setRebootOnSuccess(true); // ToDo
 
-    // Port
-    ArduinoOTA.setPort(OTAport);
+    // Use hack to check if DNS is running
+    esp_ip4_addr_t ipv4;
+    const esp_err_t dnsResult = mdns_query_a("localhost", 100, &ipv4);
+
+    if (dnsResult != ESP_ERR_INVALID_STATE)
+    {
+        // DNS is running, enable arduino ota discovery
+        ArduinoOTA.setMdnsEnabled(false);
+        MDNS.enableArduino(OTAport, (String(password).length() > 0));
+    }
+    else
+    {
+        // DNS is not running. Enable it
+        ArduinoOTA.setMdnsEnabled(true);
+    }
 
     // Password
     if (strcmp(password, "") != 0)

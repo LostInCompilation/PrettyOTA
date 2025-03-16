@@ -19,6 +19,7 @@ License:    See LICENSE.md
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 #include <ArduinoJson.h>
+#include <ESPmDNS.h>
 #include <ESPAsyncWebServer.h>
 #include <Update.h>
 #include <MD5Builder.h>
@@ -42,7 +43,7 @@ private:
 
 private:
     // Constants
-    static const uint8_t  MAX_NUM_LOGGED_IN_CLIENTS = 4;
+    static const uint8_t  MAX_NUM_LOGGED_IN_CLIENTS = 5;
     static const uint32_t BACKGROUND_TASK_STACK_SIZE = 4096;
     static const uint8_t  BACKGROUND_TASK_PRIORITY = 4;
 
