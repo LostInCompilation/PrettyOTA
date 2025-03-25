@@ -4,7 +4,7 @@
 
 ### <center>A modern looking OTA update server for ESP32 with easy rollback</center>
 
-⚠ A big release (V1.0) with many improvements and way more detailed README is currently in development. It will be release the next few days (including on the Arduino Library Manager)
+# A big release (V1.0) with many improvements and way more detailed README is currently in development. It will be release the next few days (including on the Arduino Library Manager)
 
 ## Contents
 - [Features](#features)
