@@ -107,7 +107,7 @@ lib_compat_mode = strict
 ### Arduino
 You can download PrettyOTA from the Arduino Library Manager. Simply search for PrettyOTA inside ArduinoIDE.
 
-Alternatively you can download the `.zip` file from GitHub and import it into the ArduinoIDE (Sketch->Include library->Add .ZIP library).
+Alternatively you can download the latest release / `.zip` file from GitHub and import it into the ArduinoIDE (Sketch->Include library->Add .ZIP library).
 
 ### GitHub
 Clone the repository or download the latest release / `.zip` file.

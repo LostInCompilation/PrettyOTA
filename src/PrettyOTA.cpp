@@ -35,7 +35,6 @@ Description:
 #include "PrettyOTA.h"
 
 //using namespace NSPrettyOTA;
-ArduinoOTAManager ardu;
 
 Stream* PrettyOTA::m_SerialMonitorStream = nullptr;
 
