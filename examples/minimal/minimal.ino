@@ -5,16 +5,16 @@
 const char* WIFI_SSID     = "YOUR_SSID";
 const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 
-AsyncWebServer  server(80);
-PrettyOTA       OTA;
+AsyncWebServer  server(80); // Server on port 80 (HTTP)
+PrettyOTA       OTAUpdates;
 
 void setup()
 {
     // Initialize WiFi
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
-    // Initialize OTA
-    OTA.Begin(&server);
+    // Initialize PrettyOTA
+    OTAUpdates.Begin(&server);
 
     // Start web server
     server.begin();
@@ -22,5 +22,6 @@ void setup()
 
 void loop()
 {
+    // Give CPU time to other running tasks
     delay(100);
 }

@@ -9,9 +9,14 @@ AsyncWebServer  server(80);
 PrettyOTA       OTAUpdates;
 
 // updateMode is FILESYSTEM or FIRMWARE
-void OnOTAStart(PrettyOTA::UPDATE_MODE updateMode)
+void OnOTAStart(NSPrettyOTA::UPDATE_MODE updateMode)
 {
     Serial.println("OTA update started");
+
+    if(updateMode == NSPrettyOTA::UPDATE_MODE::FIRMWARE)
+        Serial.println("Mode: Firmware");
+    else if(updateMode == NSPrettyOTA::UPDATE_MODE::FILESYSTEM)
+        Serial.println("Mode: Filesystem");
 }
 
 void OnOTAProgress(uint32_t currentSize, uint32_t totalSize)
@@ -29,12 +34,12 @@ void OnOTAEnd(bool successful)
 
 void setup()
 {
-    Serial.begin(9600);
+    Serial.begin(115200);
 
     // Initialize WiFi here
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
-    // Initialize OTA and set user and password
+    // Initialize PrettyOTA and set username and password authentication
     OTAUpdates.Begin(&server, "admin", "123");
 
     // Set callbacks
