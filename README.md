@@ -49,7 +49,7 @@ You can view the changelog here: [Changelog](CHANGELOG.md)
 - Support for ***ArduinoOTA*** to directly upload firmware over WiFi inside Arduino IDE and PlatformIO (tutorial included)
 
 ## Demo
-![Screen Recording 2025-03-02 at 08 26 48](https://github.com/user-attachments/assets/191e4082-1d72-49ef-8e65-83700b7cf4a4)
+TODO: DEMO
 
 ## Minimal example
 With the example code below you can access PrettyOTA at `http://IP_ADDRESS/update`, or upload via OTA inside ArduinoIDE and PlatformIO
@@ -227,9 +227,7 @@ OTAUpdates.UseDefaultCallbacks();
 
 When using the default callbacks you will get this output on your serial monitor during an OTA update:
 
-<img width="357" alt="Screenshot 2025-03-15 at 18 18 50" src="https://github.com/user-attachments/assets/4876388d-6543-46b7-a4c2-695acf0230d0" />
-
-TODO CHANGE PICTURE
+TODO: PICTURE
 
 ### Unmounting SPIFFS filesystem before update
 TODO
