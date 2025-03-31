@@ -22,10 +22,16 @@
     - [Arduino](#arduino)
     - [GitHub](#github)
     - [Dependencies](#dependencies)
+    - [OTA upload directly inside PlatformIO](#ota-upload-directly-inside-platformio)
 - [Usage](#usage)
     - [Documentation of all functions](#documentation-of-all-functions)
+        - [Begin()](#begin)
+        - [SetAuthenticationDetails()](#setauthenticationdetails)
+        - [UseDefaultCallbacks()](#usedefaultcallbacks)
+        - [SetSerialOutputStream()](#setserialoutputstream)
+        - [OnStart(), OnProgress(), OnEnd()](#onstart-onprogress-onend)
     - [Authentication (username and password)](#authentication-username-and-password)
-    - [Enable DNS](#enable-dns)
+    - [Use mDNS](#use-mdns)
     - [Callbacks](#callbacks)
         - [Use default callbacks](#use-default-callbacks)
     - [Unmounting SPIFFS filesystem before update](#unmounting-spiffs-filesystem-before-update)
@@ -90,7 +96,6 @@ void loop()
 
 ## Installation
 ### PlatformIO
-
 To use this library with PlatformIO, simply search for PrettyOTA inside PlatformIO Library Manager.
 
 ⚠️ **Important:** You must add this line to your `platformio.ini`:
@@ -183,8 +188,8 @@ SetAuthenticationDetails("", "");
 
 Authentication is disabled by default if you don't pass any values to `username` and `password` inside `Begin()`.
 
-### Enable DNS
-You can use the mDNS to display the hostname for the OTA upload target inside ArduinoIDE. You can also use it to access the ESP32 using a normal URL like `http://my-esp.local/update` in your local network.
+### Use mDNS
+You can use the mDNS to display the hostname for the OTA upload target inside ArduinoIDE. You can also use it to access the ESP32 using a normal URL like `http://my-esp.local/update` in your local network instead of the IP address.
 
 TODO
 ```cpp
@@ -309,7 +314,13 @@ OTAUpdates.Begin(&server, "admin", "123", false, "/myCustomUpdateURL", "/myCusto
 With the code above you can reach PrettyOTA under `http://YOUR_IP/myCustomUpdateURL`.
 
 ### How can I set the version number of my firmware?
-TODO
+In PlatformIO simply create a text file called `version.txt` in your projects root folder. The content of the textfile must be one line containing the firmware version:
+```text
+1.0.0
+```
+PlatformIO will automatically find the `version.txt` file and set the version of your firmware, which gets displayed by PrettyOTA in the browser.
+
+TODO: Arduino
 
 ## Use PrettyOTA with ESP-IDF
 TODO
@@ -319,7 +330,6 @@ If you get the following error when compiling with PlatformIO:
 ```
 'ip_addr_t' {aka 'struct ip_addr'} has no member named 'addr'; did you mean 'u_addr'?
 ```
-
 You must add this line to your `platformio.ini`:
 
 ```ini
