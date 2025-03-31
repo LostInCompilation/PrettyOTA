@@ -1,0 +1,18 @@
+# Syntax Coloring Map For ExampleLibrary
+
+# Datatypes (KEYWORD1)
+UPDATE_MODE     KEYWORD1
+UPDATE_ERROR    KEYWORD1
+
+# Methods and Functions (KEYWORD2)
+Begin KEYWORD2
+SetAuthenticationDetails KEYWORD2
+OnStart KEYWORD2
+OnProgress KEYWORD2
+OnEnd KEYWORD2
+UseDefaultCallbacks KEYWORD2
+SetSerialOutputStream KEYWORD2
+
+# Instances (KEYWORD2)
+
+# Constants (LITERAL1)

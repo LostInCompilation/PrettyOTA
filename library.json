@@ -1,8 +1,8 @@
 {
     "name": "PrettyOTA",
-    "version": "0.3.8",
-    "description": "A modern looking OTA web interface easy updates and rollbacks. Also directly supports PlatformIO OTA upload",
-    "keywords": "OTA, update, wifi, web update, server, website, upgrade",
+    "version": "1.0.0",
+    "description": "A modern looking OTA web interface for easy updates and rollbacks. Also directly supports PlatformIO OTA upload",
+    "keywords": "OTA, update, upgrade, wifi, web update, server, website, firmware",
     "headers": "PrettyOTA.h",
     "repository":
     {
@@ -45,6 +45,6 @@
         ]
     },
     "license": "MIT",
-    "frameworks": ["espidf", "arduino"],
+    "frameworks": ["arduino"],
     "platforms": "espressif32"
 }

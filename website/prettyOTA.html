@@ -8,7 +8,7 @@
         <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' xmlns:v='https://vecta.io/nano'%3E%3Cpath d='M0 0h512v512H0V0z' fill='%23454545'/%3E%3Cpath d='M155.358 89.853l3.371-.022 3.702-.008 3.899-.02 12.826-.041 4.433-.012 20.87-.042 23.966-.077 18.589-.048 11.066-.036C292.726 89.32 320.276 95.427 346 120c11.511 11.857 19.348 26.184 24 42l.965 3.105c5.562 21.043 2.684 44.2-5.965 63.895l-1.305 3.02C353.52 253.952 333.683 272.57 311 281c-18.677 6.795-36.629 7.29-56.312 7.195l-6.927-.009-18.07-.049-18.503-.04L175 288l.008 1.852.147 44.672.071 21.603.056 18.836.035 9.967.023 11.146.033 3.313c-.029 7.064-.542 13.21-5.24 18.853-5.864 4.769-10.089 7.293-17.797 7.063-6.109-.797-10.049-3.552-13.773-8.367-3.032-4.304-3.689-7.59-3.71-12.825l-.022-3.726-.008-4.095-.02-4.307-.041-14.153-.012-4.876-.042-22.912-.077-26.427-.048-20.439-.036-12.201-.017-11.487-.02-4.204c-.077-8.341-.097-15.383 5.902-21.797 4.622-4.136 8.932-5.74 15.055-5.742l3.291-.016 3.581.012 3.796-.011 8.165-.008 12.956-.029 36.842-.077 20.356-.055 10.746-.017c23.798.055 43.383-.912 61.55-18.176 10.626-11.198 16.528-25.929 16.207-41.452-.849-16.206-6.779-30.028-17.957-41.919-13.741-11.13-27.272-15.31-44.812-15.271l-3.802-.016-8.137-.018-12.889-.041-32.003-.101-24.901-.083-12.79-.028-9.852-.042-3.543.014c-7.426-.066-14.612-.496-20.61-5.282-4.68-5.881-7.194-10.13-6.965-17.797.797-6.109 3.552-10.049 8.367-13.773 4.115-2.899 7.286-3.688 12.296-3.71z' fill='%232cb3a6'/%3E%3C/svg%3E" />
         <script type="module" crossorigin>
             const sleep = ms => new Promise(r => setTimeout(r, ms));
-            var md5 = (function() {
+            const md5 = (function() {
                 var MD5 = function (d) {
                     return M(V(Y(X(d), 8 * d.length)))
                 }
@@ -81,19 +81,20 @@
                     }
                     return MD5(binary.join(''));
                 }
-
                 return MD5Unicode;
             })();
-            const hashFromFile = async (l) => new Promise((resolve, reject) => {
-                let str = "";
+
+            // Calculate hash from file
+            const hashFromFile = async (file) => new Promise((resolve, reject) => {
                 let reader = new FileReader();
-                reader.onload = function (c) {
-                    let data = new Uint8Array(c.target.result);
-                    str = md5(data);
-                    resolve(str);
+                reader.onload = function (e) {
+                    const data = new Uint8Array(e.target.result);
+                    resolve(md5(data));
                 };
-                reader.readAsArrayBuffer(l);
+                reader.readAsArrayBuffer(file);
             });
+
+            // Do update
             async function runUpdate(file) {
                 hideElement("uploadColumn");
                 hideElement("settingsColumn");
@@ -101,63 +102,51 @@
                 hideElement("buttonColumn");
                 await sleep(270);
                 showElement("progressColumn");
-                const otaMode = document.getElementById("otaMode").value;
-                const reboot = document.getElementById("rebootCheckboxInput").checked;
+                setProgressTitle("Starting OTA update");
+
                 try {
-                    setProgressTitle("Starting OTA Process");
-                    let fileHash = await hashFromFile(file);
-                    const response = await fetch(`/ota/start?mode=${otaMode}&hash=${fileHash}&reboot=${reboot}`);
+                    const fileHash = await hashFromFile(file);
+                    const otaMode = document.getElementById("otaMode").value;
+                    const reboot = document.getElementById("rebootCheckboxInput").checked;
+
+                    // Send ota-start request
+                    const response = await fetch(`/prettyota/start?mode=${otaMode}&hash=${fileHash}&reboot=${reboot}`);
                     if (!response.ok)
-                        throw new Error("Start OTA process failed");
+                        throw new Error("Could not start OTA update");
+
                     let xhr = new XMLHttpRequest();
-                    xhr.upload.addEventListener(
-                        "progress",
-                        function (r) {
-                            let percentage = Math.round((r.loaded / r.total) * 100);
-                            document.getElementById("progressBar").style.width = percentage + "%";
-                            document.getElementById("progressValue").innerHTML = percentage + "%";
-                        },
-                        !1
-                    );
                     xhr.upload.onprogress = function (r) {
                         if (r.lengthComputable) {
-                            let percentage = Math.round((r.loaded / r.total) * 100);
+                            const percentage = Math.round((r.loaded / r.total) * 100);
                             document.getElementById("progressBar").style.width = percentage + "%";
                             document.getElementById("progressValue").innerHTML = percentage + "%";
                         }
                     };
                     xhr.onreadystatechange = async function () {
                         if (xhr.readyState == 4) {
+                            document.getElementById("progressBar").style.width = "100%";
+                            document.getElementById("progressBar").innerHTML = "100%";
+                            hideElement("progressColumn");
+                            await sleep(270);
                             if (xhr.status == 200) {
-                                document.getElementById("progressBar").style.width = "100%";
-                                document.getElementById("progressBar").innerHTML = "100%";
-                                hideElement("progressColumn");
-                                await sleep(270);
                                 showElement("successColumn");
                                 setSuccessMessage("Update Successful");
                                 await waitForServerRebootShowResult();
                             } else if (xhr.status == 400) {
-                                document.getElementById("progressBar").style.width = "100%";
-                                document.getElementById("progressBar").innerHTML = "100%";
-                                hideElement("progressColumn");
-                                await sleep(270);
                                 showElement("errorColumn");
                                 setErrorTitle("Upload failed");
                                 setErrorReason(xhr.responseText);
                             } else {
-                                document.getElementById("progressBar").style.width = "100%";
-                                document.getElementById("progressBar").innerHTML = "100%";
-                                hideElement("progressColumn");
-                                await sleep(270);
                                 showElement("errorColumn");
                                 setErrorTitle("Upload failed");
                                 setErrorReason("Server returned status code " + xhr.status);
                             }
                         }
                     };
+
                     const formData = new FormData();
                     formData.append("file", file, file.name);
-                    xhr.open("POST", "/ota/upload");
+                    xhr.open("POST", "/prettyota/upload");
                     xhr.send(formData);
                     setProgressTitle("Uploading " + file.name);
                 } catch (e) {
@@ -168,18 +157,24 @@
                     setErrorReason(e.message);
                 }
             }
+
+            // Handle <input> event
             function onFileInput(files) {
                 hideCustomAlert();
                 if (files.length > 1) {
-                    showCustomAlert("Only a single .bin file can be uploaded at once.");
-                    return !1;
+                    showCustomAlert("Only a single file can be uploaded at once.");
+                    return false;
                 }
                 if (files[0].name.split(".").pop() != "bin") {
-                    showCustomAlert("Only .bin files can be uploaded.");
-                    return !1;
+                    showCustomAlert("Only \".bin\" files can be uploaded.");
+                    return false;
                 }
+
                 runUpdate(files[0]);
+                return true;
             }
+
+            // Button events
             document.getElementById("rollbackButton").addEventListener("click", async function (e) {
                 hideCustomAlert();
                 hideElement("uploadColumn");
@@ -204,7 +199,7 @@
                         }
                     }
                 };
-                xhr.open("POST", "/ota/rollback");
+                xhr.open("POST", "/prettyota/doRollback");
                 xhr.send();
             });
             document.getElementById("rebootButton").addEventListener("click", async function (e) {
@@ -230,20 +225,44 @@
                         }
                     }
                 };
-                xhr.open("POST", "/ota/doManualReboot");
+                xhr.open("POST", "/prettyota/doManualReboot");
                 xhr.send();
             });
+            document.getElementById("logoutButton").addEventListener("click", async function (e) {
+                let xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = async function () {
+                    if (xhr.readyState == 4) {
+                        if (xhr.status == 200) {
+                            resetView();
+                        } else {
+                            hideCustomAlert();
+                            showCustomAlert("Log out failed");
+                        }
+                    }
+                };
+                xhr.open("POST", "/prettyota/logout");
+                xhr.send();
+            });
+
+            // Checkbox event
             document.getElementById("rebootCheckboxInput").addEventListener("click", function (e) {
                 localStorage.setItem("reboot_checkbox", document.getElementById("rebootCheckboxInput").checked);
             });
 
+            // Drop area events
             let dropArea = document.getElementById("dropzone");
-            dropArea.addEventListener("dragover", dragOverHandler, false);
-            dropArea.addEventListener("drop", dropHandler, false);
-            dropArea.addEventListener("dragenter", dropHighlight, false);
-            dropArea.addEventListener("dragover", dropHighlight, false);
-            dropArea.addEventListener("dragleave", dropUnhighlight, false);
-            dropArea.addEventListener("drop", dropUnhighlight, false);
+            dropArea.addEventListener("dragover", function (e) {
+                e.preventDefault();
+            });
+            dropArea.addEventListener("drop", function (e) {
+                e.preventDefault();
+                const files = e.dataTransfer.files;
+                onFileInput(files);
+            });
+            dropArea.addEventListener("dragenter", dropHighlight);
+            dropArea.addEventListener("dragover", dropHighlight);
+            dropArea.addEventListener("dragleave", dropUnhighlight);
+            dropArea.addEventListener("drop", dropUnhighlight);
             dropArea.addEventListener("click", function (e) {
                 document.getElementById("fileInput").click();
             });
@@ -253,42 +272,37 @@
             function dropUnhighlight(e) {
                 dropArea.classList.remove("dropzone-highlight");
             }
-            function dropHandler(e) {
-                e.preventDefault();
-                let files = e.dataTransfer.files;
 
-                onFileInput(files);
+            // UI helper functions
+            function showElement(elementID) {
+                document.getElementById(elementID).classList.remove("hidden");
             }
-            function dragOverHandler(e) {
-                e.preventDefault();
+            function hideElement(elementID) {
+                document.getElementById(elementID).classList.add("hidden");
             }
-
-            function showElement(e) {
-                document.getElementById(e).classList.remove("hidden");
+            function setProgressTitle(str) {
+                document.getElementById("progressTitle").innerHTML = str;
             }
-            function hideElement(e) {
-                document.getElementById(e).classList.add("hidden");
+            function setSuccessMessage(str) {
+                document.getElementById("successMessage").innerHTML = str;
             }
-            function setProgressTitle(e) {
-                document.getElementById("progressTitle").innerHTML = e;
+            function setErrorTitle(str) {
+                document.getElementById("errorTitle").innerHTML = str;
             }
-            function setSuccessMessage(e) {
-                document.getElementById("successMessage").innerHTML = e;
-            }
-            function setErrorTitle(e) {
-                document.getElementById("errorTitle").innerHTML = e;
-            }
-            function setErrorReason(e) {
-                document.getElementById("errorReason").innerHTML = e;
+            function setErrorReason(str) {
+                document.getElementById("errorReason").innerHTML = str;
             }
 
-            var showTimeout;
+            // Notification bar functions
+            let showTimeout;
             function showCustomAlert(msg, asSuccess = false) {
                 document.getElementById("notificationMessage").innerText = msg;
+
                 if(asSuccess)
                     document.getElementById("notificationBar").classList.add("notificationBarSuccess");
                 else
                     document.getElementById("notificationBar").classList.remove("notificationBarSuccess");
+
                 document.getElementById("notificationBar").classList.add("show");
                 clearTimeout(showTimeout);
                 showTimeout = setTimeout(function() {
@@ -299,21 +313,39 @@
                 clearTimeout(showTimeout);
                 document.getElementById("notificationBar").classList.remove("show");
             }
-            function resetView() {
-                window.location.reload();
-            }
 
+            // Query info about PrettyOTA (version, URLs)
+            async function queryPrettyOTAInfo() {
+                let xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        let jsonObj = JSON.parse(this.responseText);
+                        document.getElementById("versionString").innerText = jsonObj.prettyotaVersion;
+                        localStorage.setItem("version_string", jsonObj.prettyotaVersion);
+                        localStorage.setItem("main_url", jsonObj.mainURL);
+                        localStorage.setItem("login_url", jsonObj.loginURL);
+
+                        if(jsonObj.authenticationEnabled)
+                            showElement("logoutButton");
+                        else
+                            hideElement("logoutButton");
+                    }
+                };
+
+                xhr.open("GET", "/prettyota/queryPrettyOTAInfo");
+                xhr.send();
+            }
             async function queryInfo() {
                 let xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState == 4) {
                         if (xhr.status == 200) {
                             let jsonObj = JSON.parse(this.responseText);
+
                             document.getElementById("firmware_version_text").innerText = jsonObj.firmwareVersion;
-                            document.getElementById("sdk_version_text").innerText = jsonObj.sdkVersion;
-                            //document.getElementById("project_name_text").innerText = jsonObj.projectName;
-                            //document.getElementById("build_time_text").innerText = jsonObj.buildDate + " at " + jsonObj.buildTime;
-                            document.getElementById("build_time_text").innerText = jsonObj.buildDate;
+                            document.getElementById("build_date_text").innerText = jsonObj.buildDate;
+                            document.getElementById("build_time_text").innerText = jsonObj.buildTime;
+
                             if (jsonObj.rollbackPossible) {
                                 document.getElementById("rollbackButton").disabled = false;
                                 document.getElementById("rollback_text").style = "color:#00ff00;";
@@ -330,9 +362,12 @@
                         }
                     }
                 };
-                xhr.open("GET", "/ota/queryInfo", true);
+
+                xhr.open("GET", "/prettyota/queryInfo");
                 xhr.send();
             }
+
+            // Wait for server reboot functions
             async function waitForServerReboot() {
                 const interval = 1500;
                 const attempts = 10;
@@ -350,7 +385,7 @@
                         xhttp.onerror = function() {
                             count++;
                         }
-                        xhttp.open("GET", "/ota/rebootCheck");
+                        xhttp.open("GET", "/prettyota/rebootCheck");
                         xhttp.send();
                     }
                     catch {
@@ -379,14 +414,35 @@
                     hideElement("successColumnLoaderReboot");
                 }
             }
-            window.onFileInput = onFileInput;
-            window.resetView = resetView;
-            window.onload = () => {
+
+            // Reload page
+            function resetView() {
+                window.location.reload();
+            }
+
+            // On page load
+            function onLoad() {
                 if (!("reboot_checkbox" in localStorage))
                     localStorage.setItem("reboot_checkbox", true);
+
+                if (!("version_string" in localStorage))
+                    localStorage.setItem("version_string", "1.0.0");
+                if (!("main_url" in localStorage))
+                    localStorage.setItem("main_url", "/update");
+                if (!("login_url" in localStorage))
+                    localStorage.setItem("login_url", "/login");
+
                 document.getElementById("rebootCheckboxInput").checked = localStorage.getItem("reboot_checkbox") == "true";
+                document.getElementById("versionString").innerText = localStorage.getItem("version_string");
+
+                queryPrettyOTAInfo();
                 queryInfo();
-            };
+            }
+
+            // Publish functions
+            window.onFileInput = onFileInput;
+            window.resetView = resetView;
+            window.onload = onLoad;
         </script>
         <style>
             html {
@@ -405,8 +461,8 @@
                 line-height: 3px;
                 background-color: #313131;
                 color: #898989;
-                text-align: center;
                 font-size: 13px;
+                box-shadow: 0px -0px 8px #000000;
             }
             .mainDiv {
                 display: flex;
@@ -533,26 +589,37 @@
                     opacity: 0;
                 }
             }
-            .loaderReboot {
-                display: inline-block;
-                width: 13px;
-                height: 13px;
-                padding: 4.5px;
-                margin-top: 2px;
-                border-radius: 50%;
-                background: #25b09b;
-                --_m:
-                conic-gradient(#0000 10%, #000),
-                linear-gradient(#000 0 0) content-box;
-                -webkit-mask: var(--_m);
-                  mask: var(--_m);
-                -webkit-mask-composite: source-out;
-                  mask-composite: subtract;
-                animation: l3 1s infinite linear;
+            .loaderRebootSVG {
+                width: 23px;
+                transform-origin: center;
+                animation: rotate4 2s linear infinite;
+                margin-top: -1px;
             }
-            @keyframes l3 {
-                to{
-                    transform: rotate(1turn);
+            .loaderRebootCircle {
+                fill: none;
+                stroke: #25b09b;
+                stroke-width: 7;
+                stroke-dasharray: 1, 200;
+                stroke-dashoffset: 0;
+                stroke-linecap: round;
+                animation: dash4 1.5s ease-in-out infinite;
+            }
+            @keyframes rotate4 {
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+            @keyframes dash4 {
+                0% {
+                    stroke-dasharray: 1, 200;
+                    stroke-dashoffset: 0;
+                }
+                50% {
+                    stroke-dasharray: 90, 200;
+                    stroke-dashoffset: -35px;
+                }
+                100% {
+                    stroke-dashoffset: -125px;
                 }
             }
             .uploadColumn {
@@ -596,9 +663,20 @@
                 margin-top: 1px;
             }
             .columnHeaderText {
-                margin-top: 16px;
+                margin-top: 15px;
                 margin-bottom: 7px;
                 color: #b0b0b0;
+            }
+            .columnHeaderSVG {
+                position: relative;
+                color: #25b09b;
+                margin-top: 6px;
+            }
+            .columnHeaderSVGMCU {
+                margin-right: 12px;
+            }
+            .columnHeaderSVGGear {
+                margin-right: 8px;
             }
             .column {
                 width: 340px;
@@ -680,7 +758,14 @@
                 margin-top: 30px;
                 flex-direction: column;
                 align-items: center;
-            }            
+            }
+            .buttonColumn {
+                display: inline-flex;
+                margin-top: 30px;
+                flex-direction: row;
+                align-items: center;
+                gap: 15px;
+            }
             .statusTitleText {
                 margin-top: 15px;
                 margin-bottom: 5px;
@@ -708,35 +793,37 @@
             }
             .goBackButton {
                 display: flex;
-                background: #0e121f;
+                background: #2d5fec;
                 color: #e4e6eb;
                 cursor: pointer;
-                width: 120px;
-                height: 42px;
-                font-size: 13px;
-                border: 2px solid #2d5fec;
-                border-radius: 9px;
+                width: 140px;
+                height: 45px;
+                padding-left: 15px;
+                font-weight: bold;
+                font-size: 14px;
+                border: 0;
+                border-radius: 13px;
                 align-items: center;
                 box-shadow: 0 5px 15px #00000092;
-                transition: all 0.35s ease;
-                margin-top: 35px;
+                transition: all 0.25s ease;
+                margin-top: 30px;
             }
             .goBackButton:hover {
-                background-color: #2d5fec;
+                background-color: #4d82ff;
             }
             .goBackButton > svg {
                 width: 35px;
-                transition: transform 0.3s normal;
+                transition: transform 0.25s normal;
                 scale: 1.3;
             }
             .goBackButton:hover svg {
-                transform: translateX(-5px);
+                transform: translateX(-3px);
             }
             .goBackButton:active {
-                transform: scale(0.95);
+                transform: scale(0.96);
+                background-color: #0045e6;
             }
             .goBackButton:disabled {
-                border: 1px solid #808080;
                 background-color: #383838;
                 color: #9a9a9a;
                 box-shadow: none;
@@ -744,22 +831,22 @@
             }
             .rollbackButton {
                 display: flex;
-                background: #0e121f;
+                background: #2d5fec;
                 color: #e4e6eb;
                 cursor: pointer;
-                width: 200px;
-                height: 47px;
-                font-size: 15px;
-                border: 2px solid #2d5fec;
-                border-radius: 8px;
+                width: 150px;
+                height: 45px;
+                font-weight: bold;
+                font-size: 14px;
+                border: 0;
+                border-radius: 13px;
                 align-items: center;
                 box-shadow: 0 5px 15px #00000092;
                 transition: all 0.25s ease;
-                margin-bottom: 8px;
                 opacity: 1;
             }
             .rollbackButton:hover {
-                background-color: #2d5fec;
+                background-color: #4d82ff;
             }
             .rollbackButton > svg {
                 position: absolute;
@@ -771,36 +858,36 @@
                 transform: rotate(-180deg);
             }
             .rollbackButton:active {
-                transform: scale(0.95);
+                transform: scale(0.96);
+                background-color: #0045e6;
             }
             .rollbackButton:disabled {
-                border: 1px solid #808080;
                 background-color: #383838;
                 color: #9a9a9a;
                 box-shadow: none;
                 pointer-events: none;
             }
             .rollbackButtonText {
-                margin-left: 44px;
+                margin-left: 30px;
             }
             .rebootButton {
                 display: flex;
-                background: #0e121f;
+                background: #2d5fec;
                 color: #e4e6eb;
                 cursor: pointer;
-                width: 200px;
-                height: 47px;
-                font-size: 15px;
-                border: 2px solid #2d5fec;
-                border-radius: 9px;
+                width: 150px;
+                height: 45px;
+                font-weight: bold;
+                font-size: 14px;
+                border: 0;
+                border-radius: 13px;
                 align-items: center;
                 box-shadow: 0 5px 15px #00000092;
                 transition: all 0.25s ease;
-                margin-top: 8px;
                 opacity: 1;
             }
             .rebootButton:hover {
-                background-color: #2d5fec;
+                background-color: #4d82ff;
             }
             .rebootButton > svg {
                 position: absolute;
@@ -808,18 +895,44 @@
                 scale: 1.14;
             }
             .rebootButton:active {
-                transform: scale(0.95);
+                transform: scale(0.96);
+                background-color: #0045e6;
             }
             .rebootButton:disabled {
-                border: 1px solid #808080;
                 background-color: #383838;
                 color: #9a9a9a;
                 box-shadow: none;
                 pointer-events: none;
             }
             .rebootButtonText {
-                margin-left: 72px;
-            }            
+                margin-left: 53px;
+            }
+            .logoutButton {
+                position: relative;
+                float: right;
+                padding-right: 25px;
+                bottom: 26px;
+                height: 23px;
+                background-color: transparent;
+                color: #ececec;
+                border: none;
+                cursor: pointer;
+            }
+            .logoutButton:hover {
+                color: #75ffea;
+            }
+            .logoutButton:active {
+                color: #5cc6b6;
+            }
+            #logoutSVG {
+                position: relative;
+                top: -2px;
+                left: -4px;
+            }
+            #logoutText {
+                position: relative;
+                top: -9px;
+            }
             .progressBarContainer {
                 display: inline-flex;
                 flex-direction: row;
@@ -936,7 +1049,7 @@
                 </svg>
                 <p id="successMessage" class="statusTitleText">Update Successful</p>
                 <div class="successColumnWaitForReboot">
-                    <span id="successColumnLoaderReboot" class="loaderReboot"></span>
+                    <svg id="successColumnLoaderReboot" class="loaderRebootSVG" viewBox="25 25 50 50"><circle class="loaderRebootCircle" r="20" cy="50" cx="50"></circle></svg>
                     <p id="successColumnRebootMessage" class="waitForRebootDetailText">Rebooting device...</p>
                 </div>
                 <button disabled id="goBackButton" onclick="resetView()" type="button" class="goBackButton">
@@ -967,6 +1080,7 @@
             <!-- Board info column -->
             <div id="boardColumn" class="column">
                 <div class="columnHeader">
+                    <svg class="columnHeaderSVG columnHeaderSVGMCU" xmlns="http://www.w3.org/2000/svg" fill="currentcolor" version="1.1" width="21px" height="21px" viewBox="0 0 9420 9420"><path d="M5791 8940a480 480 0 00 960 0v-775h-959V8940h-1zm0-8460v775H6750V480a480 480 0 00-959 0zM4230 480v775h960V480a480 480 0 00-960 0zm0 8460a480 480 0 00 960 0v-775h-960V8940zM2670 480v775h959V480a480 480 0 00-959 0zm0 8460a480 480 0 00 960 0v-775h-960V8940zM0 6270a480 480 0 00 480 480h775v-959H480A480 480 0 00 0 6270zm8940-479h-775V6750H8940a480 480 0 00 0-959zM0 4710a480 480 0 00 480 480h775v-960H480a480 480 0 00-480 480zm8940-480h-775v960H8940a480 480 0 00 0-960zM0 3150a480 480 0 00 480 480h775v-960H480a480 480 0 00-480 480zm8940-480h-775v959H8940a480 480 0 00 0-959zM1716 7204a500 500 0 00 500 500h4988a500 500 0 00 500-500V2216a500 500 0 00-500-500H2216a500 500 0 00-500 500v4988"/></svg>
                     <p class="columnHeaderText">Board info</p>
                 </div>
                 <div class="headerRow"></div>
@@ -976,11 +1090,11 @@
                         <span id="firmware_version_text" class="columnContentValue"></span>
                     </div>
                     <div class="columnContentEntry">
-                        <p>SDK version</p>
-                        <span id="sdk_version_text" class="columnContentValue"></span>
+                        <p>Build date</p>
+                        <span id="build_date_text" class="columnContentValue"></span>
                     </div>
                     <div class="columnContentEntry">
-                        <p>Build date</p>
+                        <p>Build time</p>
                         <span id="build_time_text" class="columnContentValue"></span>
                     </div>
                     <div class="columnContentEntry">
@@ -993,6 +1107,7 @@
             <!-- Settings column -->
             <div id="settingsColumn" class="column">
                 <div class="columnHeader">
+                    <svg class="columnHeaderSVG columnHeaderSVGGear" xmlns="http://www.w3.org/2000/svg" fill="currentcolor" width="21px" height="21px" viewBox="0 0 2400 2400"><path d="M2089 978h-65a116 116 0 01-100-74V900a113 113 0 01 22-126l46-46a113 113 0 00 0-158L1830 414a113 113 0 00-160 0l-45 46a113 113 0 01-125 22 116 116 0 01-74-100V310A111 111 0 00 1311 200h-222a111 111 0 00-111 110v65a116 116 0 01-74 100H900a113 113 0 01-125-16l-46-46a113 113 0 00-158 0L414 571a113 113 0 00 0 158l46 46A113 113 0 01 482 900a116 116 0 01-100 74h-70a111 111 0 00-110 115v222a111 111 0 00 110 111h64a116 116 0 01 100 74 113 113 0 01-22 126l-46 46a113 113 0 00 0 158l157 157a113 113 0 00 158 0l46-46a113 113 0 01 130-20 116 116 0 01 75 100v66A111 111 0 00 1089 2200h222a111 111 0 00 111-111v-65a116 116 0 01 74-100 113 113 0 01 126 22l46 46a113 113 0 00 158 0l157-157a113 113 0 00 0-158l-46-46a113 113 0 01-20-130 116 116 0 01 100-72h66A111 111 0 00 2200 1311v-222a111 111 0 00-110-111ZM1200 1600a400 400 0 11 400-400 400 400 0 01-400 400Z"/></svg>
                     <p class="columnHeaderText">Settings</p>
                 </div>
                 <div class="headerRow"></div>
@@ -1006,47 +1121,52 @@
                     </div>
                     <div class="columnContentEntry">
                         <p>Reboot after update</p>
-                        <input type="checkbox" id="rebootCheckboxInput" class="rebootCheckboxInput" />
+                        <input type="checkbox" id="rebootCheckboxInput" class="rebootCheckboxInput" checked />
                         <label for="rebootCheckboxInput" class="toggleSwitch"></label>
                     </div>
                 </div>
             </div>
 
             <!-- Button column -->
-            <div id="buttonColumn" class="statusColumn">
+            <div id="buttonColumn" class="buttonColumn">
                 <!-- Rollback button -->
-                <form>
-                    <button disabled id="rollbackButton" name="rollbackButton" type="button" class="rollbackButton">
-                        <svg width="20px" height="20px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="white" stroke="white">
-                            <path d="M513 203.1c-19.3 0-35 15.7-35 35v294.2c0 12.5 6.7 24 17.5 30.3L651 652.7c5.5 3.2 11.6 4.7 17.5 4.7 12.1 0 23.8-6.3 30.3-17.5 9.7-16.7 4-38.1-12.8-47.8l-138.1-80v-274c0.1-19.3-15.6-35-34.9-35z" />
-                        </svg>
-                        <svg id="svg_rotate" width="20px" height="20px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="white" stroke="white">
-                            <path d="M966.2 428.3c-11.3-61.3-34.3-118.6-68.3-170.2-32.9-49.9-74.6-92.4-123.9-126.4-49.4-34-104-57.8-162.3-70.7-60.4-13.4-122.1-14.4-183.4-3.1-96.9 17.8-183.8 65.1-250.6 135.3V96c0-19.3-15.7-35-35-35s-35 15.7-35 35v175.5c0 19.3 15.7 35 35 35h177.1c19.3 0 35-15.7 35-35s-15.7-35-35-35h-86.6c55.9-56.8 127.8-95.1 207.7-109.9 102.9-19 207.1 3.3 293.3 62.6 86.2 59.4 144.1 148.7 163.1 251.7 19 102.9-3.3 207.1-62.6 293.3-59.3 86.3-148.7 144.2-251.6 163.2-24 4.4-48 6.6-71.9 6.6-78.6 0-155.3-23.7-221.4-69.2-86.3-59.4-144.2-148.8-163.2-251.7-6.7-36.6-8.3-73.7-4.6-110.4 1.9-19.2-12.1-36.4-31.3-38.3-19.2-1.9-36.4 12.1-38.3 31.3-4.3 43.2-2.5 87 5.4 130.1 11.3 61.3 34.3 118.6 68.3 170.2 32.9 49.9 74.6 92.4 123.9 126.4 49.4 34 104 57.8 162.3 70.7 32.7 7.2 65.9 10.9 99.1 10.9 28.1 0 56.2-2.6 84.3-7.8 61.3-11.3 118.6-34.3 170.2-68.3 49.9-32.9 92.4-74.6 126.4-123.9 34-49.4 57.8-104 70.7-162.3 13.5-60.4 14.5-122.1 3.2-183.4z" />
-                        </svg>
-                        <span class="rollbackButtonText">Rollback Firmware</span>
-                    </button>
-                </form>
+                <button disabled id="rollbackButton" name="rollbackButton" type="button" class="rollbackButton">
+                    <svg width="20px" height="20px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="white" stroke="white">
+                        <path d="M513 203.1c-19.3 0-35 15.7-35 35v294.2c0 12.5 6.7 24 17.5 30.3L651 652.7c5.5 3.2 11.6 4.7 17.5 4.7 12.1 0 23.8-6.3 30.3-17.5 9.7-16.7 4-38.1-12.8-47.8l-138.1-80v-274c0.1-19.3-15.6-35-34.9-35z" />
+                    </svg>
+                    <svg id="svg_rotate" width="20px" height="20px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="white" stroke="white">
+                        <path d="M966.2 428.3c-11.3-61.3-34.3-118.6-68.3-170.2-32.9-49.9-74.6-92.4-123.9-126.4-49.4-34-104-57.8-162.3-70.7-60.4-13.4-122.1-14.4-183.4-3.1-96.9 17.8-183.8 65.1-250.6 135.3V96c0-19.3-15.7-35-35-35s-35 15.7-35 35v175.5c0 19.3 15.7 35 35 35h177.1c19.3 0 35-15.7 35-35s-15.7-35-35-35h-86.6c55.9-56.8 127.8-95.1 207.7-109.9 102.9-19 207.1 3.3 293.3 62.6 86.2 59.4 144.1 148.7 163.1 251.7 19 102.9-3.3 207.1-62.6 293.3-59.3 86.3-148.7 144.2-251.6 163.2-24 4.4-48 6.6-71.9 6.6-78.6 0-155.3-23.7-221.4-69.2-86.3-59.4-144.2-148.8-163.2-251.7-6.7-36.6-8.3-73.7-4.6-110.4 1.9-19.2-12.1-36.4-31.3-38.3-19.2-1.9-36.4 12.1-38.3 31.3-4.3 43.2-2.5 87 5.4 130.1 11.3 61.3 34.3 118.6 68.3 170.2 32.9 49.9 74.6 92.4 123.9 126.4 49.4 34 104 57.8 162.3 70.7 32.7 7.2 65.9 10.9 99.1 10.9 28.1 0 56.2-2.6 84.3-7.8 61.3-11.3 118.6-34.3 170.2-68.3 49.9-32.9 92.4-74.6 126.4-123.9 34-49.4 57.8-104 70.7-162.3 13.5-60.4 14.5-122.1 3.2-183.4z" />
+                    </svg>
+                    <span class="rollbackButtonText">Rollback Firmware</span>
+                </button>
 
                 <!-- Reboot button -->
-                <form>
-                    <button id="rebootButton" name="rebootButton" type="button" class="rebootButton">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 1024 1024" fill="#ff3b3b" overflow="hidden" xmlns:v="https://vecta.io/nano">
-                            <path d="M313.672 153.539a40.969 40.969 0 0 1 39.731 71.66A327.537 327.537 0 0 0 184.32 512c0 180.982 146.698 327.68 327.68 327.68S839.68 692.982 839.68 512c0-116.675-61.44-222.659-159.785-281.457a40.96 40.96 0 1 1 42.045-70.308A409.354 409.354 0 0 1 921.6 512c0 226.222-183.378 409.6-409.6 409.6S102.4 738.222 102.4 512a409.436 409.436 0 0 1 211.272-358.461zM512 102.4h0q40.96 0 40.96 40.96v409.6q0 40.96-40.96 40.96h0q-40.96 0-40.96-40.96v-409.6q0-40.96 40.96-40.96z"/>
-                        </svg>
-                        <span class="rebootButtonText">Reboot</span>
-                    </button>
-                </form>
+                <button id="rebootButton" name="rebootButton" type="button" class="rebootButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 1024 1024" fill="#ff3b3b" overflow="hidden" xmlns:v="https://vecta.io/nano">
+                        <path d="M313.672 153.539a40.969 40.969 0 0 1 39.731 71.66A327.537 327.537 0 0 0 184.32 512c0 180.982 146.698 327.68 327.68 327.68S839.68 692.982 839.68 512c0-116.675-61.44-222.659-159.785-281.457a40.96 40.96 0 1 1 42.045-70.308A409.354 409.354 0 0 1 921.6 512c0 226.222-183.378 409.6-409.6 409.6S102.4 738.222 102.4 512a409.436 409.436 0 0 1 211.272-358.461zM512 102.4h0q40.96 0 40.96 40.96v409.6q0 40.96-40.96 40.96h0q-40.96 0-40.96-40.96v-409.6q0-40.96 40.96-40.96z"/>
+                    </svg>
+                    <span class="rebootButtonText">Reboot</span>
+                </button>
             </div>
-            
+
             <!-- Notification Bar -->
             <div id="notificationBar" class="notificationBar">
                 <span id="notificationMessage"></span>
             </div>
         </div>
-        
+
         <!-- Footer -->
         <div class="footer">
-            <p>PrettyOTA - Version 0.3 - © 2025</p>
+            <p style="text-align:center">PrettyOTA - Version <span id="versionString">1.0.0</span> - © 2025</p>
+            <button id="logoutButton" name="logoutButton" type="button" class="logoutButton hidden">
+                <svg id="logoutSVG" fill="currentcolor" height="22px" width="22px" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490.3 490.3">
+                    <g>
+                        <path d="M0,121.05v248.2c0,34.2,27.9,62.1,62.1,62.1h200.6c34.2,0,62.1-27.9,62.1-62.1v-40.2c0-6.8-5.5-12.3-12.3-12.3s-12.3,5.5-12.3,12.3v40.2c0,20.7-16.9,37.6-37.6,37.6H62.1c-20.7,0-37.6-16.9-37.6-37.6v-248.2c0-20.7,16.9-37.6,37.6-37.6h200.6c20.7,0,37.6,16.9,37.6,37.6v40.2c0,6.8,5.5,12.3,12.3,12.3s12.3-5.5,12.3-12.3v-40.2c0-34.2-27.9-62.1-62.1-62.1H62.1C27.9,58.95,0,86.75,0,121.05z"/>
+                        <path d="M385.4,337.65c2.4,2.4,5.5,3.6,8.7,3.6s6.3-1.2,8.7-3.6l83.9-83.9c4.8-4.8,4.8-12.5,0-17.3l-83.9-83.9c-4.8-4.8-12.5-4.8-17.3,0s-4.8,12.5,0,17.3l63,63H218.6c-6.8,0-12.3,5.5-12.3,12.3c0,6.8,5.5,12.3,12.3,12.3h229.8l-63,63C380.6,325.15,380.6,332.95,385.4,337.65z"/>
+                    </g>
+                </svg>
+                <span id="logoutText">Log out</span>
+            </button>
         </div>
     </body>
 </html>
