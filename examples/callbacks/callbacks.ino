@@ -8,7 +8,7 @@ const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 AsyncWebServer  server(80);
 PrettyOTA       OTAUpdates;
 
-// UpdateMode is FILESYSTEM or FIRMWARE
+// updateMode is FILESYSTEM or FIRMWARE
 void OnOTAStart(PrettyOTA::UPDATE_MODE updateMode)
 {
     Serial.println("OTA update started");
