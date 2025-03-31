@@ -2,15 +2,15 @@
 <img src="img/logo.svg" alt="Screenshot" style="height:100px;"/>
 </p>
 
-![Version](https://img.shields.io/badge/Version-V0.3.8-brightgreen?style=flat&&logo=framework) ![CPU](https://img.shields.io/badge/CPU-ESP32-red?style=flat&&logo=espressif) ![Arduino](https://img.shields.io/badge/Arduino-Supported-blue?style=flat&&logo=arduino) ![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-blue?style=flat&&logo=platformio)
+![Version](https://img.shields.io/badge/Version-V1.0.0-brightgreen?style=flat&&logo=framework) ![CPU](https://img.shields.io/badge/CPU-ESP32-red?style=flat&&logo=espressif) ![Arduino](https://img.shields.io/badge/Arduino-Supported-blue?style=flat&&logo=arduino) ![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-blue?style=flat&&logo=platformio)
 
 ## <p align="center">A modern looking OTA web-update library for ESP32 with easy rollback - Completely free</p>
 
 <!--❤️ <span style="color:lightblue;font-weight: bold;">Support me:</span> If you like this project and want to support a student, please consider donating ☺️-->
 
-💬 *Support* this project by *telling other people* about PrettyOTA
+💬 *Support* this project by *telling other people* about PrettyOTA!
 
-⚠️ This README and the library will be updated the next days for the new release v1.0.0.
+⚠️ This README will be updated the next days to be complete for the new release v1.0.0
 
 ## Contents
 - [Features](#features)
