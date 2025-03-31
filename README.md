@@ -212,6 +212,7 @@ void setup()
 
 void loop()
 {
+    // Give CPU time to other running tasks
     delay(100);
 }
 ```
