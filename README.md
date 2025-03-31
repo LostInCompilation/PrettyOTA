@@ -30,7 +30,7 @@
     - [Unmounting SPIFFS filesystem before update](#unmounting-spiffs-filesystem-before-update)
     - [Custom URLs](#custom-urls)
     - [How can I set the version number of my firmware?](#how-can-i-set-the-version-number-of-my-firmware)
-- [Help, I'm getting compiler errors](#help-i-m-getting-compiler-errors)
+- [Help I got compilation errors](#help-i-got-compilation-errors)
 
 *See also: [License (zlib)](LICENSE.md)*
 
@@ -256,7 +256,7 @@ With the code above you would reach PrettyOTA under `http://YOUR_IP/myCustomUpda
 ### How can I set the version number of my firmware?
 TODO
 
-## Help, I'm getting compiler errors
+## Help I got compilation errors
 
 If you get the following error when compiling:
 ```
