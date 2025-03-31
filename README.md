@@ -13,6 +13,7 @@
 ⚠️ This README will be updated the next days to be complete for the new release v1.0.0
 
 ## Contents
+- [Changelog](#changelog)
 - [Features](#features)
 - [Demo](#demo)
 - [Minimal example](#minimal-example)
@@ -30,6 +31,7 @@
     - [Unmounting SPIFFS filesystem before update](#unmounting-spiffs-filesystem-before-update)
     - [Custom URLs](#custom-urls)
     - [How can I set the version number of my firmware?](#how-can-i-set-the-version-number-of-my-firmware)
+- [Use PrettyOTA with ESP-IDF](#use-prettyota-with-esp-idf)
 - [Help I got compilation errors](#help-i-got-compilation-errors)
 
 *See also: [License (zlib)](LICENSE.md)*
@@ -118,31 +120,62 @@ Replace the IP address with the IP address of your ESP32.
 
 ## Usage
 ### Documentation of all functions
-TODO
-
+#### Begin()
 ```cpp
-// Returns true on success
+// Returns true on success, false on error or if already initialized
 bool Begin(AsyncWebServer* const server,            // The AsyncWebServer instance
             const char* const username = "",        // (Optional) Username for authentication
             const char* const password = "",        // (Optional) Password for authentication
-            bool passwordIsMD5Hash = false,         // (Optional) Is the password cleartext or MD5 hash?
+            bool passwordIsMD5Hash = false,         // (Optional) Is the password cleartext or a MD5 hash?
             const char* const mainURL = "/update",  // (Optional) Main URL for PrettyOTA
             const char* const loginURL = "/login",  // (Optional) Login page URL
             uint16_t OTAport = 3232);               // (Optional) The port for OTA uploads inside ArduinoIDE/PlatformIO. 
                                                     // Leave it set to `3232` for compatability with ArduinoIDE OTA upload
 ```
 
-⚠️ More functions will be added to README soon.
+#### SetAuthenticationDetails()
+```cpp
+void SetAuthenticationDetails(const char* const username,    // Username
+                            const char* const password,      // Password
+                            bool passwordIsMD5Hash = false); // (Optional) Is the password cleartext or a MD5 hash?
+```
+
+If `username` and `password` is empty, authentication will be disabled. The `/login` page then redirects automatically to the main `/update` page.
+
+See [Authentication](#authentication-username-and-password) below for details and examples.
+
+#### UseDefaultCallbacks()
+Call this function to use the built-in default callbacks. The default callbacks only print the update status to the Serial-Monitor (or any other Stream you specified).
+See [Use default callbacks](#use-default-callbacks) for more details.
+```cpp
+void UseDefaultCallbacks();
+```
+
+#### SetSerialOutputStream()
+TODO
+```cpp
+// Set the Stream to write log messages too (Example: Use &Serial as argument)
+void SetSerialOutputStream(Stream* const serialStream);
+```
+
+#### OnStart(), OnProgress(), OnEnd()
+TODO
+```cpp
+// Set custom callback functions
+void OnStart(std::function<void(NSPrettyOTA::UPDATE_MODE updateMode)> func);
+void OnProgress(std::function<void(uint32_t currentSize, uint32_t totalSize)> func);
+void OnEnd(std::function<void(bool successful)> func);
+```
 
 ### Authentication (username and password)
-To enable authentication using username and password, simply pass the username and password to the `Begin()` function.
+To enable authentication with username and password, simply pass the username and password to the `Begin()` function.
 
 You can always change the username or password after PrettyOTA has been initialized using:
 ```cpp
 void SetAuthenticationDetails(const char* const username, const char* const password, bool passwordIsMD5Hash = false);
 ```
 
-To disable authentication after it has been enabled previously, pass empty values for ùsername` and `password` to `SetAuthenticationDetails()`:
+To disable authentication after it has been enabled previously, pass empty values for `username` and `password` to `SetAuthenticationDetails()`:
 ```cpp
 // This will disable authentication
 SetAuthenticationDetails("", "");
@@ -151,10 +184,15 @@ SetAuthenticationDetails("", "");
 Authentication is disabled by default if you don't pass any values to `username` and `password` inside `Begin()`.
 
 ### Enable DNS
+You can use the mDNS to display the hostname for the OTA upload target inside ArduinoIDE. You can also use it to access the ESP32 using a normal URL like `http://my-esp.local/update` in your local network.
+
 TODO
+```cpp
+// TODO
+```
 
 ### Callbacks
-You can define your own callbacks which get called by PrettyOTA:
+You can define your own callbacks which get called by PrettyOTA during the update:
 
 ```cpp
 #include <Arduino.h>
@@ -164,9 +202,10 @@ You can define your own callbacks which get called by PrettyOTA:
 const char* WIFI_SSID     = "YOUR_SSID";
 const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 
-AsyncWebServer  server(80);
+AsyncWebServer  server(80); // Server on port 80 (HTTP)
 PrettyOTA       OTAUpdates;
 
+// Gets called when update starts
 // updateMode is FILESYSTEM or FIRMWARE
 void OnOTAStart(NSPrettyOTA::UPDATE_MODE updateMode)
 {
@@ -178,11 +217,15 @@ void OnOTAStart(NSPrettyOTA::UPDATE_MODE updateMode)
         Serial.println("Mode: Filesystem");
 }
 
+// Gets called while update is running
+// currentSize: Number of bytes already processed
+// totalSize: Total size of new firmware (bytes)
 void OnOTAProgress(uint32_t currentSize, uint32_t totalSize)
 {
     Serial.printf("OTA Progress Current: %u bytes, Total: %u bytes\n", currentSize, totalSize);
 }
 
+// Gets called when update finishes
 void OnOTAEnd(bool successful)
 {
     if (successful)
@@ -195,13 +238,13 @@ void setup()
 {
     Serial.begin(115200);
 
-    // Initialize WiFi here
+    // Initialize WiFi
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
-    // Initialize PrettyOTA and set username and password authentication
+    // Initialize PrettyOTA and set username and password for authentication
     OTAUpdates.Begin(&server, "admin", "123");
 
-    // Set callbacks
+    // Set custom callbacks
     OTAUpdates.OnStart(OnOTAStart);
     OTAUpdates.OnProgress(OnOTAProgress);
     OTAUpdates.OnEnd(OnOTAEnd);
@@ -218,48 +261,61 @@ void loop()
 ```
 
 ### Use default callbacks
-PrettyOTA provides default callbacks, which just print the update status to the SerialMonitor (or any other Stream you specified with `PrettyOTA::SetSerialOutputStream(Stream*)` ).
+PrettyOTA provides built-in default callbacks, which just print the update status to the SerialMonitor (or any other Stream you specified with `PrettyOTA::SetSerialOutputStream(Stream*)` ).
 
 To use the built-in default callbacks:
 ```cpp
-// Use built-in default callbacks
+// Use built-in default callbacks.
+// Do not call OnStart, OnProgress or OnEnd anymore, since they would override the built-in default callbacks
 OTAUpdates.UseDefaultCallbacks();
 ```
 
-When using the default callbacks you will get this output on your serial monitor during an OTA update:
+When using the default callbacks you will get the following output on your Serial-Monitor during an OTA update:
 <img width="385" alt="Screenshot 2025-03-31 at 03 35 45" src="https://github.com/user-attachments/assets/40f76183-3f94-469b-bb25-b01dd89e8606" />
 
 ### Unmounting SPIFFS filesystem before update
-TODO
+If you want to upload a filesystem image, the filesystem must be unmounted before the update begins (not neccessary for firmware updates).
+
+You can use a custom callback for `OnStart`, and unmount the filesystem (i.e. SPIFFS/LittleFS) inside the `OnStart` callback:
+
+TODO: Example
+```cpp
+example
+```
 
 ### Custom URLs
 PrettyOTA uses these URLs by default:
 
-- *Customizable* URLs
+- Customizable URLs:
     - `/login`: Login page if authentication is enabled. Redirects to `/update` if authentication is disabled
     - `/update`: PrettyOTA's main website. Redirects to `/login` if authentication is enabled and client is not logged in
-- *Fixed* URLs (cannot be changed)
+- Fixed URLs used internally (cannot be changed):
     - `/prettyota/start`: 
     - `/prettyota/upload`: 
-    - `/prettyota/rollback`: 
+    - `/prettyota/doRollback`: 
     - `/prettyota/queryInfo`: 
+    - `/prettyota/queryPrettyOTAInfo`: 
     - `/prettyota/rebootCheck`: 
     - `/prettyota/doManualReboot`: 
+    - `/prettyota/logout`: 
 
-If you want to change the `/login` and/or `/update` URLs, you can specify them in the `Begin()` function:
+If you want to change the `/login` and / or `/update` URLs, specify them in the `Begin()` function:
+
 ```cpp
 // Use custom URLs and enable authentication (username and password)
 OTAUpdates.Begin(&server, "admin", "123", false, "/myCustomUpdateURL", "/myCustomLoginURL");
 ```
 
-With the code above you would reach PrettyOTA under `http://YOUR_IP/myCustomUpdateURL`.
+With the code above you can reach PrettyOTA under `http://YOUR_IP/myCustomUpdateURL`.
 
 ### How can I set the version number of my firmware?
 TODO
 
-## Help I got compilation errors
+## Use PrettyOTA with ESP-IDF
+TODO
 
-If you get the following error when compiling:
+## Help I got compilation errors
+If you get the following error when compiling with PlatformIO:
 ```
 'ip_addr_t' {aka 'struct ip_addr'} has no member named 'addr'; did you mean 'u_addr'?
 ```
