@@ -2,34 +2,59 @@
 <img src="img/logo.svg" alt="Screenshot" style="height:100px;"/>
 </p>
 
-### <center>A modern looking OTA update server for ESP32 with easy rollback</center>
+### <p align="center">A modern looking OTA web-update library for ESP32 with easy rollback - Completely free</p>
 
-# A big release (V1.0) with many improvements and way more detailed README is currently in development. It will be release the next few days (including on the Arduino Library Manager)
+![Version](https://img.shields.io/badge/Version-V0.3.8-brightgreen?style=flat&&logo=framework) ![CPU](https://img.shields.io/badge/CPU-ESP32-red?style=flat&&logo=espressif) ![Arduino](https://img.shields.io/badge/Arduino-Supported-blue?style=flat&&logo=arduino) ![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-blue?style=flat&&logo=platformio)
+
+<!--❤️ <span style="color:lightblue;font-weight: bold;">Support me:</span> If you like this project and want to support a student, please consider donating ☺️-->
+
+💬 *Support* this project by *telling other people* about PrettyOTA
+
+⚠️ This README and the library will be updated the next days for the new release v1.0.0.
 
 ## Contents
 - [Features](#features)
+- [Demo](#demo)
 - [Minimal example](#minimal-example)
-- [Preview](#preview)
-- [PlatformIO](#platformio)
+- [Installation](#installation)
+    - [PlatformIO](#platformio)
+    - [Arduino](#arduino)
+    - [GitHub](#github)
+    - [Dependencies](#dependencies)
 - [Usage](#usage)
-    - [The Begin function](#the-begin-function)
+    - [Documentation of all functions](#documentation-of-all-functions)
+    - [Authentication (username and password)](#authentication-username-and-password)
+    - [Enable DNS](#enable-dns)
     - [Callbacks](#callbacks)
-    - [Use default callbacks](#use-default-callbacks)
-- [Help, I'm getting compilation errors](#help-i-get-compilation-errors)
+        - [Use default callbacks](#use-default-callbacks)
+    - [Unmounting SPIFFS filesystem before update](#unmounting-spiffs-filesystem-before-update)
+    - [Custom URLs](#custom-urls)
+    - [How can I set the version number of my firmware?](#how-can-i-set-the-version-number-of-my-firmware)
+- [Help, I'm getting compiler errors](#help-i-m-getting-compiler-errors)
 
 *See also: [License (zlib)](LICENSE.md)*
 
+## Changelog
+You can view the changelog here: [Changelog](CHANGELOG.md)
+
 ## Features
-- ***Drag and drop*** firmware or filesystem .bin file to start updating
-- ***Rollback*** to previous firmware with one button click
-- ***Show info*** about board (Firmware version, build time)
-- Automatic ***reboot*** after update/rollback
-- If needed enable **authentication** (username and password login)
-- Support for ArduinoOTA to directly upload OTA inside PlatformIO
+- ***Easy to use*** (two lines of code)
+- ***Drag and drop*** firmware or filesystem `.bin` file to start updating
+- ***Rollback*** to previous firmware with a button click
+- ***Reboot*** remotely with a button click
+- ***Show info*** about installed firmware (Firmware version, SDK version, build time)
+- ***Automatic reboot*** after update/rollback can be enabled
+- Support for **authentication** (login with username and password) using server generated keys
+- ***Asynchronous web server***
+- Support for ***ArduinoOTA*** to directly upload firmware over WiFi inside Arduino IDE and PlatformIO (tutorial included)
+
+## Demo
+![Screen Recording 2025-03-02 at 08 26 48](https://github.com/user-attachments/assets/191e4082-1d72-49ef-8e65-83700b7cf4a4)
 
 ## Minimal example
-With the example code below you can access PrettyOTA at *http://192.168.x.x/update*
-Replace the IP in the URL with the IP address of your ESP32.
+With the example code below you can access PrettyOTA at `http://IP_ADDRESS/update`, or upload via OTA inside ArduinoIDE and PlatformIO
+
+Replace `IP_ADDRESS` in the URL with the IP address of your ESP32.
 
 ```cpp
 #include <Arduino.h>
@@ -39,30 +64,30 @@ Replace the IP in the URL with the IP address of your ESP32.
 const char* WIFI_SSID     = "YOUR_SSID";
 const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 
-AsyncWebServer  server(80);
+AsyncWebServer  server(80); // Server on port 80 (HTTP)
 PrettyOTA       OTAUpdates;
 
 void setup()
 {
     // Initialize WiFi
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-    
-    // Initialize OTA
+
+    // Initialize PrettyOTA
     OTAUpdates.Begin(&server);
-    
+
     // Start web server
     server.begin();
 }
 
 void loop()
 {
+    // Give CPU time to other running tasks
+    delay(100);
 }
 ```
 
-## Preview
-![Screen Recording 2025-03-02 at 08 26 48](https://github.com/user-attachments/assets/191e4082-1d72-49ef-8e65-83700b7cf4a4)
-
-## PlatformIO
+## Installation
+### PlatformIO
 
 To use this library with PlatformIO, simply search for PrettyOTA inside PlatformIO Library Manager.
 
@@ -72,9 +97,17 @@ To use this library with PlatformIO, simply search for PrettyOTA inside Platform
 lib_compat_mode = strict
 ```
 
-### OTA upload directly inside PlatformIO
+### Arduino
+TODO
 
-If you dont want to use the web interface of PrettyOTA, you can directly upload the firmware OTA with PlatformIO. Just change the `platformio.ini` file like usual for OTA uploads and add the following:
+### GitHub
+TODO
+
+### Dependencies
+TODO
+
+### OTA upload directly inside PlatformIO
+If you dont want to use the web interface of PrettyOTA, you can directly upload the firmware via OTA using PlatformIO. Just change the `platformio.ini` file like usual for OTA uploads and add the following:
 
 ```ini
 upload_protocol = espota
@@ -84,16 +117,41 @@ upload_port = 192.168.x.x
 Replace the IP address with the IP address of your ESP32.
 
 ## Usage
+### Documentation of all functions
+TODO
 
-### The Begin function
 ```cpp
-PrettyOTA::Begin(Server, Username, Password, IsPasswordMD5Hash, otaPort);
+// Returns true on success
+bool Begin(AsyncWebServer* const server,            // The AsyncWebServer instance
+            const char* const username = "",        // (Optional) Username for authentication
+            const char* const password = "",        // (Optional) Password for authentication
+            bool passwordIsMD5Hash = false,         // (Optional) Is the password cleartext or MD5 hash?
+            const char* const mainURL = "/update",  // (Optional) Main URL for PrettyOTA
+            const char* const loginURL = "/login",  // (Optional) Login page URL
+            uint16_t OTAport = 3232);               // (Optional) The port for OTA uploads inside ArduinoIDE/PlatformIO. 
+                                                    // Leave it set to `3232` for compatability with ArduinoIDE OTA upload
 ```
-- Server: `AsyncWebServer*`
-- Username: `const char*` *(Optional)*
-- Password: `const char*` *(Optional)* - Can be normal text or an MD5 hash of the password
-- IsPasswordMD5Hash: `bool` *(Optional) Default: false* - Set to `true` if the password is a MD5 hash
-- otaPort: `int` *(Optional) Default: 3232* The port for ArduinoOTA / PlatformIO OTA upload
+
+⚠️ More functions will be added to README soon.
+
+### Authentication (username and password)
+To enable authentication using username and password, simply pass the username and password to the `Begin()` function.
+
+You can always change the username or password after PrettyOTA has been initialized using:
+```cpp
+void SetAuthenticationDetails(const char* const username, const char* const password, bool passwordIsMD5Hash = false);
+```
+
+To disable authentication after it has been enabled previously, pass empty values for ùsername` and `password` to `SetAuthenticationDetails()`:
+```cpp
+// This will disable authentication
+SetAuthenticationDetails("", "");
+```
+
+Authentication is disabled by default if you don't pass any values to `username` and `password` inside `Begin()`.
+
+### Enable DNS
+TODO
 
 ### Callbacks
 You can define your own callbacks which get called by PrettyOTA:
@@ -109,10 +167,15 @@ const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 AsyncWebServer  server(80);
 PrettyOTA       OTAUpdates;
 
-// UpdateMode is FILESYSTEM or FIRMWARE
-void OnOTAStart(PrettyOTA::UPDATE_MODE updateMode)
+// updateMode is FILESYSTEM or FIRMWARE
+void OnOTAStart(NSPrettyOTA::UPDATE_MODE updateMode)
 {
     Serial.println("OTA update started");
+
+    if(updateMode == NSPrettyOTA::UPDATE_MODE::FIRMWARE)
+        Serial.println("Mode: Firmware");
+    else if(updateMode == NSPrettyOTA::UPDATE_MODE::FILESYSTEM)
+        Serial.println("Mode: Filesystem");
 }
 
 void OnOTAProgress(uint32_t currentSize, uint32_t totalSize)
@@ -130,41 +193,73 @@ void OnOTAEnd(bool successful)
 
 void setup()
 {
-    Serial.begin(9600);
-    
+    Serial.begin(115200);
+
     // Initialize WiFi here
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-    
-    // Initialize OTA and set user and password
+
+    // Initialize PrettyOTA and set username and password authentication
     OTAUpdates.Begin(&server, "admin", "123");
-    
+
     // Set callbacks
     OTAUpdates.OnStart(OnOTAStart);
     OTAUpdates.OnProgress(OnOTAProgress);
     OTAUpdates.OnEnd(OnOTAEnd);
-    
+
     // Start web server
     server.begin();
 }
 
 void loop()
 {
+    delay(100);
 }
 ```
 
 ### Use default callbacks
-PrettyOTA provides default callbacks, which just print the update status to the SerialMonitor (or any other Stream you specify with `PrettyOTA::SetSerialOutputStream(Stream*)` ).
+PrettyOTA provides default callbacks, which just print the update status to the SerialMonitor (or any other Stream you specified with `PrettyOTA::SetSerialOutputStream(Stream*)` ).
 
+To use the built-in default callbacks:
 ```cpp
-// Use default callbacks
+// Use built-in default callbacks
 OTAUpdates.UseDefaultCallbacks();
 ```
 
-When using default callbacks you get this output on your serial monitor:
+When using the default callbacks you will get this output on your serial monitor during an OTA update:
 
 <img width="357" alt="Screenshot 2025-03-15 at 18 18 50" src="https://github.com/user-attachments/assets/4876388d-6543-46b7-a4c2-695acf0230d0" />
 
-## Help I get compilation errors
+TODO CHANGE PICTURE
+
+### Unmounting SPIFFS filesystem before update
+TODO
+
+### Custom URLs
+PrettyOTA uses these URLs by default:
+
+- *Customizable* URLs
+    - `/login`: Login page if authentication is enabled. Redirects to `/update` if authentication is disabled
+    - `/update`: PrettyOTA's main website. Redirects to `/login` if authentication is enabled and client is not logged in
+- *Fixed* URLs (cannot be changed)
+    - `/prettyota/start`: 
+    - `/prettyota/upload`: 
+    - `/prettyota/rollback`: 
+    - `/prettyota/queryInfo`: 
+    - `/prettyota/rebootCheck`: 
+    - `/prettyota/doManualReboot`: 
+
+If you want to change the `/login` and/or `/update` URLs, you can specify them in the `Begin()` function:
+```cpp
+// Use custom URLs and enable authentication (username and password)
+OTAUpdates.Begin(&server, "admin", "123", false, "/myCustomUpdateURL", "/myCustomLoginURL");
+```
+
+With the code above you would reach PrettyOTA under `http://YOUR_IP/myCustomUpdateURL`.
+
+### How can I set the version number of my firmware?
+TODO
+
+## Help, I'm getting compiler errors
 
 If you get the following error when compiling:
 ```
