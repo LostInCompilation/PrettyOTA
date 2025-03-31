@@ -128,24 +128,24 @@ Replace the IP address with the IP address of your ESP32.
 #### Begin()
 ```cpp
 // Returns true on success, false on error or if already initialized
-bool Begin(AsyncWebServer* const server,            // The AsyncWebServer instance
-            const char* const username = "",        // (Optional) Username for authentication
-            const char* const password = "",        // (Optional) Password for authentication
-            bool passwordIsMD5Hash = false,         // (Optional) Is the password cleartext or a MD5 hash?
-            const char* const mainURL = "/update",  // (Optional) Main URL for PrettyOTA
-            const char* const loginURL = "/login",  // (Optional) Login page URL
-            uint16_t OTAport = 3232);               // (Optional) The port for OTA uploads inside ArduinoIDE/PlatformIO. 
-                                                    // Leave it set to `3232` for compatability with ArduinoIDE OTA upload
+bool Begin(AsyncWebServer* const server,             // The AsyncWebServer instance
+             const char* const   username = "",      // (Optional) Username for authentication
+             const char* const   password = "",      // (Optional) Password for authentication
+             bool                passwordIsMD5Hash = false, // (Optional) Is the password cleartext or a MD5 hash?
+             const char* const   mainURL = "/update", // (Optional) Main URL for PrettyOTA
+             const char* const   loginURL = "/login", // (Optional) Login page URL
+             uint16_t            OTAport = 3232);     // (Optional) The port for OTA uploads inside ArduinoIDE/PlatformIO. 
+                                                      // Leave it set to `3232` for compatability with ArduinoIDE OTA upload
 ```
 
 #### SetAuthenticationDetails()
 ```cpp
 void SetAuthenticationDetails(const char* const username,    // Username
-                            const char* const password,      // Password
-                            bool passwordIsMD5Hash = false); // (Optional) Is the password cleartext or a MD5 hash?
+                              const char* const password,    // Password
+                              bool passwordIsMD5Hash = false); // (Optional) Is the password cleartext or a MD5 hash?
 ```
 
-If `username` and `password` is empty, authentication will be disabled. The `/login` page then redirects automatically to the main `/update` page.
+If `username` _and_ `password` is empty, authentication will be disabled. The `/login` page then redirects automatically to the main `/update` page.
 
 See [Authentication](#authentication-username-and-password) below for details and examples.
 
@@ -185,6 +185,8 @@ To disable authentication after it has been enabled previously, pass empty value
 // This will disable authentication
 SetAuthenticationDetails("", "");
 ```
+
+It is also possible to only have an username but no password (and vice versa). Simply leave one of the parameters (username _or_ password) empty.
 
 Authentication is disabled by default if you don't pass any values to `username` and `password` inside `Begin()`.
 
