@@ -69,7 +69,7 @@ Description:
 
 // Is it the correct version and fork of ESP32AsyncWebServer?
 #if !defined(ASYNCWEBSERVER_VERSION) || ASYNCWEBSERVER_VERSION_MAJOR < 3
-    #error PrettyOTA needs the "ESP32AsyncWebServer" library (from ESPAsync) version 3.0 or newer.
+    #error PrettyOTA needs the "ESPAsyncWebServer" library (from ESP32Async) version 3.0 or newer.
 #endif
 
 // Is it the correct version for ArduinoJson?
@@ -83,7 +83,7 @@ private:
     // Constants
     static const uint8_t    PRETTY_OTA_VERSION_MAJOR = 1;
     static const uint8_t    PRETTY_OTA_VERSION_MINOR = 0;
-    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 0;
+    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 1;
 
     static const uint32_t   BACKGROUND_TASK_STACK_SIZE = 4096;
     static const uint8_t    BACKGROUND_TASK_PRIORITY = 4;
@@ -103,6 +103,10 @@ private:
 
 private:
     // Variables
+    static std::string  m_AppBuildTime;
+    static std::string  m_AppBuildDate;
+    static std::string  m_AppVersion;
+
     std::string         m_LoginURL = "";
     std::string         m_MainURL = "";
 
@@ -168,4 +172,21 @@ public:
 
     // Set the Stream to write log messages too (Example: Use &Serial as argument)
     void SetSerialOutputStream(Stream* const serialStream);
+
+    // Overwrite the build time and date read automatically by PrettyOTA using esp_ota_get_app_description().
+    // This is needed for ArduinoIDE, since ArduinoIDE uses a prebuilt ESP-IDF SDK so the build time and date
+    // would be wrong. It is not needed for PlatformIO.
+    // However you can always call this function to overwrite the build time and date
+    // which will be send to the client browser
+    static void OverwriteAppBuildTimeAndDate(const char* const appBuildTime, const char* const appBuildDate);
+
+    // Same as above but for the app version
+    static void OverwriteAppVersion(const char* const appVersion);
 };
+
+// ********************************************************
+// Helper macro to be able to set build time and date when using ArduinoIDE.
+// This is not required for PlatformIO, however you can use it to overwrite the
+// build time and date read by PrettyOTA from the firmware image itself
+// using esp_ota_get_app_description().
+#define PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE() PrettyOTA::OverwriteAppBuildTimeAndDate(__TIME__, __DATE__)

@@ -29,6 +29,12 @@ void setup()
     // Initialize PrettyOTA
     OTAUpdates.Begin(&server);
 
+    // Set firmware version to 1.0.0
+    OTAUpdates.OverwriteAppVersion("1.0.0");
+
+    // Set current build time and date
+    PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE();
+
     // Start web server
     server.begin();
 }

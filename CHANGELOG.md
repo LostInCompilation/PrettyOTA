@@ -1,6 +1,15 @@
 # Changelog
 
+## Version: 1.0.1
+
+- Added `PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE` macro, `OverwriteAppBuildTimeAndDate(...)` and `OverwriteAppVersion(...)` to overwrite the build time, build date and app version which get displayed on the website. This is needed when using the ArduinoIDE. See README for details
+- Added mDNS example
+- Fixed examples
+- Fixed dependencies for ArduinoIDE
+- Updated README
+
 ## Version: 1.0.0
+
 - Backend rewrite and code cleanup for performance optimization
 - Reduced code size
 - UI improvements and cleanup
@@ -16,4 +25,5 @@
 - Many more changes for usability and performance
 
 ## Version 0.3.8
+
 - Initial release

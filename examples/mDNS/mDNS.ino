@@ -1,9 +1,11 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <ESPmDNS.h>
 #include <PrettyOTA.h>
 
 const char* WIFI_SSID     = "YOUR_SSID";
 const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
+const char* DNS_ADDRESS   = "myesp"; // http://myesp.local
 
 AsyncWebServer  server(80); // Server on port 80 (HTTP)
 PrettyOTA       OTAUpdates;
@@ -23,8 +25,13 @@ void setup()
         ESP.restart();
     }
 
-    // Print IP address
-    Serial.println("PrettyOTA can be accessed at: http://" + WiFi.localIP().toString() + "/update");
+    // Print address and IP
+    Serial.println("PrettyOTA can be accessed at: http://" + String(DNS_ADDRESS) + ".local/update");
+    Serial.println("And at: http://" + WiFi.localIP().toString() + "/update");
+
+    // Setup mDNS
+    // You must call "MDNS.begin()" BEFORE "OTAUpdates.Begin()"
+    MDNS.begin(DNS_ADDRESS);
 
     // Initialize PrettyOTA
     OTAUpdates.Begin(&server);

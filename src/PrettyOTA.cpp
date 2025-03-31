@@ -36,7 +36,11 @@ Description:
 
 //using namespace NSPrettyOTA;
 
+// Static variables
 Stream* PrettyOTA::m_SerialMonitorStream = nullptr;
+std::string PrettyOTA::m_AppBuildTime = "";
+std::string PrettyOTA::m_AppBuildDate = "";
+std::string PrettyOTA::m_AppVersion = "";
 
 // ********************************************************
 // NVS storage
@@ -532,12 +536,27 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
 
         JsonDocument jsonInfo;
         jsonInfo["rollbackPossible"] = m_UpdateManager.IsRollbackPossible();
-        jsonInfo["firmwareVersion"] = appDesc->version;
         jsonInfo["sdkVersion"] = appDesc->idf_ver;
-        jsonInfo["buildTime"] = appDesc->time;
-        jsonInfo["buildDate"] = appDesc->date;
         jsonInfo["projectName"] = appDesc->project_name;
         jsonInfo["firmwareSHA256"] = SHA256ToString(appDesc->app_elf_sha256);
+
+        // Check if app version has been overwritten
+        if(m_AppVersion != "")
+            jsonInfo["firmwareVersion"] = m_AppVersion;
+        else
+            jsonInfo["firmwareVersion"] = appDesc->version;
+
+        // Check if build date has been overwritten
+        if(m_AppBuildDate != "")
+            jsonInfo["buildDate"] = m_AppBuildDate;
+        else
+            jsonInfo["buildDate"] = appDesc->date;
+
+        // Check if build time has been overwritten
+        if(m_AppBuildTime != "")
+            jsonInfo["buildTime"] = m_AppBuildTime;
+        else
+            jsonInfo["buildTime"] = appDesc->time;
 
         // Send Json
         std::string jsonString = "";
@@ -608,7 +627,7 @@ void PrettyOTA::EnableArduinoOTA(const char* const password, bool passwordIsMD5H
     ArduinoOTA.setPort(OTAport);
     ArduinoOTA.setRebootOnSuccess(true); // ToDo
 
-    // Use hack to check if DNS is running
+    // Do a dummy query to check if DNS is running
     esp_ip4_addr_t ipv4;
     const esp_err_t dnsResult = mdns_query_a("localhost", 100, &ipv4);
 
@@ -627,11 +646,14 @@ void PrettyOTA::EnableArduinoOTA(const char* const password, bool passwordIsMD5H
 
         // Add mDNS service
         if(mdns_service_add(nullptr, "_arduino", "_tcp", OTAport, arduTxtData, 4) != ESP_OK)
-            P_LOG_E("Could not add ArduinoOTA as mDNS service");
+            P_LOG_E("Could not add ArduinoOTA as a mDNS service");
 
         // Set authentication
-        if((strlen(password) > 0) && (mdns_service_txt_item_set("_arduino", "_tcp", "auth_upload", "yes") != ESP_OK))
-            P_LOG_E("Could not set ArduinoOTA mDNS txt item");
+        if(strlen(password) > 0)
+        {
+            if(mdns_service_txt_item_set("_arduino", "_tcp", "auth_upload", "yes") != ESP_OK)
+                P_LOG_E("Could not set ArduinoOTA mDNS txt item");
+        }
     }
     else
     {
@@ -709,6 +731,17 @@ void PrettyOTA::UseDefaultCallbacks()
 void PrettyOTA::SetSerialOutputStream(Stream* const serialStream)
 {
     m_SerialMonitorStream = serialStream;
+}
+
+void PrettyOTA::OverwriteAppBuildTimeAndDate(const char *const appBuildTime, const char *const appBuildDate)
+{
+    m_AppBuildTime = appBuildTime;
+    m_AppBuildDate = appBuildDate;
+}
+
+void PrettyOTA::OverwriteAppVersion(const char* const appVersion)
+{
+    m_AppVersion = appVersion;
 }
 
 const uint8_t PrettyOTA::PRETTY_OTA_WEBSITE_DATA[12627] = {

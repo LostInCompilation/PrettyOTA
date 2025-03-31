@@ -5,10 +5,11 @@
 const char* WIFI_SSID     = "YOUR_SSID";
 const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 
-AsyncWebServer  server(80);
+AsyncWebServer  server(80); // Server on port 80 (HTTP)
 PrettyOTA       OTAUpdates;
 
-// updateMode is FILESYSTEM or FIRMWARE
+// Gets called when update starts
+// updateMode can be FILESYSTEM or FIRMWARE
 void OnOTAStart(NSPrettyOTA::UPDATE_MODE updateMode)
 {
     Serial.println("OTA update started");
@@ -19,11 +20,15 @@ void OnOTAStart(NSPrettyOTA::UPDATE_MODE updateMode)
         Serial.println("Mode: Filesystem");
 }
 
+// Gets called while update is running
+// currentSize: Number of bytes already processed
+// totalSize: Total size of new firmware in bytes
 void OnOTAProgress(uint32_t currentSize, uint32_t totalSize)
 {
     Serial.printf("OTA Progress Current: %u bytes, Total: %u bytes\n", currentSize, totalSize);
 }
 
+// Gets called when update finishes
 void OnOTAEnd(bool successful)
 {
     if (successful)
@@ -36,13 +41,24 @@ void setup()
 {
     Serial.begin(115200);
 
-    // Initialize WiFi here
+    // Initialize WiFi
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
-    // Initialize PrettyOTA and set username and password authentication
+    // Wait for successful WiFi connection
+    while (WiFi.waitForConnectResult() != WL_CONNECTED)
+    {
+        Serial.println("[WiFi] Connection failed! Rebooting...");
+        delay(3000);
+        ESP.restart();
+    }
+
+    // Print IP address
+    Serial.println("PrettyOTA can be accessed at: http://" + WiFi.localIP().toString() + "/update");
+
+    // Initialize PrettyOTA and set username and password for authentication
     OTAUpdates.Begin(&server, "admin", "123");
 
-    // Set callbacks
+    // Set custom callbacks
     OTAUpdates.OnStart(OnOTAStart);
     OTAUpdates.OnProgress(OnOTAProgress);
     OTAUpdates.OnEnd(OnOTAEnd);
@@ -53,5 +69,6 @@ void setup()
 
 void loop()
 {
+    // Give CPU time to other running tasks
     delay(100);
 }

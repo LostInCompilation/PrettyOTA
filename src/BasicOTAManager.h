@@ -43,11 +43,11 @@ Description:
 #include "MD5Hasher.h"
 #include "ESPUpdateManager.h"
 
-class ArduinoOTAManager
+class BasicOTAManager
 {
 private:
     NSPrettyOTA::ESPUpdateManager m_UpdateManager;
 
 public:
-    ArduinoOTAManager() = default;
+    BasicOTAManager() = default;
 };
