@@ -105,13 +105,23 @@ lib_compat_mode = strict
 ```
 
 ### Arduino
-TODO
+You can download PrettyOTA from the Arduino Library Manager. Simply search for PrettyOTA inside ArduinoIDE.
+
+Alternatively you can download the `.zip` file from GitHub and import it into the ArduinoIDE (Sketch->Include library->Add .ZIP library).
 
 ### GitHub
-TODO
+Clone the repository or download the latest release / `.zip` file.
+```sh
+git clone https://github.com/LostInCompilation/PrettyOTA
+```
 
 ### Dependencies
 TODO
+
+PrettyOTA needs the following libraries:
+- AsyncTCP
+- ESPAsyncWebServer
+- ArduinoJson
 
 ### OTA upload directly inside PlatformIO
 If you dont want to use the web interface of PrettyOTA, you can directly upload the firmware via OTA using PlatformIO. Just change the `platformio.ini` file like usual for OTA uploads and add the following:
