@@ -36,6 +36,7 @@
         - [Use default callbacks](#use-default-callbacks)
     - [Unmounting SPIFFS filesystem before update](#unmounting-spiffs-filesystem-before-update)
     - [Custom URLs](#custom-urls)
+    - [Save logged in clients to NVS](#save-logged-in-clients-to-nvs)
     - [How can I set the version number of my firmware?](#how-can-i-set-the-version-number-of-my-firmware)
 - [Use PrettyOTA with ESP-IDF](#use-prettyota-with-esp-idf)
 - [Help I got compilation errors](#help-i-got-compilation-errors)
@@ -324,6 +325,12 @@ OTAUpdates.Begin(&server, "admin", "123", false, "/myCustomUpdateURL", "/myCusto
 ```
 
 With the code above you can reach PrettyOTA under `http://YOUR_IP/myCustomUpdateURL`.
+
+### Save logged in clients to NVS
+PrettyOTA automatically saves logged in clients (sessionIDs) to the NVS partition and loads them during initialization. This enables clients to stay logged in after a reboot or firmware update of the ESP32.
+
+For this to work you must have a NVS partition (for example inside the partitions.csv file for PlatformIO).
+Without a NVS partition saving will not work and you have to log in again after a reboot or firmware update of the ESP32.
 
 ### How can I set the version number of my firmware?
 In PlatformIO simply create a text file called `version.txt` in your projects root folder. The content of the textfile must be one line containing the firmware version:
