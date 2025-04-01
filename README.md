@@ -10,8 +10,6 @@
 
 💬 *Support* this project by *telling other people* about PrettyOTA!
 
-⚠️ This README will be updated the next days to be complete for the new release v1.0.2
-
 ## Contents
 
 - [Changelog](#changelog)
