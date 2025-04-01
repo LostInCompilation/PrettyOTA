@@ -25,8 +25,8 @@
   - [Authentication (username and password)](#authentication-username-and-password)
   - [OTA upload directly inside PlatformIO or ArduinoIDE](#ota-upload-directly-inside-platformio-or-arduinoide)
   - [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date)
-    - [PlatformIO (automatic)](#platformio-automatic)
     - [ArduinoIDE (manual)](#arduinoide-manual)
+    - [PlatformIO with ESP-IDF (automatic)](#platformio-with-esp-idf-automatic)
   - [Use mDNS](#use-mdns)
   - [Callbacks](#callbacks)
     - [Use default callbacks](#use-default-callbacks)
@@ -134,7 +134,7 @@ To use this library with PlatformIO, simply search for PrettyOTA inside Platform
 lib_compat_mode = strict
 ```
 
-### ArduinoIDE <a name="arduinoIDE"/>
+### ArduinoIDE <div id="arduinoIDE"/>
 
 You can download PrettyOTA from the Arduino Library Manager. Simply search for PrettyOTA inside ArduinoIDE.
 
@@ -202,23 +202,8 @@ Replace the IP address with the IP address of your ESP32.
 
 ### Set firmware version number, build time and date <div id="set-firmware-version-number-build-time-and-date"/>
 
-You can manually set the version number and build time/date (must be done when using ArduinoIDE). Or if you use PlatformIO, PrettyOTA can automatically detect the version number and build time/date for you.
-
-#### PlatformIO (automatic) <div id="platformio-automatic"/>
-
-#### Firmware version number
-
-In PlatformIO simply create a text file called `version.txt` in your projects root folder. The content of the textfile must be one line containing the firmware version:
-
-```text
-1.0.0
-```
-
-PlatformIO will automatically find the `version.txt` file and set the version of your firmware, which gets displayed by PrettyOTA in the browser.
-
-#### Build time and date
-
-The build time and date will be automatically set. You don't have to do anything. PrettyOTA reads the time and date of the build from the firmware partition using `esp_ota_get_app_description()`.
+You can manually set the version number and build time/date (must be done when using ArduinoIDE or PlatformIO without ESP-IDF framework).
+If you use PlatformIO with the ESP-IDF framework (you can use both, ESP-IDF and the Arduino Framework at the same time), PrettyOTA can automatically detect the version number and build time/date for you.
 
 #### ArduinoIDE (manual) <div id="arduinoide-manual"/>
 
@@ -268,6 +253,22 @@ void setup()
     // ...
 }
 ```
+
+#### PlatformIO with ESP-IDF (automatic) <div id="platformio-with-esp-idf-automatic"/>
+
+#### Firmware version number
+
+In PlatformIO simply create a text file called `version.txt` in your projects root folder. The content of the textfile must be one line containing the firmware version:
+
+```text
+1.0.0
+```
+
+PlatformIO will automatically find the `version.txt` file and set the version of your firmware, which gets displayed by PrettyOTA in the browser.
+
+#### Build time and date
+
+The build time and date will be automatically set. You don't have to do anything. PrettyOTA reads the time and date of the build from the firmware partition using `esp_ota_get_app_description()`.
 
 ### Use mDNS <div id="use-mdns"/>
 
@@ -536,6 +537,7 @@ void SetSerialOutputStream(Stream* const serialStream);
 ```
 
 Example:
+
 ```cpp
 // Print to Serial1 instead of default Serial
 OTAUpdates.SetSerialOutputStream(&Serial1);

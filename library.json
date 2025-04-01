@@ -1,6 +1,6 @@
 {
     "name": "PrettyOTA",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "A modern looking OTA web interface for easy updates and rollbacks. Also directly supports PlatformIO OTA upload",
     "keywords": "OTA, update, upgrade, wifi, web update, server, website, firmware",
     "headers": "PrettyOTA.h",
@@ -35,11 +35,6 @@
         "name": "Callbacks",
         "base": "examples/callbacks",
         "files": ["callbacks.ino"]
-    },
-    {
-        "name": "Set custom firmware version and build time",
-        "base": "examples/setCustomVersionAndBuildTime",
-        "files": ["setCustomVersionAndBuildTime.ino"]
     },
     {
         "name": "mDNS",

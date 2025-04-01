@@ -58,6 +58,12 @@ void setup()
     // Initialize PrettyOTA and set username and password for authentication
     OTAUpdates.Begin(&server, "admin", "123");
 
+    // Set firmware version to 1.0.0
+    OTAUpdates.OverwriteAppVersion("1.0.0");
+
+    // Set current build time and date
+    PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE();
+    
     // Set custom callbacks
     OTAUpdates.OnStart(OnOTAStart);
     OTAUpdates.OnProgress(OnOTAProgress);
