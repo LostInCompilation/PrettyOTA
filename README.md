@@ -2,7 +2,7 @@
 <img src="img/logo.svg" alt="Screenshot" style="height:100px;"/>
 </p>
 
-![Version](https://img.shields.io/badge/Version-V1.0.0-brightgreen?style=flat&&logo=framework) ![CPU](https://img.shields.io/badge/CPU-ESP32-red?style=flat&&logo=espressif) ![Arduino](https://img.shields.io/badge/Arduino-Supported-blue?style=flat&&logo=arduino) ![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-blue?style=flat&&logo=platformio)
+![Version](https://img.shields.io/badge/Version-V1.0.2-brightgreen?style=flat&&logo=framework) ![CPU](https://img.shields.io/badge/CPU-ESP32-red?style=flat&&logo=espressif) ![Arduino](https://img.shields.io/badge/Arduino-Supported-blue?style=flat&&logo=arduino) ![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-blue?style=flat&&logo=platformio)
 
 ## <p align="center">A modern looking OTA web-update library for ESP32 with easy rollback - Completely free</p>
 
@@ -10,7 +10,7 @@
 
 💬 *Support* this project by *telling other people* about PrettyOTA!
 
-⚠️ This README will be updated the next days to be complete for the new release v1.0.0
+⚠️ This README will be updated the next days to be complete for the new release v1.0.2
 
 ## Contents
 
@@ -144,13 +144,13 @@ git clone https://github.com/LostInCompilation/PrettyOTA
 
 ### Dependencies
 
-TODO
+You dont have to manually install the dependencies when using ArduinoIDE or PlatformIO. Simply search for *PrettyOTA* in the library manager and install it.
 
 PrettyOTA needs the following libraries:
 
-- AsyncTCP
-- ESPAsyncWebServer
-- ArduinoJson
+- AsyncTCP: https://github.com/ESP32Async/AsyncTCP
+- ESPAsyncWebServer: https://github.com/ESP32Async/ESPAsyncWebServer
+- ArduinoJson: https://github.com/bblanchon/ArduinoJson
 
 ### OTA upload directly inside PlatformIO
 
@@ -204,11 +204,19 @@ void UseDefaultCallbacks();
 
 #### SetSerialOutputStream()
 
-TODO
+PrettyOTA outputs log messages when an error occurs. You can specify where these log messages should be printed. The default is printing to `Serial` (you must have `Serial.begin(115200);` inside `setup()` for this to work).
+
+If you want to print to a different output, use the following function:
 
 ```cpp
 // Set the Stream to write log messages too (Example: Use &Serial as argument)
 void SetSerialOutputStream(Stream* const serialStream);
+```
+
+Example:
+```cpp
+// Print to Serial1 instead of default Serial
+OTAUpdates.SetSerialOutputStream(&Serial1);
 ```
 
 #### OnStart(), OnProgress(), OnEnd()
@@ -224,7 +232,7 @@ void OnEnd(std::function<void(bool successful)> func);
 
 #### OverwriteAppVersion()
 
-TODO
+See [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date).
 
 ```cpp
 static void OverwriteAppVersion(const char* const appVersion);
@@ -232,13 +240,15 @@ static void OverwriteAppVersion(const char* const appVersion);
 
 #### OverwriteAppBuildTimeAndDate()
 
-TODO
+See [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date).
 
 ```cpp
 static void OverwriteAppBuildTimeAndDate(const char* const appBuildTime, const char* const appBuildDate);
 ```
 
 #### Macro - PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE()
+
+See [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date).
 
 ```cpp
 #define PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE() PrettyOTA::OverwriteAppBuildTimeAndDate(__TIME__, __DATE__)
@@ -354,11 +364,13 @@ void setup()
 }
 ```
 
-For a full example see [mDNS example](/examples/mDNS/mDNS.ino)
+For a full example see [mDNS example](/examples/mDNS/mDNS.ino).
 
 ### Callbacks
 
-You can define your own callbacks which get called by PrettyOTA during the update:
+You can define your own callbacks which get called by PrettyOTA during the update.
+
+Example:
 
 ```cpp
 #include <Arduino.h>
@@ -439,7 +451,7 @@ void loop()
 
 ### Use default callbacks
 
-PrettyOTA provides built-in default callbacks, which just print the update status to the SerialMonitor (or any other Stream you specified with `PrettyOTA::SetSerialOutputStream(Stream*)` ).
+PrettyOTA provides built-in default callbacks, which just print the update status to the SerialMonitor (or any other Stream you specified with `PrettyOTA::SetSerialOutputStream(Stream*)`).
 
 To use the built-in default callbacks:
 
@@ -461,7 +473,7 @@ You can use a custom callback for `OnStart`, and unmount the filesystem (i.e. SP
 TODO: Example
 
 ```cpp
-example
+TODO
 ```
 
 ### Custom URLs
