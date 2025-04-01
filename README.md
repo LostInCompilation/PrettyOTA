@@ -520,8 +520,8 @@ SPIFFS is not a requirement.
 
 Example `partitions.csv` (4MB flash) for PlatformIO including an optional SPIFFS partition:
 
-```text
-# Name,   Type, SubType, Offset,  Size, Flags
+```scala
+# Name, Type, SubType, Offset, Size, Flags
 nvs,data,nvs,0x9000,0x13000,
 phy,data,phy,0x1C000,0x2000,
 otadata,data,ota,0x1E000,0x2000,
