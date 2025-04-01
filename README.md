@@ -21,7 +21,7 @@
     - [Arduino](#arduino)
     - [GitHub](#github)
     - [Dependencies](#dependencies)
-    - [OTA upload directly inside PlatformIO](#ota-upload-directly-inside-platformio)
+    - [OTA upload directly inside PlatformIO or ArduinoIDE](#ota-upload-directly-inside-platformio-or-arduinoide)
 - [Usage](#usage)
     - [Documentation of all functions](#documentation-of-all-functions)
         - [Begin()](#begin)
@@ -150,9 +150,13 @@ PrettyOTA needs the following libraries:
 - ESPAsyncWebServer: https://github.com/ESP32Async/ESPAsyncWebServer
 - ArduinoJson: https://github.com/bblanchon/ArduinoJson
 
-### OTA upload directly inside PlatformIO
+### OTA upload directly inside PlatformIO or ArduinoIDE
 
-If you don't want to use the web interface of PrettyOTA, you can directly upload the firmware via OTA using PlatformIO. Just change the `platformio.ini` file like usual for OTA uploads and add the following:
+If you don't want to use the web interface of PrettyOTA, you can directly upload the firmware via OTA using PlatformIO or ArduinoIDE.
+
+For ArduinoIDE you don't have to change anything. The ESP32 will show up under boards as an WiFi OTA target.
+
+For PlatformIO you have to change the `platformio.ini` file like usual for OTA uploads and add the following:
 
 ```ini
 upload_protocol = espota

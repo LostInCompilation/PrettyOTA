@@ -2,7 +2,7 @@
 
 ## Version: 1.0.3
 
-- Fixed PlatformIO README (TOC links and logo)
+- WIP: Fixing PlatformIO README (TOC links and logo)
 - Updated keywords.txt for ArduinoIDE
 - Finished README
 
