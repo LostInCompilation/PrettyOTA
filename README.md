@@ -43,12 +43,12 @@
   - [OverwriteAppVersion()](#overwriteappversion)
   - [OverwriteAppBuildTimeAndDate()](#overwriteappbuildtimeanddate)
   - [Macro - PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE()](#macro---pretty_ota_set_current_build_time_and_date)
-- [Use PrettyOTA with ESP-IDF](#use-prettyota-with-esp-idf)
-- [Help I got compilation errors](#help-i-got-compilation-errors)
-- [Usage in commercial applications and white labeling](#usage-in-commercial-applications-and-white-labeling)
-- [Can I support you?](#can-i-support-you)
+- **[Use PrettyOTA with ESP-IDF](#use-prettyota-with-esp-idf)**
+- **[Help I got compilation errors](#help-i-got-compilation-errors)**
+- **[Usage in commercial applications and white labeling](#usage-in-commercial-applications-and-white-labeling)**
+- **[Can I support you?](#can-i-support-you)**
 
-*See also: [License (zlib)](LICENSE.md)*
+*See also: **[License (zlib)](LICENSE.md)***
 
 ## Changelog
 
@@ -68,7 +68,9 @@ You can view the changelog here: [Changelog](CHANGELOG.md)
 
 ## Demo
 
-![new](https://github.com/user-attachments/assets/cd5b869b-26ec-4d18-aa3c-554c78ec7306)
+<p align="center">
+<img src="https://github.com/user-attachments/assets/cd5b869b-26ec-4d18-aa3c-554c78ec7306" alt="Screenshot" />
+</p>
 
 ## Minimal example
 
