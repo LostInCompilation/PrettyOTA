@@ -17,7 +17,7 @@
 - **[Minimal example](#minimal-example)**
 - **[Installation](#installation)**
   - [PlatformIO](#platformio)
-  - [Arduino](#arduino)
+  - [ArduinoIDE](#arduinoide)
   - [GitHub](#github)
   - [Dependencies](#dependencies)
 - **[Usage](#usage)**
@@ -30,7 +30,7 @@
   - [Use mDNS](#use-mdns)
   - [Callbacks](#callbacks)
     - [Use default callbacks](#use-default-callbacks)
-  - [Unmounting SPIFFS filesystem before update](#unmounting-spiffs-filesystem-before-update)
+  - [Unmounting SPIFFS filesystem before an update](#unmounting-spiffs-filesystem-before-an-update)
   - [Custom URLs](#custom-urls)
   - [Partitions](#partitions)
   - [Save logged in clients to NVS](#save-logged-in-clients-to-nvs)
@@ -46,15 +46,16 @@
 - **[Use PrettyOTA with ESP-IDF](#use-prettyota-with-esp-idf)**
 - **[Help I got compilation errors](#help-i-got-compilation-errors)**
 - **[Usage in commercial applications and white labeling](#usage-in-commercial-applications-and-white-labeling)**
+  - [White-labeling](#white-labeling)
 - **[Can I support you?](#can-i-support-you)**
 
 *See also: **[License (zlib)](LICENSE.md)***
 
-## Changelog
+## Changelog <div id="changelog"/>
 
 You can view the changelog here: [Changelog](CHANGELOG.md)
 
-## Features
+## Features <div id="features"/>
 
 - ***Easy to use*** (two lines of code)
 - ***Drag and drop*** firmware or filesystem `.bin` file to start updating
@@ -66,13 +67,13 @@ You can view the changelog here: [Changelog](CHANGELOG.md)
 - ***Asynchronous web server***
 - Support for ***ArduinoOTA*** to directly upload firmware over WiFi inside Arduino IDE and PlatformIO (tutorial included)
 
-## Demo
+## Demo <div id="demo"/>
 
 <p align="center">
 <img src="https://github.com/user-attachments/assets/cd5b869b-26ec-4d18-aa3c-554c78ec7306" alt="Screenshot" />
 </p>
 
-## Minimal example
+## Minimal example <div id="minimal-example"/>
 
 With the example code below you can access PrettyOTA at `http://IP_ADDRESS/update`, or upload via OTA inside ArduinoIDE and PlatformIO
 
@@ -121,9 +122,9 @@ void loop()
 }
 ```
 
-## Installation
+## Installation <div id="installation"/>
 
-### PlatformIO
+### PlatformIO <div id="platformio"/>
 
 To use this library with PlatformIO, simply search for PrettyOTA inside PlatformIO Library Manager.
 
@@ -133,7 +134,7 @@ To use this library with PlatformIO, simply search for PrettyOTA inside Platform
 lib_compat_mode = strict
 ```
 
-### Arduino
+### ArduinoIDE <a name="arduinoIDE"/>
 
 You can download PrettyOTA from the Arduino Library Manager. Simply search for PrettyOTA inside ArduinoIDE.
 
@@ -147,7 +148,7 @@ Clone the repository or download the latest release / `.zip` file.
 git clone https://github.com/LostInCompilation/PrettyOTA
 ```
 
-### Dependencies
+### Dependencies <div id="dependencies"/>
 
 You don't have to manually install the dependencies when using ArduinoIDE or PlatformIO. Simply search for *PrettyOTA* in the library manager and install it.
 
@@ -157,13 +158,13 @@ PrettyOTA needs the following libraries:
 - [ESPAsyncWebServer](https://github.com/ESP32Async/ESPAsyncWebServer)
 - [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
 
-## Usage
+## Usage <div id="usage"/>
 
-### Documentation
+### Documentation <div id="documentation"/>
 
 See **[Documentation of all functions](#documentation-of-all-functions)**.
 
-### Authentication (username and password)
+### Authentication (username and password) <div id="authentication-username-and-password"/>
 
 To enable authentication with username and password, simply pass the username and password to the `Begin()` function.
 
@@ -184,7 +185,7 @@ It is also possible to only have an username but no password (and vice versa). S
 
 Authentication is disabled by default if you don't pass any values to `username` and `password` inside `Begin()`.
 
-### OTA upload directly inside PlatformIO or ArduinoIDE
+### OTA upload directly inside PlatformIO or ArduinoIDE <div id="ota-upload-directly-inside-platformio-or-arduinoide"/>
 
 If you don't want to use the web interface of PrettyOTA, you can directly upload the firmware via OTA using PlatformIO or ArduinoIDE.
 
@@ -199,11 +200,11 @@ upload_port = 192.168.x.x
 
 Replace the IP address with the IP address of your ESP32.
 
-### Set firmware version number, build time and date
+### Set firmware version number, build time and date <div id="set-firmware-version-number-build-time-and-date"/>
 
 You can manually set the version number and build time/date (must be done when using ArduinoIDE). Or if you use PlatformIO, PrettyOTA can automatically detect the version number and build time/date for you.
 
-#### PlatformIO (automatic)
+#### PlatformIO (automatic) <div id="platformio-automatic"/>
 
 #### Firmware version number
 
@@ -219,7 +220,7 @@ PlatformIO will automatically find the `version.txt` file and set the version of
 
 The build time and date will be automatically set. You don't have to do anything. PrettyOTA reads the time and date of the build from the firmware partition using `esp_ota_get_app_description()`.
 
-#### ArduinoIDE (manual)
+#### ArduinoIDE (manual) <div id="arduinoide-manual"/>
 
 When using the ArduinoIDE you must manually set the version number and build time/date.
 
@@ -268,7 +269,7 @@ void setup()
 }
 ```
 
-### Use mDNS
+### Use mDNS <div id="use-mdns"/>
 
 You can use mDNS to display the hostname for the OTA upload target inside ArduinoIDE. You can also use it to access the ESP32 using a normal URL like `http://myesp.local/update` in your local network instead of the IP address.
 
@@ -296,7 +297,7 @@ The ArduinoIDE will now show the ESP32 as "myesp" like specified in the code abo
 
 For a full example see [mDNS example](/examples/mDNS/mDNS.ino).
 
-### Callbacks
+### Callbacks <div id="callbacks"/>
 
 You can define your own callbacks which get called by PrettyOTA during the update.
 
@@ -381,7 +382,7 @@ void loop()
 
 For the full example see [Callbacks example](/examples/callbacks/callbacks.ino).
 
-### Use default callbacks
+### Use default callbacks <div id="use-default-callbacks"/>
 
 PrettyOTA provides built-in default callbacks, which just print the update status to the SerialMonitor (or any other Stream you specified with `PrettyOTA::SetSerialOutputStream(Stream*)`).
 
@@ -399,7 +400,7 @@ When using the default callbacks you will get the following output on your Seria
 <img width="380" alt="Screenshot 2025-03-31 at 03 35 45" src="https://github.com/user-attachments/assets/40f76183-3f94-469b-bb25-b01dd89e8606" />
 </p>
 
-### Unmounting SPIFFS filesystem before update
+### Unmounting SPIFFS filesystem before an update <div id="unmounting-spiffs-filesystem-before-an-update"/>
 
 If you want to upload a filesystem image, the filesystem must be unmounted before the update begins (not necessary for firmware updates).
 
@@ -425,7 +426,7 @@ void setup()
 }
 ```
 
-### Custom URLs
+### Custom URLs <div id="custom-urls"/>
 
 PrettyOTA uses these URLs by default:
 
@@ -451,7 +452,7 @@ OTAUpdates.Begin(&server, "admin", "123", false, "/myCustomUpdateURL", "/myCusto
 
 With the code above you can reach PrettyOTA under `http://YOUR_IP/myCustomUpdateURL`.
 
-### Partitions
+### Partitions <div id="partitions"/>
 
 #### ArduinoIDE
 
@@ -479,16 +480,16 @@ spiff,data,spiffs,0x3C0000,0x40000,
 
 I can recommend [the ESP Partition Builder Website](https://thelastoutpostworkshop.github.io/microcontroller_devkit/esp32partitionbuilder) for an easy way to manage partitions.
 
-### Save logged in clients to NVS
+### Save logged in clients to NVS <div id="save-logged-in-clients-to-nvs"/>
 
 PrettyOTA automatically saves logged in clients (sessionIDs) to the NVS partition and loads them during initialization. This enables clients to stay logged in after a reboot or firmware update of the ESP32.
 
 For this to work you must have a NVS partition (for example inside the partitions.csv file for PlatformIO).
 Without a NVS partition saving will not work and you have to log in again after a reboot or firmware update of the ESP32.
 
-## Documentation of all functions
+## Documentation of all functions <div id="documentation-of-all-functions"/>
 
-### Begin()
+### Begin() <div id="begin"/>
 
 ```cpp
 // Returns true on success, false on error or if already initialized
@@ -502,7 +503,7 @@ bool Begin(AsyncWebServer* const server,             // The AsyncWebServer insta
                                                       // Leave it set to `3232` for compatibility with ArduinoIDE OTA upload
 ```
 
-#### SetAuthenticationDetails()
+#### SetAuthenticationDetails() <div id="setauthenticationdetails"/>
 
 ```cpp
 void SetAuthenticationDetails(const char* const username,    // Username
@@ -514,7 +515,7 @@ If `username` *and* `password` is empty, authentication will be disabled. The `/
 
 See [Authentication](#authentication-username-and-password) below for details and examples.
 
-#### UseDefaultCallbacks()
+#### UseDefaultCallbacks() <div id="usedefaultcallbacks"/>
 
 Call this function to use the built-in default callbacks. The default callbacks only print the update status to the Serial-Monitor (or any other Stream you specified).
 See [Use default callbacks](#use-default-callbacks) for more details.
@@ -523,7 +524,7 @@ See [Use default callbacks](#use-default-callbacks) for more details.
 void UseDefaultCallbacks();
 ```
 
-#### SetSerialOutputStream()
+#### SetSerialOutputStream() <div id="setserialoutputstream"/>
 
 PrettyOTA outputs log messages when an error occurs. You can specify where these log messages should be printed. The default is printing to `Serial` (you must have `Serial.begin(115200);` inside `setup()` for this to work).
 
@@ -540,7 +541,7 @@ Example:
 OTAUpdates.SetSerialOutputStream(&Serial1);
 ```
 
-#### OnStart(), OnProgress(), OnEnd()
+#### OnStart(), OnProgress(), OnEnd() <div id="onstart-onprogress-onend"/>
 
 Set custom user defined callbacks. See [callbacks example](/examples/callbacks/callbacks.ino).
 
@@ -551,7 +552,7 @@ void OnProgress(std::function<void(uint32_t currentSize, uint32_t totalSize)> fu
 void OnEnd(std::function<void(bool successful)> func);
 ```
 
-#### OverwriteAppVersion()
+#### OverwriteAppVersion() <div id="overwriteappversion"/>
 
 See [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date).
 
@@ -559,7 +560,7 @@ See [Set firmware version number, build time and date](#set-firmware-version-num
 static void OverwriteAppVersion(const char* const appVersion);
 ```
 
-#### OverwriteAppBuildTimeAndDate()
+#### OverwriteAppBuildTimeAndDate() <div id="overwriteappbuildtimeanddate"/>
 
 See [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date).
 
@@ -567,7 +568,7 @@ See [Set firmware version number, build time and date](#set-firmware-version-num
 static void OverwriteAppBuildTimeAndDate(const char* const appBuildTime, const char* const appBuildDate);
 ```
 
-#### Macro - PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE()
+#### Macro - PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE() <div id="macro---pretty_ota_set_current_build_time_and_date"/>
 
 See [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date).
 
@@ -575,13 +576,13 @@ See [Set firmware version number, build time and date](#set-firmware-version-num
 #define PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE() PrettyOTA::OverwriteAppBuildTimeAndDate(__TIME__, __DATE__)
 ```
 
-## Use PrettyOTA with ESP-IDF
+## Use PrettyOTA with ESP-IDF <div id="use-prettyota-with-esp-idf"/>
 
 PrettyOTA relies on ESPAsyncWebServer which is an Arduino library. However you can include the Arduino dependencies as a package inside your ESP-IDF project. No changes are required to your code base and the Arduino stuff is not interfering with anything in the background.
 
 Instructions: TODO
 
-## Help I got compilation errors
+## Help I got compilation errors <div id="help-i-got-compilation-errors"/>
 
 If you get the following error when compiling with PlatformIO:
 
@@ -595,19 +596,19 @@ You must add this line to your `platformio.ini`:
 lib_compat_mode = strict
 ```
 
-## Usage in commercial applications and white labeling
+## Usage in commercial applications and white labeling <div id="usage-in-commercial-applications-and-white-labeling"/>
 
 You are allowed to use PrettyOTA for commercial purposes. An acknowledgement would be appreciated.
 However you are not allowed to modify the source code and then claim that you wrote it.
 
 *See also: [License (zlib)](LICENSE.md)*
 
-### White-labeling
+### White-labeling <div id="white-labeling"/>
 
 If you want to white-label PrettyOTA (use a custom name and logo for commercial or private application), please **[contact me via E-Mail](mailto:marc.public.mail@gmail.com)** for inquiries.
 White-labeling is the only use case which is not free.
 
-## Can I support you?
+## Can I support you? <div id="can-i-support-you"/>
 
 Yes, spread the word about PrettyOTA.
 
