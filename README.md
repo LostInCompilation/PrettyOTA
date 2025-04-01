@@ -21,7 +21,6 @@
     - [Arduino](#arduino)
     - [GitHub](#github)
     - [Dependencies](#dependencies)
-    - [OTA upload directly inside PlatformIO or ArduinoIDE](#ota-upload-directly-inside-platformio-or-arduinoide)
 - [Usage](#usage)
     - [Documentation of all functions](#documentation-of-all-functions)
         - [Begin()](#begin)
@@ -29,7 +28,11 @@
         - [UseDefaultCallbacks()](#usedefaultcallbacks)
         - [SetSerialOutputStream()](#setserialoutputstream)
         - [OnStart(), OnProgress(), OnEnd()](#onstart-onprogress-onend)
+        - [OverwriteAppVersion()](#overwriteappversion)
+        - [OverwriteAppBuildTimeAndDate()](#overwriteappbuildtimeanddate)
+        - [Macro - PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE()](#macro---pretty_ota_set_current_build_time_and_date)
     - [Authentication (username and password)](#authentication-username-and-password)
+    - [OTA upload directly inside PlatformIO or ArduinoIDE](#ota-upload-directly-inside-platformio-or-arduinoide)
     - [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date)
         - [PlatformIO (automatic)](#platformio-automatic)
         - [ArduinoIDE (manual)](#arduinoide-manual)
@@ -150,21 +153,6 @@ PrettyOTA needs the following libraries:
 - ESPAsyncWebServer: https://github.com/ESP32Async/ESPAsyncWebServer
 - ArduinoJson: https://github.com/bblanchon/ArduinoJson
 
-### OTA upload directly inside PlatformIO or ArduinoIDE
-
-If you don't want to use the web interface of PrettyOTA, you can directly upload the firmware via OTA using PlatformIO or ArduinoIDE.
-
-For ArduinoIDE you don't have to change anything. The ESP32 will show up under boards as an WiFi OTA target.
-
-For PlatformIO you have to change the `platformio.ini` file like usual for OTA uploads and add the following:
-
-```ini
-upload_protocol = espota
-upload_port = 192.168.x.x
-```
-
-Replace the IP address with the IP address of your ESP32.
-
 ## Usage
 
 ### Documentation of all functions
@@ -276,6 +264,21 @@ SetAuthenticationDetails("", "");
 It is also possible to only have an username but no password (and vice versa). Simply leave one of the parameters (username *or* password) empty.
 
 Authentication is disabled by default if you don't pass any values to `username` and `password` inside `Begin()`.
+
+### OTA upload directly inside PlatformIO or ArduinoIDE
+
+If you don't want to use the web interface of PrettyOTA, you can directly upload the firmware via OTA using PlatformIO or ArduinoIDE.
+
+For ArduinoIDE you don't have to change anything. The ESP32 will show up under boards as an WiFi OTA target.
+
+For PlatformIO you have to change the `platformio.ini` file like usual for OTA uploads and add the following:
+
+```ini
+upload_protocol = espota
+upload_port = 192.168.x.x
+```
+
+Replace the IP address with the IP address of your ESP32.
 
 ### Set firmware version number, build time and date
 
