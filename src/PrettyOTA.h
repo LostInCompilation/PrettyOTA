@@ -83,7 +83,7 @@ private:
     // Constants
     static const uint8_t    PRETTY_OTA_VERSION_MAJOR = 1;
     static const uint8_t    PRETTY_OTA_VERSION_MINOR = 0;
-    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 2;
+    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 3;
 
     static const uint32_t   BACKGROUND_TASK_STACK_SIZE = 4096;
     static const uint8_t    BACKGROUND_TASK_PRIORITY = 4;

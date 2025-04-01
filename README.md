@@ -142,7 +142,7 @@ git clone https://github.com/LostInCompilation/PrettyOTA
 
 ### Dependencies
 
-You dont have to manually install the dependencies when using ArduinoIDE or PlatformIO. Simply search for *PrettyOTA* in the library manager and install it.
+You don't have to manually install the dependencies when using ArduinoIDE or PlatformIO. Simply search for *PrettyOTA* in the library manager and install it.
 
 PrettyOTA needs the following libraries:
 
@@ -350,14 +350,14 @@ You can use mDNS to display the hostname for the OTA upload target inside Arduin
 void setup()
 {
     // ...
-    
+
     // Setup mDNS
     // You must call "MDNS.begin()" BEFORE "OTAUpdates.Begin()"
     MDNS.begin("myesp"); // http://myesp.local/
-    
+
     // Initialize PrettyOTA
     OTAUpdates.Begin(&server);
-    
+
     // ...
 }
 ```
@@ -506,7 +506,29 @@ With the code above you can reach PrettyOTA under `http://YOUR_IP/myCustomUpdate
 
 ### Partitions
 
-TODO
+#### ArduinoIDE
+
+Inside the ArduinoIDE make sure you select a partition scheme *with OTA*. For example you can use `Minimal SPIFFS (APP with OTA)`. However having a separate SPIFFS is not a requirement.
+
+#### PlatformIO
+
+To be able to use OTA updates you need (at least) two app partitions (for the firmware) and one ota_data partition (for configuration).
+
+You also need a NVS partition where PrettyOTA can store the logged in clients. If you don't have a NVS partition, logged in clients won't be remembered after reboot/update and PrettyOTA will print an error message (but everything else will work without issues).
+
+SPIFFS is not a requirement.
+
+Example `partitions.csv` (4MB flash) for PlatformIO including an optional SPIFFS partition:
+
+```text
+# Name,   Type, SubType, Offset,  Size, Flags
+nvs,data,nvs,0x9000,0x13000,
+phy,data,phy,0x1C000,0x2000,
+otadata,data,ota,0x1E000,0x2000,
+app0,app,ota_0,0x20000,0x1D0000,
+app1,app,ota_1,0x1F0000,0x1D0000,
+spiff,data,spiffs,0x3C0000,0x40000,
+````
 
 ### Save logged in clients to NVS
 

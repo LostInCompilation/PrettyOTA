@@ -1,5 +1,11 @@
 # Changelog
 
+## Version: 1.0.3
+
+- Fixed PlatformIO README (TOC links and logo)
+- Updated keywords.txt for ArduinoIDE
+- Finished README
+
 ## Version: 1.0.2
 
 - Fixed PlatformIO release

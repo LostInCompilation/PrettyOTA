@@ -12,6 +12,9 @@ OnProgress KEYWORD2
 OnEnd KEYWORD2
 UseDefaultCallbacks KEYWORD2
 SetSerialOutputStream KEYWORD2
+OverwriteAppBuildTimeAndDate KEYWORD2
+OverwriteAppVersion KEYWORD2
+PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE KEYWORD2
 
 # Instances (KEYWORD2)
 
