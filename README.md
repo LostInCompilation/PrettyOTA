@@ -528,7 +528,9 @@ otadata,data,ota,0x1E000,0x2000,
 app0,app,ota_0,0x20000,0x1D0000,
 app1,app,ota_1,0x1F0000,0x1D0000,
 spiff,data,spiffs,0x3C0000,0x40000,
-````
+```
+
+I can recommend [the ESP Partition Builder Website](https://thelastoutpostworkshop.github.io/microcontroller_devkit/esp32partitionbuilder) for an easy way to manage partitions.
 
 ### Save logged in clients to NVS
 
@@ -539,7 +541,9 @@ Without a NVS partition saving will not work and you have to log in again after 
 
 ## Use PrettyOTA with ESP-IDF
 
-TODO
+PrettyOTA relies on ESPAsyncWebServer which is an Arduino library. However you can include the Arduino dependencies as a package inside your ESP-IDF project. No changes are required to your code base and the Arduino stuff is not interfering with anything in the background.
+
+Instructions: TODO
 
 ## Help I got compilation errors
 
