@@ -8,7 +8,7 @@
 
 <!--❤️ <span style="color:lightblue;font-weight: bold;">Support me:</span> If you like this project and want to support a student, please consider donating ☺️-->
 
-💬 *Support* this project by *telling other people* about PrettyOTA!
+💬 Support this project by *telling other people* about PrettyOTA!
 
 ## Contents
 
@@ -111,6 +111,12 @@ void setup()
     // Initialize PrettyOTA
     OTAUpdates.Begin(&server);
 
+    // Set firmware version to 1.0.0
+    OTAUpdates.OverwriteAppVersion("1.0.0");
+
+    // Set current build time and date
+    PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE();
+    
     // Start web server
     server.begin();
 }
@@ -375,6 +381,12 @@ void setup()
     // Initialize PrettyOTA and set username and password for authentication
     OTAUpdates.Begin(&server, "admin", "123");
 
+    // Set firmware version to 1.0.0
+    OTAUpdates.OverwriteAppVersion("1.0.0");
+
+    // Set current build time and date
+    PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE();
+    
     // Set custom callbacks
     OTAUpdates.OnStart(OnOTAStart);
     OTAUpdates.OnProgress(OnOTAProgress);
