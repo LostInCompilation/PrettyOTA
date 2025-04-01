@@ -256,6 +256,8 @@ void setup()
 
 #### PlatformIO with ESP-IDF (automatic) <div id="platformio-with-esp-idf-automatic"/>
 
+⚠️ The automatic way will only work if you use the ESP-IDF framework *with* the Arduino framework. If you only use the Arduino framework inside PlatformIO you must set the version and build time / date manually like described above for ArduinoIDE.
+
 #### Firmware version number
 
 In PlatformIO simply create a text file called `version.txt` in your projects root folder. The content of the textfile must be one line containing the firmware version:
@@ -266,9 +268,17 @@ In PlatformIO simply create a text file called `version.txt` in your projects ro
 
 PlatformIO will automatically find the `version.txt` file and set the version of your firmware, which gets displayed by PrettyOTA in the browser.
 
+See [Use PrettyOTA with ESP-IDF](#use-prettyota-with-esp-idf) below for details and examples.
+
 #### Build time and date
 
 The build time and date will be automatically set. You don't have to do anything. PrettyOTA reads the time and date of the build from the firmware partition using `esp_ota_get_app_description()`.
+
+You can set it manually too with:
+
+```cpp
+OTAUpdates.OverwriteAppBuildTimeAndDate("17:10:00", "Mar 31 2025");
+```
 
 ### Use mDNS <div id="use-mdns"/>
 
