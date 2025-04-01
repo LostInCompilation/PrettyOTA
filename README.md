@@ -2,7 +2,7 @@
 <img src="https://github.com/user-attachments/assets/0efbf883-8ecd-4a2a-af7b-b6620b43138b" alt="Screenshot" style="height:100px;"/>
 </p>
 
-![Version](https://img.shields.io/badge/Version-V1.0.2-brightgreen?style=flat&&logo=framework) ![CPU](https://img.shields.io/badge/CPU-ESP32-red?style=flat&&logo=espressif) ![Arduino](https://img.shields.io/badge/Arduino-Supported-blue?style=flat&&logo=arduino) ![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-blue?style=flat&&logo=platformio)
+![Version](https://img.shields.io/badge/Version-V1.0.3-brightgreen?style=flat&&logo=framework) ![CPU](https://img.shields.io/badge/CPU-ESP32-red?style=flat&&logo=espressif) ![Arduino](https://img.shields.io/badge/Arduino-Supported-blue?style=flat&&logo=arduino) ![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-blue?style=flat&&logo=platformio)
 
 ## <p align="center">Simple to use, modern looking OTA updates library - Install updates on your ESP32 over WiFi inside the browser with easy rollback feature</p>
 
@@ -45,6 +45,8 @@
     - [Save logged in clients to NVS](#save-logged-in-clients-to-nvs)
 - [Use PrettyOTA with ESP-IDF](#use-prettyota-with-esp-idf)
 - [Help I got compilation errors](#help-i-got-compilation-errors)
+- [Usage in commercial applications and white labeling](#usage-in-commercial-applications-and-white-labeling)
+- [Can I support you?](#can-i-support-you)
 
 *See also: [License (zlib)](LICENSE.md)*
 
@@ -565,3 +567,21 @@ You must add this line to your `platformio.ini`:
 ```ini
 lib_compat_mode = strict
 ```
+
+## Usage in commercial applications and white labeling
+
+You are allowed to use PrettyOTA for commercial purposes. An acknowledgement would be appreciated.
+However you are not allowed to modify the source code and then claim that you wrote it.
+
+*See also: [License (zlib)](LICENSE.md)*
+
+### White-labeling
+
+If you want to white-label PrettyOTA (use a custom name and logo for commercial or private application), please contact me (marc.public.mail@gmail.com) for inquiries.
+White-labeling is the only use case which is not free.
+
+## Can I support you?
+
+Yes, spread the word about PrettyOTA.
+
+A donation option will be added later.
