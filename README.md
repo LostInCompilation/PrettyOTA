@@ -65,7 +65,7 @@ You can view the changelog here: [Changelog](CHANGELOG.md)
 
 ## Demo
 
-![Demo](https://github.com/user-attachments/assets/20d7871f-90cf-483a-9371-7e6df5ca2bbb)
+![new](https://github.com/user-attachments/assets/cd5b869b-26ec-4d18-aa3c-554c78ec7306)
 
 ## Minimal example
 
@@ -363,6 +363,10 @@ void setup()
     // ...
 }
 ```
+
+The ArduinoIDE will now show the ESP32 as "myesp" like specified in the code above:
+
+<img width="685" alt="Screenshot 2025-03-31 at 21 17 08" src="https://github.com/user-attachments/assets/c97c1196-c6da-42e0-bcbf-66895dd0bdee" />
 
 For a full example see [mDNS example](/examples/mDNS/mDNS.ino).
 
