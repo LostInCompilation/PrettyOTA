@@ -1,5 +1,5 @@
 <p align="center">
-<img src="img/logo.svg" alt="Screenshot" style="height:100px;"/>
+<img src="https://github.com/user-attachments/assets/0efbf883-8ecd-4a2a-af7b-b6620b43138b" alt="Screenshot" style="height:100px;"/>
 </p>
 
 ![Version](https://img.shields.io/badge/Version-V1.0.2-brightgreen?style=flat&&logo=framework) ![CPU](https://img.shields.io/badge/CPU-ESP32-red?style=flat&&logo=espressif) ![Arduino](https://img.shields.io/badge/Arduino-Supported-blue?style=flat&&logo=arduino) ![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-blue?style=flat&&logo=platformio)
