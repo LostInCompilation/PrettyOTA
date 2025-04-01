@@ -1,5 +1,9 @@
 # Changelog
 
+## Version: 1.0.4
+
+- Fixed a bug where long strings for app version, build time and date would break the website formatting
+
 ## Version: 1.0.3
 
 - Updated keywords.txt for ArduinoIDE

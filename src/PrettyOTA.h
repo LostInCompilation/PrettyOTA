@@ -83,7 +83,7 @@ private:
     // Constants
     static const uint8_t    PRETTY_OTA_VERSION_MAJOR = 1;
     static const uint8_t    PRETTY_OTA_VERSION_MINOR = 0;
-    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 3;
+    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 4;
 
     static const uint32_t   BACKGROUND_TASK_STACK_SIZE = 4096;
     static const uint8_t    BACKGROUND_TASK_PRIORITY = 4;
@@ -91,7 +91,7 @@ private:
     static const uint8_t    MAX_NUM_LOGGED_IN_CLIENTS = 5;
 
     // Website code
-    static const uint8_t    PRETTY_OTA_WEBSITE_DATA[12627];
+    static const uint8_t    PRETTY_OTA_WEBSITE_DATA[12662];
     static const uint8_t    PRETTY_OTA_LOGIN_DATA[6208];
 
 private:
