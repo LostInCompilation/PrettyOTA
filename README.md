@@ -11,6 +11,8 @@
 
 <!--❤️ <span style="color:lightblue;font-weight: bold;">Support me:</span> If you like this project and want to support a student, please consider donating ☺️-->
 
+💰 Donation: Help a student pay rent, [donate Bitcoin for PrettyOTA](#donation)
+
 💬 Support this project by *telling other people* about PrettyOTA!
 
 ## Contents
@@ -51,7 +53,7 @@
 - **[Help I got compilation errors](#help-i-got-compilation-errors)**
 - **[Usage in commercial applications and white labeling](#usage-in-commercial-applications-and-white-labeling)**
   - [White-labeling](#white-labeling)
-- **[Can I support you?](#can-i-support-you)**
+- **[Donation](#donation)**
 
 *See also: **[License (zlib)](LICENSE.md)***
 
@@ -655,8 +657,38 @@ However you are not allowed to modify the source code and then claim that you wr
 If you want to white-label PrettyOTA (use a custom name and logo for commercial or private application), please **[contact me via E-Mail](mailto:marc.public.mail@gmail.com)** for inquiries.
 White-labeling is the only use case which is not free.
 
-## Can I support you? <div id="can-i-support-you"/>
+## Donation <div id="donation"/>
 
-Yes, spread the word about PrettyOTA.
+If you want to help out a student paying rent, a donation for PrettyOTA and my work would be greatly appreciated! :)
 
-A donation option will be added later.
+If you dont want to donate, please tell other people about PrettyOTA!
+
+### Bitcoin
+
+IMG
+
+Wallet address (**Bitcoin**):
+
+```text
+32nkLAWGsAtn3SNo1vb7RSQKLP93YJCwke
+```
+
+### Bitcoin cash
+
+IMG
+
+Wallet address (**Bitcoin Cash**):
+
+```text
+1MahrZ6Wz9tmqwaZ91jgqqqAMFrSLtEta7
+```
+
+### Ethereum
+
+IMG
+
+Wallet address (**Ethereum**):
+
+```text
+0xc95dD6A07B7C0F2d494d59DE26211c77C336E1Ba
+```
