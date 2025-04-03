@@ -5,7 +5,7 @@
 ![Version](https://img.shields.io/badge/Version-V1.0.5-brightgreen?style=flat&&logo=framework) ![CPU](https://img.shields.io/badge/CPU-ESP32-red?style=flat&&logo=espressif) ![Arduino](https://img.shields.io/badge/Arduino-Supported-blue?style=flat&&logo=arduino) ![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-blue?style=flat&&logo=platformio)
 
 # <p align="center">PrettyOTA</p>
-### <p align="center">Over the air (OTA) update library for ESP32 series chips (and soon RP2040)</p>
+### <p align="center">Over the air (OTA) update library for ESP32 series chips - (RaspberryPi Pico W coming soon)</p>
 
 #### <p align="center">Simple to use, modern design - Install updates on your ESP32 over WiFi inside the browser with easy rollback feature</p>
 
