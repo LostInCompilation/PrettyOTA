@@ -657,9 +657,9 @@ White-labeling is the only use case which is not free.
 
 ## Donation <div id="donation"/>
 
-If you want to help out a student paying rent, a donation for PrettyOTA and my work would be greatly appreciated! :)
+❤️ If you want to help out a student with paying rent a donation for PrettyOTA and my work would be greatly appreciated!
 
-If you dont want to donate, please tell other people about PrettyOTA!
+💬 If you don't want to donate, please tell other people about PrettyOTA!
 
 ### Bitcoin
 
