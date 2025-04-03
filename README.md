@@ -16,6 +16,7 @@
 ## Contents
 
 - **[Features](#features)**
+- **[Supported MCUs](#supported-mcus)**
 - **[Demo](#demo)**
 - **[Minimal example](#minimal-example)**
 - **[Installation](#installation)**
@@ -71,6 +72,12 @@ You can view the changelog here: [Changelog](CHANGELOG.md)
 - ***Asynchronous web server***
 - Support for ***ArduinoOTA*** to directly upload firmware over WiFi inside Arduino IDE and PlatformIO (tutorial included)
 
+## Supported MCUs <div id="supported-mcus"/>
+
+- ESP32 (all variants)
+- RP2040 and RP2350 (RaspberryPi Pico W) - coming soon!
+- ESP8266 - coming soon!
+  
 ## Demo <div id="demo"/>
 
 <p align="center">
