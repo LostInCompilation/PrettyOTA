@@ -665,7 +665,7 @@ If you dont want to donate, please tell other people about PrettyOTA!
 
 ### Bitcoin
 
-IMG
+<img width="200" alt="Bitcoin" src="https://github.com/user-attachments/assets/7c78d93f-60ef-45a0-afe3-e51e71e98edc" />
 
 Wallet address (**Bitcoin**):
 
@@ -675,7 +675,7 @@ Wallet address (**Bitcoin**):
 
 ### Bitcoin cash
 
-IMG
+<img width="176" alt="Bitcoin Cash" src="https://github.com/user-attachments/assets/4ad772a8-fe6b-40b3-af2b-d4f4e73588ce" />
 
 Wallet address (**Bitcoin Cash**):
 
@@ -685,7 +685,7 @@ Wallet address (**Bitcoin Cash**):
 
 ### Ethereum
 
-IMG
+<img width="174" alt="Screenshot 2025-04-03 at 20 21 47" src="https://github.com/user-attachments/assets/d079d7de-018d-480d-98c8-000ddca9d429" />
 
 Wallet address (**Ethereum**):
 
