@@ -672,6 +672,8 @@ White-labeling is the only use case which is not free.
 
 💬 If you don't want to donate, please tell other people about PrettyOTA!
 
+<a href="https://buymeacoffee.com/lostincompilation" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
 ### Bitcoin
 
 <img width="200" alt="Bitcoin" src="https://github.com/user-attachments/assets/7c78d93f-60ef-45a0-afe3-e51e71e98edc" />
