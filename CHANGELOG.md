@@ -1,5 +1,10 @@
 # Changelog
 
+## Version: 1.0.5
+
+- Updated README with better documentation
+- Added donation option
+
 ## Version: 1.0.4
 
 - Fixed a bug where long strings for app version, build time and date would break the website formatting
