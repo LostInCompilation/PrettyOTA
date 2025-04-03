@@ -1,6 +1,6 @@
 {
     "name": "PrettyOTA",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "license": "zlib",
     "description": "OTA (over the air) update library. A modern looking OTA web interface for easy updates, rollbacks and infos about your board and firmware, directly inside your browser. Also directly supports PlatformIO OTA upload",
     "keywords": "OTA, update, upgrade, wifi, web update, server, website, firmware",
