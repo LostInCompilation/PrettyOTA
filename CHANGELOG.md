@@ -1,6 +1,6 @@
 # Changelog
 
-## Version: 1.0.5
+## Version: 1.0.5 and 1.0.6
 
 - Updated README with better documentation
 - Added donation option
