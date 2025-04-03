@@ -26,6 +26,7 @@
 - **[Usage](#usage)**
   - [Documentation](#documentation)
   - [Authentication (username and password)](#authentication-username-and-password)
+      - [Password as MD5 hash](#password-as-md5-hash)
   - [OTA upload directly inside PlatformIO or ArduinoIDE](#ota-upload-directly-inside-platformio-or-arduinoide)
   - [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date)
     - [ArduinoIDE (manual)](#arduinoide-manual)
@@ -159,7 +160,7 @@ git clone https://github.com/LostInCompilation/PrettyOTA
 
 ### Dependencies <div id="dependencies"/>
 
-You don't have to manually install the dependencies when using ArduinoIDE or PlatformIO. Simply search for *PrettyOTA* in the library manager and install it.
+You don't have to install the dependencies manually when using ArduinoIDE or PlatformIO. Simply search for *PrettyOTA* in the library manager and install it.
 
 PrettyOTA needs the following libraries:
 
@@ -175,7 +176,11 @@ See **[Documentation of all functions](#documentation-of-all-functions)**.
 
 ### Authentication (username and password) <div id="authentication-username-and-password"/>
 
-To enable authentication with username and password, simply pass the username and password to the `Begin()` function.
+To enable authentication with username and password, simply pass the username and password to the `Begin(...)` function:
+
+```cpp
+OTAUpdates.Begin(&server, "username", "password");
+```
 
 You can always change the username or password after PrettyOTA has been initialized using:
 
@@ -193,6 +198,17 @@ SetAuthenticationDetails("", "");
 It is also possible to only have an username but no password (and vice versa). Simply leave one of the parameters (username *or* password) empty.
 
 Authentication is disabled by default if you don't pass any values to `username` and `password` inside `Begin()`.
+
+#### Password as MD5 hash <div id="password-as-md5-hash"/>
+
+It's better not to store the password as clear text. PrettyOTA supports setting the password as a MD5 hash.
+Simply pass the hash string to `Begin(...)` as the password argument and set `passwordIsMD5Hash` to `true`:
+
+```cpp
+// The password is "123" (without quotes)
+// The MD5 hash of "123" is "202cb962ac59075b964b07152d234b70"
+OTAUpdates.Begin(&server, "username", "202cb962ac59075b964b07152d234b70", true);
+```
 
 ### OTA upload directly inside PlatformIO or ArduinoIDE <div id="ota-upload-directly-inside-platformio-or-arduinoide"/>
 
@@ -445,10 +461,14 @@ void CustomOnStart(NSPrettyOTA::UPDATE_MODE updateMode)
 
 void setup()
 {
-    OTAUpdates.Begin();
+    // ...
+
+    OTAUpdates.Begin(&server);
 
     // Set callback
     OTAUpdates.OnStart(CustomOnStart);
+    
+    // ...
 }
 ```
 
