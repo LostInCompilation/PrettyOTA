@@ -11,9 +11,7 @@
 
 <!--❤️ <span style="color:lightblue;font-weight: bold;">Support me:</span> If you like this project and want to support a student, please consider donating ☺️-->
 
-💰 Donation: Help a student pay rent, [donate Bitcoin for PrettyOTA](#donation)
-
-💬 Support this project by *telling other people* about PrettyOTA!
+💰 **Donation:** Help a student pay rent, [donate Bitcoin for PrettyOTA](#donation)
 
 ## Contents
 
