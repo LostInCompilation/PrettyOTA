@@ -36,6 +36,9 @@ void setup()
     // Initialize PrettyOTA
     OTAUpdates.Begin(&server);
 
+    // Set unique Hardware-ID for your hardware/board
+    OTAUpdates.SetHardwareID("UniqueBoard1");
+    
     // Set firmware version to 1.0.0
     OTAUpdates.OverwriteAppVersion("1.0.0");
 

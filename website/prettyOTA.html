@@ -342,9 +342,17 @@
                         if (xhr.status == 200) {
                             let jsonObj = JSON.parse(this.responseText);
 
+                            document.getElementById("hardware_id_text").innerText = jsonObj.hardwareID;
+                            document.getElementById("hardware_id_text").title = jsonObj.hardwareID;
+                            
                             document.getElementById("firmware_version_text").innerText = jsonObj.firmwareVersion;
+                            document.getElementById("firmware_version_text").title = jsonObj.firmwareVersion;
+                            
                             document.getElementById("build_date_text").innerText = jsonObj.buildDate;
+                            document.getElementById("build_date_text").title = jsonObj.buildDate;
+                            
                             document.getElementById("build_time_text").innerText = jsonObj.buildTime;
+                            document.getElementById("build_time_text").title = jsonObj.buildTime;
 
                             if (jsonObj.rollbackPossible) {
                                 document.getElementById("rollbackButton").disabled = false;
@@ -689,7 +697,7 @@
             .columnContent {
                 display: flex;
                 flex-direction: column;
-                line-height: 0.6;
+                line-height: 9px;
                 margin-top: 15px;
                 margin-left: 15px;
                 margin-bottom: 8px;
@@ -701,14 +709,15 @@
                 justify-content: space-between;
                 align-items: center;
                 white-space: nowrap;
-                text-overflow: clip;
-                overflow: hidden;
             }
             .columnContentValue {
                 color: #b0b0b0;
                 width: 150px;
                 text-align: right;
                 padding-right: 3px;
+                line-height: normal;
+                text-overflow: ellipsis;
+                overflow: hidden;
             }
             select {
                 color: #e6e6e6;
@@ -1092,16 +1101,20 @@
                 <div class="headerRow"></div>
                 <div class="columnContent">
                     <div class="columnContentEntry">
+                        <p>Hardware ID</p>
+                        <span id="hardware_id_text" title="" class="columnContentValue"></span>
+                    </div>
+                    <div class="columnContentEntry">
                         <p>Firmware version</p>
-                        <span id="firmware_version_text" class="columnContentValue"></span>
+                        <span id="firmware_version_text" title="" class="columnContentValue"></span>
                     </div>
                     <div class="columnContentEntry">
                         <p>Build date</p>
-                        <span id="build_date_text" class="columnContentValue"></span>
+                        <span id="build_date_text" title="" class="columnContentValue"></span>
                     </div>
                     <div class="columnContentEntry">
                         <p>Build time</p>
-                        <span id="build_time_text" class="columnContentValue"></span>
+                        <span id="build_time_text" title="" class="columnContentValue"></span>
                     </div>
                     <div class="columnContentEntry">
                         <p>Rollback possible</p>

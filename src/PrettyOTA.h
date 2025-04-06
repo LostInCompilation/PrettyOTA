@@ -1,24 +1,25 @@
 /*
 
-zlib license
-
 Copyright (c) 2025 Marc Schöndorf
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
 arising from the use of this software.
 
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
+Branding or white-labeling (changing the logo and name of PrettyOTA) is permitted only
+with a commercial license. See README for details.
 
-1. The origin of this software must not be misrepresented; you must not
+Permission is granted to anyone to use this software for private and commercial
+applications, to alter it and redistribute it, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented. You must not
    claim that you wrote the original software. If you use this software
-   in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required.
+   in a product, an acknowledgment is required.
 2. Altered source versions must be plainly marked as such, and must not be
    misrepresented as being the original software.
-3. This notice may not be removed or altered from any source distribution.
+3. You are not allowed to change the logo or name of PrettyOTA without a commercial
+   license, even when redistributing modified source code.
+4. This notice may not be removed or altered from any source distribution.
 
 
 ******************************************************
@@ -64,7 +65,7 @@ Description:
 // ********************************************************
 // Compile checks
 #ifndef ESP32
-    #error PrettyOTA only supports ESP32 devices.
+    #error PrettyOTA only supports ESP32 devices. Support for RaspberryPi Pico W will follow soon.
 #endif
 
 // Is it the correct version and fork of ESP32AsyncWebServer?
@@ -72,7 +73,7 @@ Description:
     #error PrettyOTA needs the "ESPAsyncWebServer" library (from ESP32Async) version 3.0 or newer.
 #endif
 
-// Is it the correct version for ArduinoJson?
+// Is it the correct version of ArduinoJson?
 #if !defined(ARDUINOJSON_VERSION_MAJOR) || ARDUINOJSON_VERSION_MAJOR < 7
     #error PrettyOTA needs the "ArduinoJson" library version 7.0 or newer.
 #endif
@@ -82,8 +83,8 @@ class PrettyOTA
 private:
     // Constants
     static const uint8_t    PRETTY_OTA_VERSION_MAJOR = 1;
-    static const uint8_t    PRETTY_OTA_VERSION_MINOR = 0;
-    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 6;
+    static const uint8_t    PRETTY_OTA_VERSION_MINOR = 1;
+    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 0;
 
     static const uint32_t   BACKGROUND_TASK_STACK_SIZE = 4096;
     static const uint8_t    BACKGROUND_TASK_PRIORITY = 4;
@@ -91,7 +92,7 @@ private:
     static const uint8_t    MAX_NUM_LOGGED_IN_CLIENTS = 5;
 
     // Website code
-    static const uint8_t    PRETTY_OTA_WEBSITE_DATA[12662];
+    static const uint8_t    PRETTY_OTA_WEBSITE_DATA[12583];
     static const uint8_t    PRETTY_OTA_LOGIN_DATA[6208];
 
 private:
@@ -106,6 +107,7 @@ private:
     static std::string  m_AppBuildTime;
     static std::string  m_AppBuildDate;
     static std::string  m_AppVersion;
+    static std::string  m_HardwareID;
 
     std::string         m_LoginURL = "";
     std::string         m_MainURL = "";
@@ -117,6 +119,7 @@ private:
     bool                m_IsInitialized = false;
     bool                m_AutoRebootEnabled = true;
     bool                m_RequestReboot = false;
+    static bool         m_DefaultCallbackPrintWithColor;
     uint32_t            m_RebootRequestTime = 0;
     uint32_t            m_WrittenBytes = 0;
 
@@ -168,10 +171,13 @@ public:
     void OnEnd(std::function<void(bool successful)> func) { m_OnEndUpdate = func; }
 
     // Use built in callbacks that print info to the serial monitor
-    void UseDefaultCallbacks();
+    void UseDefaultCallbacks(bool printWithColor = false);
 
     // Set the Stream to write log messages too (Example: Use &Serial as argument)
     void SetSerialOutputStream(Stream* const serialStream);
+
+    // Set the HardwareID. It should be a unique identifier for your hardware/board
+    void SetHardwareID(const char* const hardwareID) { m_HardwareID = hardwareID; }
 
     // Overwrite the build time and date read automatically by PrettyOTA using esp_ota_get_app_description().
     // This is needed for ArduinoIDE, since ArduinoIDE uses a prebuilt ESP-IDF SDK so the build time and date

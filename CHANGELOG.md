@@ -1,5 +1,12 @@
 # Changelog
 
+## Version: 1.1.0
+- Added HardwareID which can be set using `SetHardwareID(const char* const)`
+- Truncate too long values with ellipsis
+- Showing full (possibly truncated) text on hover for each entry. If for example the HardwareID would be too long to display and gets truncated, you can see the full value when hovering over it
+- Added parameter `printWithColor` to `UseDefaultCallbacks(bool printWithColor = false);` because ArduinoIDE's serial monitor doesn't support color formatted printing with ANSI escape codes
+- Changed license
+
 ## Version: 1.0.5 and 1.0.6
 
 - Updated README with better documentation

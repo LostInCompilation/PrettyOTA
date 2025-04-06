@@ -2,18 +2,18 @@
 <img src="https://github.com/user-attachments/assets/0efbf883-8ecd-4a2a-af7b-b6620b43138b" alt="Screenshot" style="height:100px;"/>
 </p>
 
-![Version](https://img.shields.io/badge/Version-V1.0.6-brightgreen?style=flat&&logo=framework) ![CPU](https://img.shields.io/badge/CPU-ESP32-red?style=flat&&logo=espressif) ![Arduino](https://img.shields.io/badge/Arduino-Supported-blue?style=flat&&logo=arduino) ![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-blue?style=flat&&logo=platformio)
+![Version](https://img.shields.io/badge/Version-V1.1.0-brightgreen?style=flat&&logo=framework) ![CPU](https://img.shields.io/badge/CPU-ESP32-red?style=flat&&logo=espressif) ![Arduino](https://img.shields.io/badge/Arduino-Supported-blue?style=flat&&logo=arduino) ![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-blue?style=flat&&logo=platformio)
 
 # <p align="center">PrettyOTA</p>
 ### <p align="center">Over the air (OTA) update library for ESP32 series chips - (RaspberryPi Pico W coming soon)</p>
 
 #### <p align="center">Simple to use, modern design - Install updates on your ESP32 over WiFi inside the browser with easy rollback feature</p>
 
-### ❤️💰 Donation - Help a student pay rent
+### ❤️💰 Donation - Support me and my work
 
 <a href="https://buymeacoffee.com/lostincompilation" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
-[Donate Bitcoin for PrettyOTA](#donation)
+[or donate Bitcoin for PrettyOTA](#donation)
 
 ## Contents
 
@@ -27,10 +27,10 @@
   - [GitHub](#github)
   - [Dependencies](#dependencies)
 - **[Usage](#usage)**
-  - [Documentation](#documentation)
   - [Authentication (username and password)](#authentication-username-and-password)
       - [Password as MD5 hash](#password-as-md5-hash)
   - [OTA upload directly inside PlatformIO or ArduinoIDE](#ota-upload-directly-inside-platformio-or-arduinoide)
+  - [Set HardwareID](#set-hardwareid)
   - [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date)
     - [ArduinoIDE (manual)](#arduinoide-manual)
     - [PlatformIO with ESP-IDF (automatic)](#platformio-with-esp-idf-automatic)
@@ -47,16 +47,18 @@
   - [UseDefaultCallbacks()](#usedefaultcallbacks)
   - [SetSerialOutputStream()](#setserialoutputstream)
   - [OnStart(), OnProgress(), OnEnd()](#onstart-onprogress-onend)
+  - [SetHardwareID()](#sethardwareid)
   - [OverwriteAppVersion()](#overwriteappversion)
   - [OverwriteAppBuildTimeAndDate()](#overwriteappbuildtimeanddate)
   - [Macro - PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE()](#macro---pretty_ota_set_current_build_time_and_date)
 - **[Use PrettyOTA with ESP-IDF](#use-prettyota-with-esp-idf)**
+- **[Is Ethernet supported?](#is-ethernet-supported)**
 - **[Help I got compilation errors](#help-i-got-compilation-errors)**
 - **[Usage in commercial applications and white labeling](#usage-in-commercial-applications-and-white-labeling)**
   - [White-labeling](#white-labeling)
 - **[Donation](#donation)**
 
-*See also: **[License (zlib)](LICENSE.md)***
+*See also: **[License](LICENSE.md)***
 
 ## Changelog <div id="changelog"/>
 
@@ -76,10 +78,10 @@ You can view the changelog here: [Changelog](CHANGELOG.md)
 
 ## Supported MCUs <div id="supported-mcus"/>
 
-- ESP32 (all variants)
-- RP2040 and RP2350 (RaspberryPi Pico W) - coming soon!
-- ESP8266 - coming soon!
-  
+- **ESP32** (all variants)
+- **RP2040** and **RP2350** (**RaspberryPi Pico W**) - *coming soon!*
+- **ESP8266** - *coming soon!*
+
 ## Demo <div id="demo"/>
 
 <p align="center">
@@ -129,7 +131,7 @@ void setup()
 
     // Set current build time and date
     PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE();
-    
+
     // Start web server
     server.begin();
 }
@@ -178,10 +180,6 @@ PrettyOTA needs the following libraries:
 - [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
 
 ## Usage <div id="usage"/>
-
-### Documentation <div id="documentation"/>
-
-See **[Documentation of all functions](#documentation-of-all-functions)**.
 
 ### Authentication (username and password) <div id="authentication-username-and-password"/>
 
@@ -234,6 +232,17 @@ upload_port = 192.168.x.x
 
 Replace the IP address with the IP address of your ESP32.
 
+### Set HardwareID <div id="set-hardwareid"/>
+
+The Hardware ID should be a unique identifier for your hardware/board.
+You can set it using:
+
+```cpp
+void SetHardwareID(const char* const hardwareID);
+```
+
+If you don't set a Hardware ID, the default `"MyBoard1"` will be used. It is not recommended to leave the Hardware ID unchanged, as every board would get the same default value.
+
 ### Set firmware version number, build time and date <div id="set-firmware-version-number-build-time-and-date"/>
 
 You can manually set the version number and build time/date (must be done when using ArduinoIDE or PlatformIO without ESP-IDF framework).
@@ -274,6 +283,9 @@ void setup()
 
     // Initialize PrettyOTA
     OTAUpdates.Begin(&server);
+
+    // Set hardware id
+    OTAUpdates.SetHardwareID("MyUniqueBoard");
 
     // Set firmware version to 1.0.0
     OTAUpdates.OverwriteAppVersion("1.0.0");
@@ -414,7 +426,7 @@ void setup()
 
     // Set current build time and date
     PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE();
-    
+
     // Set custom callbacks
     OTAUpdates.OnStart(OnOTAStart);
     OTAUpdates.OnProgress(OnOTAProgress);
@@ -445,7 +457,15 @@ To use the built-in default callbacks:
 OTAUpdates.UseDefaultCallbacks();
 ```
 
-When using the default callbacks you will get the following output on your Serial-Monitor during an OTA update:
+The default callbacks also support color formatted printing. Every terminal and serial monitor supports that feature, except ArduinoIDE's serial monitor.
+To enable color formatted printing, set the `printWithColor` parameter to `true`:
+
+```cpp
+// Use built-in default callbacks with color formatted printing
+OTAUpdates.UseDefaultCallbacks(true);
+```
+
+When using the default callbacks you will get the following output on your Serial-Monitor during an OTA update (colors are not supported by ArduinoIDE):
 
 <p align="center">
 <img width="380" alt="Screenshot 2025-03-31 at 03 35 45" src="https://github.com/user-attachments/assets/40f76183-3f94-469b-bb25-b01dd89e8606" />
@@ -476,7 +496,7 @@ void setup()
 
     // Set callback
     OTAUpdates.OnStart(CustomOnStart);
-    
+
     // ...
 }
 ```
@@ -539,7 +559,7 @@ I can recommend [the ESP Partition Builder Website](https://thelastoutpostworksh
 
 PrettyOTA automatically saves logged in clients (sessionIDs) to the NVS partition and loads them during initialization. This enables clients to stay logged in after a reboot or firmware update of the ESP32.
 
-For this to work you must have a NVS partition (for example inside the partitions.csv file for PlatformIO).
+For this to work you must have a NVS partition (for example inside the `partitions.csv` file for PlatformIO).
 Without a NVS partition saving will not work and you have to log in again after a reboot or firmware update of the ESP32.
 
 ## Documentation of all functions <div id="documentation-of-all-functions"/>
@@ -573,10 +593,11 @@ See [Authentication](#authentication-username-and-password) below for details an
 #### UseDefaultCallbacks() <div id="usedefaultcallbacks"/>
 
 Call this function to use the built-in default callbacks. The default callbacks only print the update status to the Serial-Monitor (or any other Stream you specified).
+
 See [Use default callbacks](#use-default-callbacks) for more details.
 
 ```cpp
-void UseDefaultCallbacks();
+void UseDefaultCallbacks(bool printWithColor = false);
 ```
 
 #### SetSerialOutputStream() <div id="setserialoutputstream"/>
@@ -608,6 +629,14 @@ void OnProgress(std::function<void(uint32_t currentSize, uint32_t totalSize)> fu
 void OnEnd(std::function<void(bool successful)> func);
 ```
 
+#### SetHardwareID() <div id="sethardwareid"/>
+
+See [Set HardwareID](#set-hardwareid).
+
+```cpp
+void SetHardwareID(const char* const hardwareID);
+```
+
 #### OverwriteAppVersion() <div id="overwriteappversion"/>
 
 See [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date).
@@ -636,7 +665,11 @@ See [Set firmware version number, build time and date](#set-firmware-version-num
 
 PrettyOTA relies on ESPAsyncWebServer which is an Arduino library. However you can include the Arduino dependencies as a package inside your ESP-IDF project. No changes are required to your code base and the Arduino stuff is not interfering with anything in the background.
 
-Instructions: TODO
+*Instructions on how to use ESP-IDF and Arduino framework at the same time will follow soon.*
+
+## Is Ethernet supported? <div id="is-ethernet-supported"/>
+
+Yes, Ethernet is supported with PrettyOTA and AsyncWebServer. You don't have to change anything regarding PrettyOTA's usage.
 
 ## Help I got compilation errors <div id="help-i-got-compilation-errors"/>
 
@@ -654,10 +687,13 @@ lib_compat_mode = strict
 
 ## Usage in commercial applications and white labeling <div id="usage-in-commercial-applications-and-white-labeling"/>
 
-You are allowed to use PrettyOTA for commercial purposes. An acknowledgement would be appreciated.
+You are allowed to use PrettyOTA for commercial purposes. An acknowledgement is required.
 However you are not allowed to modify the source code and then claim that you wrote it.
+It is also not permitted to change the name or logo of PrettyOTA, even when redistributing changed source code versions. If you want to change the logo and/or name, you have to aquire a commercial license.
 
-*See also: [License (zlib)](LICENSE.md)*
+A commercial license also includes technical support for companies, who need reliable and fast solutions.
+
+*See also: [License](LICENSE.md)*
 
 ### White-labeling <div id="white-labeling"/>
 
@@ -668,13 +704,17 @@ White-labeling is the only use case which is not free.
 
 ❤️ If you want to help out a student with paying rent, a donation for PrettyOTA and my work would be greatly appreciated!
 
-💬 If you don't want to donate, please tell other people about PrettyOTA!
+💬 If you don't want to donate, please support by telling other people about PrettyOTA!
+
+### Support me on *Buy me a coffee*
 
 <a href="https://buymeacoffee.com/lostincompilation" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
 ### Bitcoin
 
-<img width="200" alt="Bitcoin" src="https://github.com/user-attachments/assets/7c78d93f-60ef-45a0-afe3-e51e71e98edc" />
+<img width="150" alt="Bitcoin" src="https://github.com/user-attachments/assets/7c78d93f-60ef-45a0-afe3-e51e71e98edc" />
+
+<br>
 
 Wallet address (**Bitcoin**):
 
@@ -684,7 +724,9 @@ Wallet address (**Bitcoin**):
 
 ### Bitcoin cash
 
-<img width="176" alt="Bitcoin Cash" src="https://github.com/user-attachments/assets/4ad772a8-fe6b-40b3-af2b-d4f4e73588ce" />
+<img width="150" alt="Bitcoin Cash" src="https://github.com/user-attachments/assets/4ad772a8-fe6b-40b3-af2b-d4f4e73588ce" />
+
+<br>
 
 Wallet address (**Bitcoin Cash**):
 
@@ -694,7 +736,9 @@ Wallet address (**Bitcoin Cash**):
 
 ### Ethereum
 
-<img width="174" alt="Screenshot 2025-04-03 at 20 21 47" src="https://github.com/user-attachments/assets/d079d7de-018d-480d-98c8-000ddca9d429" />
+<img width="150" alt="Screenshot 2025-04-03 at 20 21 47" src="https://github.com/user-attachments/assets/d079d7de-018d-480d-98c8-000ddca9d429" />
+
+<br>
 
 Wallet address (**Ethereum**):
 
