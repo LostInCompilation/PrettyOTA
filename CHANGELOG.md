@@ -1,5 +1,9 @@
 # Changelog
 
+## Version: 1.1.1
+
+- Fixed filesystem update issue (partition not found error)
+
 ## Version: 1.1.0
 
 - Added HardwareID which can be set using `SetHardwareID(const char* const)`

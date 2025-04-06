@@ -90,7 +90,7 @@ namespace NSPrettyOTA
     public:
         ESPUpdateManager() = default;
 
-        bool Begin(UPDATE_MODE updateMode, const char* const expectedMD5Hash, const char* const SPIFFSPartitionLabel = "");
+        bool Begin(UPDATE_MODE updateMode, const char* const expectedMD5Hash, const char* const SPIFFSPartitionLabel = nullptr);
         bool End();
         void Abort();
 

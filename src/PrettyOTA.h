@@ -84,7 +84,7 @@ private:
     // Constants
     static const uint8_t    PRETTY_OTA_VERSION_MAJOR = 1;
     static const uint8_t    PRETTY_OTA_VERSION_MINOR = 1;
-    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 0;
+    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 1;
 
     static const uint32_t   BACKGROUND_TASK_STACK_SIZE = 4096;
     static const uint8_t    BACKGROUND_TASK_PRIORITY = 4;
@@ -179,14 +179,10 @@ public:
     // Set the HardwareID. It should be a unique identifier for your hardware/board
     void SetHardwareID(const char* const hardwareID) { m_HardwareID = hardwareID; }
 
-    // Overwrite the build time and date read automatically by PrettyOTA using esp_ota_get_app_description().
-    // This is needed for ArduinoIDE, since ArduinoIDE uses a prebuilt ESP-IDF SDK so the build time and date
-    // would be wrong. It is not needed for PlatformIO.
-    // However you can always call this function to overwrite the build time and date
-    // which will be send to the client browser
+    // Overwrite the build time and date
     static void OverwriteAppBuildTimeAndDate(const char* const appBuildTime, const char* const appBuildDate);
 
-    // Same as above but for the app version
+    // Overwrite the app version
     static void OverwriteAppVersion(const char* const appVersion);
 };
 
