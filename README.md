@@ -76,7 +76,7 @@ You can view the changelog here: [Changelog](CHANGELOG.md)
 - ***Asynchronous web server***
 - Support for ***ArduinoOTA*** to directly upload firmware over WiFi inside Arduino IDE and PlatformIO (tutorial included)
 
-### Whats planned for the future?
+### What's planned for the future?
 
 - Optional **firmware pulling from server**: Configure PrettyOTA to automatically check a server for a new firmware version and install it. This is useful for many devices which all need updates at the same time. No manual firmware upload required anymore
 - Show/hide specific board infos
