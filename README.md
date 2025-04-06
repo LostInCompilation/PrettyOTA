@@ -689,7 +689,8 @@ lib_compat_mode = strict
 
 You are allowed to use PrettyOTA for commercial purposes. An acknowledgement is required.
 However you are not allowed to modify the source code and then claim that you wrote it.
-It is also not permitted to change the name or logo of PrettyOTA, even when redistributing changed source code versions. If you want to change the logo and/or name, you have to aquire a commercial license.
+
+It is also not permitted to change the name or logo of PrettyOTA, even when redistributing changed source code versions. If you want to change the logo and/or name, you must acquire a commercial license.
 
 A commercial license also includes technical support for companies, who need reliable and fast solutions.
 

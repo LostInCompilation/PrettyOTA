@@ -1,6 +1,7 @@
 # Changelog
 
 ## Version: 1.1.0
+
 - Added HardwareID which can be set using `SetHardwareID(const char* const)`
 - Truncate too long values with ellipsis
 - Showing full (possibly truncated) text on hover for each entry. If for example the HardwareID would be too long to display and gets truncated, you can see the full value when hovering over it
