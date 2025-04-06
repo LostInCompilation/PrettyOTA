@@ -42,7 +42,7 @@ void PrettyOTA::P_LOG_I(const std::string& message)
     if (!m_SerialMonitorStream)
         return;
 
-    m_SerialMonitorStream->println(("\033[92mInfo: " + message + "\033[0m").c_str());
+    m_SerialMonitorStream->println(("[PrettyOTA] Info: " + message).c_str());
 }
 
 void PrettyOTA::P_LOG_W(const std::string& message)
@@ -50,7 +50,7 @@ void PrettyOTA::P_LOG_W(const std::string& message)
     if (!m_SerialMonitorStream)
         return;
 
-    m_SerialMonitorStream->println(("\033[93mWarning: " + message + "\033[0m").c_str());
+    m_SerialMonitorStream->println(("[PrettyOTA] Warning: " + message).c_str());
 }
 
 void PrettyOTA::P_LOG_E(const std::string& message)
@@ -58,7 +58,7 @@ void PrettyOTA::P_LOG_E(const std::string& message)
     if (!m_SerialMonitorStream)
         return;
 
-    m_SerialMonitorStream->println(("\033[97;41m Error: " + message + " \033[0m").c_str());
+    m_SerialMonitorStream->println(("[PrettyOTA] Error: " + message).c_str());
 }
 
 // ********************************************************

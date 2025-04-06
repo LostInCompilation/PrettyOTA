@@ -1,5 +1,10 @@
 # Changelog
 
+## Version: 1.1.2
+
+- Removed printing of ANSI escape codes in log functions
+- Reduced used stack size by 1KB
+
 ## Version: 1.1.1
 
 - Fixed filesystem update issue (partition not found error)

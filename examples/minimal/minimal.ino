@@ -2,8 +2,8 @@
 #include <WiFi.h>
 #include <PrettyOTA.h>
 
-const char* const   WIFI_SSID             = "FRITZ!Box 6660 Cable IF";
-const char* const   WIFI_PASSWORD         = "45680759868962370573";
+const char* WIFI_SSID     = "YOUR_SSID";
+const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 
 AsyncWebServer  server(80); // Server on port 80 (HTTP)
 PrettyOTA       OTAUpdates;
