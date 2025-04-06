@@ -92,7 +92,7 @@ private:
     static const uint8_t    MAX_NUM_LOGGED_IN_CLIENTS = 5;
 
     // Website code
-    static const uint8_t    PRETTY_OTA_WEBSITE_DATA[12583];
+    static const uint8_t    PRETTY_OTA_WEBSITE_DATA[12706];
     static const uint8_t    PRETTY_OTA_LOGIN_DATA[6208];
 
 private:
