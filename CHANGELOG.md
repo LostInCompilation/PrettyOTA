@@ -1,6 +1,6 @@
 # Changelog
 
-## Version: 1.2.0
+## Version: 1.2.0 (WIP)
 
 - (WIP) Added FirmwarePull function to PrettyOTA. See README for details
 - Added compile switch to disable ArduinoOTA functionality `#define PRETTY_OTA_ENABLE_ARDUINO_OTA 1`
