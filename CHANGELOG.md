@@ -1,5 +1,14 @@
 # Changelog
 
+## Version: 1.2.0
+
+- (WIP) Added FirmwarePull function to PrettyOTA. See README for details
+- Added compile switch to disable ArduinoOTA functionality `#define PRETTY_OTA_ENABLE_ARDUINO_OTA 1`
+- Changed default hardwareID to `ARDUINO_BOARD` symbol
+- Optimized duplicate strings in default callbacks
+- Deprecated `OverwriteAppVersion()` and `OverwriteAppBuildTimeAndDate()`. Use `SetAppVersion()` and `SetAppBuildTimeAndDate()` instead. The deprecated functions will be removed in a future release
+
+
 ## Version: 1.1.2
 
 - Removed printing of ANSI escape codes in log functions

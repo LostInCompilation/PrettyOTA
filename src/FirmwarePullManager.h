@@ -29,45 +29,49 @@ applications, to alter it and redistribute it, subject to the following restrict
 ******************************************************
 
 Description:
-    Custom type declarations.
+    Internal handler for writing updates to ESP flash.
 
 */
 
 #pragma once
 
+// C++ API
 #include <cstdint>
+//#include <functional>
+#include <string>   // For std::string
+
+// Arduino dependencies
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
+
+// PrettyOTA
+#include "CustomTypes.h"
 
 namespace NSPrettyOTA
 {
-    enum class UPDATE_MODE : uint8_t
+    class FirmwarePullManager
     {
-        FIRMWARE = 0,
-        FILESYSTEM
-    };
+    private:
+        Stream*         m_SerialMonitorStream = nullptr;
 
-    // Return type for ESPUpdateManager
-    enum class UPDATE_ERROR : uint8_t
-    {
-        OK = 0,
-        ABORT,
-        ERROR_OUT_OF_MEMORY,
-        ERROR_NO_PARTITION,
-        ERROR_NO_SPACE,
-        ERROR_INVALID_HASH,
-        ERROR_HASH_MISMATCH,
-        ERROR_READ,
-        ERROR_WRITE,
-        ERROR_ERASE,
-        ERROR_ACTIVATE,
-        ERROR_MAGIC_BYTE
-    };
+        bool            m_AllowDowngrade = false;
+        std::string     m_HardwareID = "";
+        std::string     m_CustomFilter = "";
+        std::string     m_CurrentAppVersion = "";
 
-    // Return type for FirmwarePullManager
-    enum class PULL_RESULT : uint8_t
-    {
-        OK = 0,
-        NO_UPDATE_AVAILABLE = 1,
-        NO_CONFIGURATION_PROFILE_MATCH_FOUND = 2,
-        ERROR = 3
+        void Log(const std::string& message);
+
+    public:
+        FirmwarePullManager() = default;
+        void Begin(Stream* const serialStream);
+
+        PULL_RESULT CheckForNewFirmwareAvailable(const char* const jsonURL, std::string& out_firmwareURL);
+        PULL_RESULT RunPullUpdate(const char* const jsonURL);
+
+        void SetHardwareID(const char* const hardwareID) { m_HardwareID = hardwareID; }
+        void SetCustomFilter(const char* const customFilter) { m_CustomFilter = customFilter; }
+        void SetCurrentAppVersion(const char* const currentAppVersion) { m_CurrentAppVersion = currentAppVersion; }
+
+        void SetAllowDowngrade(bool allowDowngrade) { m_AllowDowngrade = allowDowngrade; }
     };
 }

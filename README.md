@@ -2,14 +2,14 @@
 <img src="https://github.com/user-attachments/assets/0efbf883-8ecd-4a2a-af7b-b6620b43138b" alt="Screenshot" style="height:100px;"/>
 </p>
 
-![Version](https://img.shields.io/badge/Version-V1.1.1-brightgreen?style=flat&&logo=framework) ![CPU](https://img.shields.io/badge/CPU-ESP32-red?style=flat&&logo=espressif) ![Arduino](https://img.shields.io/badge/Arduino-Supported-blue?style=flat&&logo=arduino) ![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-blue?style=flat&&logo=platformio)
+![Version](https://img.shields.io/badge/Version-V1.2.0-brightgreen?style=flat&&logo=framework) ![CPU](https://img.shields.io/badge/CPU-ESP32-red?style=flat&&logo=espressif) ![Arduino](https://img.shields.io/badge/Arduino-Supported-blue?style=flat&&logo=arduino) ![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-blue?style=flat&&logo=platformio)
 
 # <p align="center">PrettyOTA</p>
 ### <p align="center">Over the air (OTA) update library for ESP32 series chips - (RaspberryPi Pico W coming soon)</p>
 
 #### <p align="center">Simple to use, modern design - Install updates on your ESP32 over WiFi inside the browser with easy rollback feature</p>
 
-### ❤️💰 Donation - Support me and my work
+### ❤️💰 Donation - Please support my work
 
 <a href="https://buymeacoffee.com/lostincompilation" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
@@ -48,8 +48,8 @@
   - [SetSerialOutputStream()](#setserialoutputstream)
   - [OnStart(), OnProgress(), OnEnd()](#onstart-onprogress-onend)
   - [SetHardwareID()](#sethardwareid)
-  - [OverwriteAppVersion()](#overwriteappversion)
-  - [OverwriteAppBuildTimeAndDate()](#overwriteappbuildtimeanddate)
+  - [SetAppVersion()](#setappversion)
+  - [SetAppBuildTimeAndDate()](#setappbuildtimeanddate)
   - [Macro - PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE()](#macro---pretty_ota_set_current_build_time_and_date)
 - **[Use PrettyOTA with ESP-IDF](#use-prettyota-with-esp-idf)**
 - **[Is Ethernet supported?](#is-ethernet-supported)**
@@ -86,7 +86,7 @@ You can view the changelog here: [Changelog](CHANGELOG.md)
 
 - **ESP32** (all variants)
 - **RP2040** and **RP2350** (**RaspberryPi Pico W**) - *coming soon!*
-- **ESP8266** - *coming soon!*
+- **ESP8266** - Support is planned but is not the highest priority now since the ESP8266 is end of life
 
 ## Demo <div id="demo"/>
 
@@ -136,7 +136,7 @@ void setup()
     OTAUpdates.SetHardwareID("UniqueBoard1");
     
     // Set firmware version to 1.0.0
-    OTAUpdates.OverwriteAppVersion("1.0.0");
+    OTAUpdates.SetAppVersion("1.0.0");
 
     // Set current build time and date
     PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE();
@@ -170,13 +170,9 @@ You can download PrettyOTA from the Arduino Library Manager. Simply search for P
 
 Alternatively you can download the latest release / `.zip` file from GitHub and import it into the ArduinoIDE (Sketch->Include library->Add .ZIP library).
 
-### GitHub
+### GitHub <div id="github"/>
 
-Clone the repository or download the latest release / `.zip` file.
-
-```sh
-git clone https://github.com/LostInCompilation/PrettyOTA
-```
+Download the latest release / `.zip` file from releases.
 
 ### Dependencies <div id="dependencies"/>
 
@@ -266,19 +262,19 @@ When using the ArduinoIDE you must manually set the version number and build tim
 To set the firmware version inside ArduinoIDE (or setting it manually if you use PlatformIO) use the following function inside `setup()`:
 
 ```cpp
-void OverwriteAppVersion(const char* const appVersion);
+void SetAppVersion(const char* const appVersion);
 ```
 
 #### Build time and date
 
 To set the *current* build time and date you can use the macro `PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE();` inside `setup().
 
-The macro will call `OverwriteAppBuildTimeAndDate(const char* const appBuildTime, const char* const appBuildDate)` with the current build time and date already filled in for you.
+The macro will call `SetAppBuildTimeAndDate(const char* const appBuildTime, const char* const appBuildDate)` with the current build time and date already filled in for you.
 
-If you want to set a specific build time or date, just call `OverwriteAppBuildTimeAndDate(...)` manually inside `setup()`:
+If you want to set a specific build time or date, just call `SetAppBuildTimeAndDate(...)` manually inside `setup()`:
 
 ```cpp
-OTAUpdates.OverwriteAppBuildTimeAndDate("17:10:00", "Mar 31 2025");
+OTAUpdates.SetAppBuildTimeAndDate("17:10:00", "Mar 31 2025");
 ```
 
 You don't have to follow any specific formatting for the time or date. Both parameters are strings and can be set to any value you like.
@@ -297,13 +293,13 @@ void setup()
     OTAUpdates.SetHardwareID("MyUniqueBoard");
 
     // Set firmware version to 1.0.0
-    OTAUpdates.OverwriteAppVersion("1.0.0");
+    OTAUpdates.SetAppVersion("1.0.0");
 
     // Set current build time and date
     PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE();
 
     // Or manually set a specific build time and date
-    //OTAUpdates.OverwriteAppBuildTimeAndDate("17:10:00", "Mar 31 2025");
+    //OTAUpdates.SetAppBuildTimeAndDate("17:10:00", "Mar 31 2025");
 
     // ...
 }
@@ -332,7 +328,7 @@ The build time and date will be automatically set. You don't have to do anything
 You can set it manually too with:
 
 ```cpp
-OTAUpdates.OverwriteAppBuildTimeAndDate("17:10:00", "Mar 31 2025");
+OTAUpdates.SetAppBuildTimeAndDate("17:10:00", "Mar 31 2025");
 ```
 
 ### Use mDNS <div id="use-mdns"/>
@@ -434,7 +430,7 @@ void setup()
     OTAUpdates.SetHardwareID("UniqueBoard1");
     
     // Set firmware version to 1.0.0
-    OTAUpdates.OverwriteAppVersion("1.0.0");
+    OTAUpdates.SetAppVersion("1.0.0");
 
     // Set current build time and date
     PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE();
@@ -649,20 +645,20 @@ See [Set HardwareID](#set-hardwareid).
 void SetHardwareID(const char* const hardwareID);
 ```
 
-#### OverwriteAppVersion() <div id="overwriteappversion"/>
+#### SetAppVersion() <div id="setappversion"/>
 
 See [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date).
 
 ```cpp
-static void OverwriteAppVersion(const char* const appVersion);
+static void SetAppVersion(const char* const appVersion);
 ```
 
-#### OverwriteAppBuildTimeAndDate() <div id="overwriteappbuildtimeanddate"/>
+#### SetAppBuildTimeAndDate() <div id="setappbuildtimeanddate"/>
 
 See [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date).
 
 ```cpp
-static void OverwriteAppBuildTimeAndDate(const char* const appBuildTime, const char* const appBuildDate);
+static void SetAppBuildTimeAndDate(const char* const appBuildTime, const char* const appBuildDate);
 ```
 
 #### Macro - PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE() <div id="macro---pretty_ota_set_current_build_time_and_date"/>
@@ -670,7 +666,7 @@ static void OverwriteAppBuildTimeAndDate(const char* const appBuildTime, const c
 See [Set firmware version number, build time and date](#set-firmware-version-number-build-time-and-date).
 
 ```cpp
-#define PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE() PrettyOTA::OverwriteAppBuildTimeAndDate(__TIME__, __DATE__)
+#define PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE() PrettyOTA::SetAppBuildTimeAndDate(__TIME__, __DATE__)
 ```
 
 ## Use PrettyOTA with ESP-IDF <div id="use-prettyota-with-esp-idf"/>
@@ -733,28 +729,4 @@ Wallet address (**Bitcoin**):
 
 ```text
 32nkLAWGsAtn3SNo1vb7RSQKLP93YJCwke
-```
-
-### Bitcoin cash
-
-<img width="150" alt="Bitcoin Cash" src="https://github.com/user-attachments/assets/4ad772a8-fe6b-40b3-af2b-d4f4e73588ce" />
-
-<br>
-
-Wallet address (**Bitcoin Cash**):
-
-```text
-1MahrZ6Wz9tmqwaZ91jgqqqAMFrSLtEta7
-```
-
-### Ethereum
-
-<img width="150" alt="Screenshot 2025-04-03 at 20 21 47" src="https://github.com/user-attachments/assets/d079d7de-018d-480d-98c8-000ddca9d429" />
-
-<br>
-
-Wallet address (**Ethereum**):
-
-```text
-0xc95dD6A07B7C0F2d494d59DE26211c77C336E1Ba
 ```

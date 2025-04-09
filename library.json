@@ -1,8 +1,8 @@
 {
     "name": "PrettyOTA",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "license": "Custom",
-    "description": "OTA (over the air) update library. A modern looking OTA web interface for easy updates, rollbacks and infos about your board and firmware, directly inside your browser. Also directly supports PlatformIO OTA upload",
+    "description": "OTA (over-the-air) update library. A modern looking OTA web interface for easy updates (with automatic firmware pulling feature for updating many devices at once), rollbacks and infos about your board and firmware, directly inside your browser. Includes support for OTA upload directly inside PlatformIO.",
     "keywords": "OTA, update, upgrade, wifi, web update, server, website, firmware",
     "headers": "PrettyOTA.h",
     "repository":

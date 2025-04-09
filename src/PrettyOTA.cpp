@@ -42,7 +42,7 @@ bool    PrettyOTA::m_DefaultCallbackPrintWithColor = false;
 std::string PrettyOTA::m_AppBuildTime = "";
 std::string PrettyOTA::m_AppBuildDate = "";
 std::string PrettyOTA::m_AppVersion = "";
-std::string PrettyOTA::m_HardwareID = "MyBoard1";
+std::string PrettyOTA::m_HardwareID = ARDUINO_BOARD;
 
 // ********************************************************
 // NVS storage
@@ -242,6 +242,20 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
     // Enable ArduinoOTA support
     EnableArduinoOTA(password, passwordIsMD5Hash, OTAport);
 
+
+#if (PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
+    // Initialize firmware pulling backend
+    m_FirmwarePullManager.Begin(m_SerialMonitorStream);
+
+    m_FirmwarePullManager.SetCurrentAppVersion("1.0.0");
+    m_FirmwarePullManager.SetHardwareID("Board2");
+    m_FirmwarePullManager.SetCustomFilter("custom1");
+
+    std::string fwUrl = "";
+    m_FirmwarePullManager.CheckForNewFirmwareAvailable("https://pastebin.com/raw/K0yi7htv", fwUrl);
+#endif
+
+
     // ********************************************************
     // Login page (default: "/login")
     server->on(m_LoginURL.c_str(), HTTP_GET | HTTP_POST, [&](AsyncWebServerRequest* request)
@@ -266,7 +280,11 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
 
         // Parse JSON
         JsonDocument loginData;
-        deserializeJson(loginData, data);
+        if(deserializeJson(loginData, data))
+        {
+            P_LOG_E("Could not deserialize Json");
+            return request->send(400, "text/plain", "Could not deserialize Json");
+        }
 
         // Check login credentials
         if(loginData["userId"].as<std::string>() == m_Username && loginData["password"].as<std::string>() == m_Password)
@@ -276,7 +294,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
             GenerateUUID(&id);
             const std::string sessionIDstr = "sessionID=" + UUIDToString(id);
 
-            // If max number of clients is logged in, log out oldest client (first in vector) by removing it's sessionID
+            // If max number of clients is logged in, log out oldest client (first entry in vector) by removing it's sessionID
             if(m_AuthenticatedSessionIDs.size() >= MAX_NUM_LOGGED_IN_CLIENTS)
                 m_AuthenticatedSessionIDs.erase(m_AuthenticatedSessionIDs.begin());
 
@@ -627,6 +645,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
 
 void PrettyOTA::EnableArduinoOTA(const char* const password, bool passwordIsMD5Hash, uint16_t OTAport)
 {
+#if (PRETTY_OTA_ENABLE_ARDUINO_OTA == 1)
     ArduinoOTA.setPort(OTAport);
     ArduinoOTA.setRebootOnSuccess(true); // ToDo
 
@@ -696,6 +715,7 @@ void PrettyOTA::EnableArduinoOTA(const char* const password, bool passwordIsMD5H
     });
 
     ArduinoOTA.begin();
+#endif
 }
 
 // Handle reboot request background task
@@ -705,7 +725,9 @@ void PrettyOTA::BackgroundTask(void* parameter)
 
     while (true)
     {
+#if (PRETTY_OTA_ENABLE_ARDUINO_OTA == 1)
         ArduinoOTA.handle();
+#endif
 
         // Check if specified time has passed since reboot request was made
         if(me->m_RequestReboot && (millis() - me->m_RebootRequestTime >= 2000))
@@ -724,6 +746,13 @@ void PrettyOTA::BackgroundTask(void* parameter)
     }
 }
 
+#if (PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
+bool PrettyOTA::DoFirmwarePull(const char* const customFilter)
+{
+    return false;
+}
+#endif
+
 void PrettyOTA::UseDefaultCallbacks(bool printWithColor)
 {
     m_DefaultCallbackPrintWithColor = printWithColor;
@@ -738,13 +767,13 @@ void PrettyOTA::SetSerialOutputStream(Stream* const serialStream)
     m_SerialMonitorStream = serialStream;
 }
 
-void PrettyOTA::OverwriteAppBuildTimeAndDate(const char *const appBuildTime, const char *const appBuildDate)
+void PrettyOTA::SetAppBuildTimeAndDate(const char *const appBuildTime, const char *const appBuildDate)
 {
     m_AppBuildTime = appBuildTime;
     m_AppBuildDate = appBuildDate;
 }
 
-void PrettyOTA::OverwriteAppVersion(const char* const appVersion)
+void PrettyOTA::SetAppVersion(const char* const appVersion)
 {
     m_AppVersion = appVersion;
 }

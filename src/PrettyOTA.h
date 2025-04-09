@@ -35,6 +35,11 @@ Description:
 
 #pragma once
 
+// ********************************************************
+// Settings
+#define PRETTY_OTA_ENABLE_ARDUINO_OTA 1
+#define PRETTY_OTA_ENABLE_FIRMWARE_PULLING 1
+
 // std-lib
 #include <string>
 #include <vector>
@@ -43,7 +48,10 @@ Description:
 // Arduino include
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include <ArduinoOTA.h>
+
+#if (PRETTY_OTA_ENABLE_ARDUINO_OTA == 1)
+    #include <ArduinoOTA.h>
+#endif
 
 // ESP-IDF
 #include <esp_err.h>
@@ -52,7 +60,7 @@ Description:
 #include <nvs_flash.h>
 #include <mdns.h>
 
-// Dependencies
+// Arduino dependencies
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 
@@ -60,7 +68,10 @@ Description:
 #include "CustomTypes.h"
 #include "MD5Hasher.h"
 #include "ESPUpdateManager.h"
-#include "BasicOTAManager.h"
+
+#if (PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
+    #include "FirmwarePullManager.h"
+#endif
 
 // ********************************************************
 // Compile checks
@@ -83,8 +94,8 @@ class PrettyOTA
 private:
     // Constants
     static const uint8_t    PRETTY_OTA_VERSION_MAJOR = 1;
-    static const uint8_t    PRETTY_OTA_VERSION_MINOR = 1;
-    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 2;
+    static const uint8_t    PRETTY_OTA_VERSION_MINOR = 2;
+    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 0;
 
     static const uint32_t   BACKGROUND_TASK_STACK_SIZE = 3072;
     static const uint8_t    BACKGROUND_TASK_PRIORITY = 4;
@@ -115,6 +126,10 @@ private:
     static Stream*      m_SerialMonitorStream;
     AsyncWebServer*     m_Server = nullptr;
     NSPrettyOTA::ESPUpdateManager m_UpdateManager;
+
+#if (PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
+    NSPrettyOTA::FirmwarePullManager m_FirmwarePullManager;
+#endif
 
     bool                m_IsInitialized = false;
     bool                m_AutoRebootEnabled = true;
@@ -157,13 +172,17 @@ private:
 
     // Helper
     std::string GetVersionAsString() const;
-    std::string SHA256ToString(const uint8_t hash[32]) const;
+    //std::string SHA256ToString(const uint8_t hash[32]) const;
 
 public:
     PrettyOTA() = default;
 
     bool Begin(AsyncWebServer* const server, const char* const username = "", const char* const password = "", bool passwordIsMD5Hash = false, const char* const mainURL = "/update", const char* const loginURL = "/login", uint16_t OTAport = 3232);
     void SetAuthenticationDetails(const char* const username, const char* const password, bool passwordIsMD5Hash = false);
+
+#if (PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
+    bool DoFirmwarePull(const char* const customFilter);
+#endif
 
     // Set user callbacks
     void OnStart(std::function<void(NSPrettyOTA::UPDATE_MODE updateMode)> func) { m_OnStartUpdate = func; }
@@ -173,17 +192,23 @@ public:
     // Use built in callbacks that print info to the serial monitor
     void UseDefaultCallbacks(bool printWithColor = false);
 
-    // Set the Stream to write log messages too (Example: Use &Serial as argument)
-    void SetSerialOutputStream(Stream* const serialStream);
-
     // Set the HardwareID. It should be a unique identifier for your hardware/board
     void SetHardwareID(const char* const hardwareID) { m_HardwareID = hardwareID; }
 
-    // Overwrite the build time and date
-    static void OverwriteAppBuildTimeAndDate(const char* const appBuildTime, const char* const appBuildDate);
+    // Set the app version
+    static void SetAppVersion(const char* const appVersion);
+    // Alias for backwards compatibility
+    [[deprecated("Use SetAppVersion() instead.")]]
+    static constexpr auto OverwriteAppVersion = SetAppVersion;
 
-    // Overwrite the app version
-    static void OverwriteAppVersion(const char* const appVersion);
+    // Set the build time and date
+    static void SetAppBuildTimeAndDate(const char* const appBuildTime, const char* const appBuildDate);
+    // Alias for backwards compatibility
+    [[deprecated("Use SetAppBuildTimeAndDate() instead.")]]
+    static constexpr auto OverwriteAppBuildTimeAndDate = SetAppBuildTimeAndDate;
+
+    // Set the Stream to write log messages too (Example: Use &Serial as argument)
+    void SetSerialOutputStream(Stream* const serialStream);
 };
 
 // ********************************************************
@@ -191,4 +216,4 @@ public:
 // This is not required for PlatformIO, however you can use it to overwrite the
 // build time and date read by PrettyOTA from the firmware image itself
 // using esp_ota_get_app_description().
-#define PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE() PrettyOTA::OverwriteAppBuildTimeAndDate(__TIME__, __DATE__)
+#define PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE() PrettyOTA::SetAppBuildTimeAndDate(__TIME__, __DATE__)
