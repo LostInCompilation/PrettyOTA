@@ -59,11 +59,19 @@ namespace NSPrettyOTA
         std::string     m_CustomFilter = "";
         std::string     m_CurrentAppVersion = "";
 
+        // User callbacks
+        std::function<void(NSPrettyOTA::UPDATE_MODE updateMode)> m_OnStartUpdate = nullptr;
+        std::function<void(uint32_t currentSize, uint32_t totalSize)> m_OnProgressUpdate = nullptr;
+        std::function<void(bool successful)> m_OnEndUpdate = nullptr;
+
         void Log(const std::string& message);
 
     public:
         FirmwarePullManager() = default;
-        void Begin(Stream* const serialStream);
+        void Begin(Stream* const serialStream,
+            std::function<void(NSPrettyOTA::UPDATE_MODE updateMode)> onStart,
+            std::function<void(uint32_t currentSize, uint32_t totalSize)> onProgress,
+            std::function<void(bool successful)> onEnd);
 
         PULL_RESULT CheckForNewFirmwareAvailable(const char* const jsonURL, std::string& out_firmwareURL);
         PULL_RESULT RunPullUpdate(const char* const jsonURL);

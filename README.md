@@ -51,6 +51,7 @@
   - [SetAppVersion()](#setappversion)
   - [SetAppBuildTimeAndDate()](#setappbuildtimeanddate)
   - [Macro - PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE()](#macro---pretty_ota_set_current_build_time_and_date)
+  - [IsUpdateRunning()](#isupdaterunning)
 - **[Use PrettyOTA with ESP-IDF](#use-prettyota-with-esp-idf)**
 - **[Is Ethernet supported?](#is-ethernet-supported)**
 - **[Help I got compilation errors](#help-i-got-compilation-errors)**
@@ -667,6 +668,13 @@ See [Set firmware version number, build time and date](#set-firmware-version-num
 
 ```cpp
 #define PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE() PrettyOTA::SetAppBuildTimeAndDate(__TIME__, __DATE__)
+```
+#### IsUpdateRunning() <div id="isupdaterunning"/>
+
+Returns `true` if an update is currently running (either through the web interface (push) or automatically with pulling a firmware in the background).
+
+```cpp
+bool IsUpdateRunning() const;
 ```
 
 ## Use PrettyOTA with ESP-IDF <div id="use-prettyota-with-esp-idf"/>

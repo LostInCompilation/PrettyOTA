@@ -73,9 +73,15 @@ Example Json file:
 
 using namespace NSPrettyOTA;
 
-void FirmwarePullManager::Begin(Stream* const serialStream)
+void FirmwarePullManager::Begin(Stream* const serialStream, std::function<void(NSPrettyOTA::UPDATE_MODE updateMode)> onStart,
+                                std::function<void(uint32_t currentSize, uint32_t totalSize)> onProgress,
+                                std::function<void(bool successful)> onEnd)
 {
     m_SerialMonitorStream = serialStream;
+
+    m_OnStartUpdate = onStart;
+    m_OnProgressUpdate = onProgress;
+    m_OnEndUpdate = onEnd;
 }
 
 void FirmwarePullManager::Log(const std::string& message)
@@ -83,21 +89,21 @@ void FirmwarePullManager::Log(const std::string& message)
     if(!m_SerialMonitorStream)
         return;
 
-    m_SerialMonitorStream->println(message.c_str());
+    m_SerialMonitorStream->println(("[FirmwarePullManager] " + message).c_str());
 }
 
 PULL_RESULT FirmwarePullManager::CheckForNewFirmwareAvailable(const char* const jsonURL, std::string& out_firmwareURL)
 {
     out_firmwareURL = "";
 
-    this->Log("[FirmwarePullManager] Info: Checking for new firmware version...");
+    this->Log("Info: Checking for new firmware version...");
 
     HTTPClient http;
     http.useHTTP10(true);
     http.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
     if(!http.begin(jsonURL))
     {
-        this->Log("[FirmwarePullManager] Error: Could not initialize HTTPClient");
+        this->Log("Error: Could not initialize HTTPClient");
         return PULL_RESULT::ERROR;
     }
 
@@ -106,7 +112,7 @@ PULL_RESULT FirmwarePullManager::CheckForNewFirmwareAvailable(const char* const 
     if(response != 200)
     {
         http.end();
-        this->Log("[FirmwarePullManager] Error: Server replied with HTTP code: " + std::to_string(response));
+        this->Log("Error (Json download): Server replied with HTTP code: " + std::to_string(response));
         return PULL_RESULT::ERROR;
     }
 
@@ -115,7 +121,7 @@ PULL_RESULT FirmwarePullManager::CheckForNewFirmwareAvailable(const char* const 
     if(!stream)
     {
         http.end();
-        this->Log("[FirmwarePullManager] Error: Received Json is empty");
+        this->Log("Error: Received Json is empty");
         return PULL_RESULT::ERROR;
     }
 
@@ -125,7 +131,7 @@ PULL_RESULT FirmwarePullManager::CheckForNewFirmwareAvailable(const char* const 
     if(jsonError)
     {
         http.end();
-        this->Log("[FirmwarePullManager] Error: Could not parse Json (" + std::string(jsonError.c_str()) + ")");
+        this->Log("Error: Could not parse Json (" + std::string(jsonError.c_str()) + ")");
         return PULL_RESULT::ERROR;
     }
 
@@ -135,7 +141,7 @@ PULL_RESULT FirmwarePullManager::CheckForNewFirmwareAvailable(const char* const 
     // Are there any "Configuration" entries
     if(json["Configuration"].as<JsonArray>().size() == 0)
     {
-        this->Log("[FirmwarePullManager] Error (Json): No valid \"Configuration\" entries found");
+        this->Log("Error (Json): No valid \"Configuration\" entries found");
         return PULL_RESULT::ERROR;
     }
 
@@ -164,7 +170,7 @@ PULL_RESULT FirmwarePullManager::CheckForNewFirmwareAvailable(const char* const 
         }
         else // HardwareID entry not found
         {
-            this->Log("[FirmwarePullManager] Error (Json): No valid \"HardwareID\" found in \"Configuration\". Skipping entry...");
+            this->Log("Error (Json): No valid \"HardwareID\" found in \"Configuration\". Skipping entry...");
             continue;
         }
 
@@ -194,7 +200,7 @@ PULL_RESULT FirmwarePullManager::CheckForNewFirmwareAvailable(const char* const 
         // Check if version is present
         if(!configuration["Version"].is<std::string>() || configuration["Version"].as<std::string>().length() == 0)
         {
-            this->Log("[FirmwarePullManager] Error (Json): No valid \"Version\" found in \"Configuration\". Skipping entry...");
+            this->Log("Error (Json): No valid \"Version\" found in \"Configuration\". Skipping entry...");
             continue;
         }
 
@@ -214,17 +220,17 @@ PULL_RESULT FirmwarePullManager::CheckForNewFirmwareAvailable(const char* const 
 
         if(!newVersionAvailable)
         {
-            this->Log("[FirmwarePullManager] Info: No updated firmware version available (Current: " + std::string(m_CurrentAppVersion) + ", New: " + configuration["Version"].as<std::string>() + ")");
+            this->Log("Info: No updated firmware version available (Current: " + std::string(m_CurrentAppVersion) + ", New: " + configuration["Version"].as<std::string>() + ")");
             return PULL_RESULT::NO_UPDATE_AVAILABLE;
         }
 
-        this->Log("[FirmwarePullManager] Info: New firmware version available (Current: " + std::string(m_CurrentAppVersion) + ", New: " + configuration["Version"].as<std::string>() + ")");
+        this->Log("Info: New firmware version available (Current: " + std::string(m_CurrentAppVersion) + ", New: " + configuration["Version"].as<std::string>() + ")");
 
         // **********************************************************
         // Get firmware URL
         if(!configuration["FirmwareURL"].is<std::string>() || configuration["FirmwareURL"].as<std::string>().length() == 0)
         {
-            this->Log("[FirmwarePullManager] Error (Json): No valid \"FirmwareURL\" found in \"Configuration\"");
+            this->Log("Error (Json): No valid \"FirmwareURL\" found in \"Configuration\"");
             continue;
         }
 
@@ -233,7 +239,7 @@ PULL_RESULT FirmwarePullManager::CheckForNewFirmwareAvailable(const char* const 
         return PULL_RESULT::OK;
     }
 
-    this->Log("[FirmwarePullManager] Warning: No matching profile found in Json");
+    this->Log("Warning: No matching profile found in Json");
 
     return PULL_RESULT::NO_CONFIGURATION_PROFILE_MATCH_FOUND;
 }
@@ -252,7 +258,7 @@ PULL_RESULT FirmwarePullManager::RunPullUpdate(const char* const jsonURL)
     http.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
     if(!http.begin(firmwareURL.c_str()))
     {
-        this->Log("[FirmwarePullManager] Error: Could not initialize HTTPClient");
+        this->Log("Error: Could not initialize HTTPClient");
         return PULL_RESULT::ERROR;
     }
 
@@ -261,12 +267,12 @@ PULL_RESULT FirmwarePullManager::RunPullUpdate(const char* const jsonURL)
     if(response != 200)
     {
         http.end();
-        this->Log("[FirmwarePullManager] Error: Server replied with HTTP code: " + std::to_string(response));
+        this->Log("Error (firmware download): Server replied with HTTP code: " + std::to_string(response));
         return PULL_RESULT::ERROR;
     }
 
-
-
+    const int32_t firmwareSize = http.getSize();
+    uint8_t buffer[1280] = { 0 };
 
     // End connection
     http.end();

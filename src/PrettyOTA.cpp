@@ -245,7 +245,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
 
 #if (PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
     // Initialize firmware pulling backend
-    m_FirmwarePullManager.Begin(m_SerialMonitorStream);
+    m_FirmwarePullManager.Begin(m_SerialMonitorStream, m_OnStartUpdate, m_OnProgressUpdate, m_OnEndUpdate);
 
     m_FirmwarePullManager.SetCurrentAppVersion("1.0.0");
     m_FirmwarePullManager.SetHardwareID("Board2");
@@ -253,8 +253,9 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
 
     std::string fwUrl = "";
     m_FirmwarePullManager.CheckForNewFirmwareAvailable("https://pastebin.com/raw/K0yi7htv", fwUrl);
-#endif
 
+    m_SerialMonitorStream->println(("Received firmware URL: " + fwUrl).c_str());
+#endif
 
     // ********************************************************
     // Login page (default: "/login")
@@ -374,6 +375,15 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
             return request->send(response);
         }
 
+        // Is an update already running? (web interface or pulling in background)
+        if(m_IsUpdateRunning)
+        {
+            P_LOG_E("An update is already running");
+            return request->send(400, "text/plain", "An update is already running");
+        }
+
+        m_IsUpdateRunning = true;
+
         // Get OTA update mode (filesystem / firmware)
         NSPrettyOTA::UPDATE_MODE updateMode = NSPrettyOTA::UPDATE_MODE::FIRMWARE;
         if(request->hasParam("mode"))
@@ -383,6 +393,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         }
         else
         {
+            m_IsUpdateRunning = false;
             P_LOG_E("Missing parameter: mode");
             return request->send(400, "text/plain", "Missing parameter in URL: mode");
         }
@@ -395,6 +406,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         }
         else
         {
+            m_IsUpdateRunning = false;
             P_LOG_E("Missing parameter: reboot");
             return request->send(400, "text/plain", "Missing parameter in URL: reboot");
         }
@@ -407,6 +419,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         }
         else
         {
+            m_IsUpdateRunning = false;
             P_LOG_E("Missing parameter: hash");
             return request->send(400, "text/plain", "Missing parameter in URL: hash");
         }
@@ -418,6 +431,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         // Start update
         if(!m_UpdateManager.Begin(updateMode, md5Hash.c_str()))
         {
+            m_IsUpdateRunning = false;
             P_LOG_E("UpdateManager: Could not start update");
             P_LOG_E(m_UpdateManager.GetLastErrorAsString() + "\n");
             return request->send(400, "text/plain", m_UpdateManager.GetLastErrorAsString().c_str());
@@ -442,6 +456,8 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         // Call OnEnd callback
         if(m_OnEndUpdate)
             m_OnEndUpdate(!m_UpdateManager.HasError());
+
+        m_IsUpdateRunning = false;
 
         // Response
         AsyncWebServerResponse* response;
@@ -471,9 +487,6 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
             return request->send(response);
         }
 
-        if(index == 0)
-            m_WrittenBytes = 0;
-
         if(size != 0)
         {
             if(m_UpdateManager.Write(data, size) != size)
@@ -483,11 +496,9 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
                 return request->send(400, "text/plain", m_UpdateManager.GetLastErrorAsString().c_str());
             }
 
-            m_WrittenBytes += size;
-
             // Call OnProgress callback
             if(m_OnProgressUpdate)
-                m_OnProgressUpdate(m_WrittenBytes, request->contentLength());
+                m_OnProgressUpdate(index + size, request->contentLength());
         }
 
         // Is this the last frame of data?
@@ -512,6 +523,13 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
             response->addHeader("Cache-Control", "no-cache");
 
             return request->send(response);
+        }
+
+        // Is an update already running? (web interface or pulling in background)
+        if(m_IsUpdateRunning)
+        {
+            P_LOG_E("Rollback is not possible while an update is running");
+            return request->send(400, "text/plain", "Rollback is not possible while an update is running");
         }
 
         // Is a rollback possible?
@@ -618,6 +636,13 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
             response->addHeader("Cache-Control", "no-cache");
 
             return request->send(response);
+        }
+
+        // Is an update already running? (web interface or pulling in background)
+        if(m_IsUpdateRunning)
+        {
+            P_LOG_E("Reboot is not possible while an update is running");
+            return request->send(400, "text/plain", "Reboot is not possible while an update is running");
         }
 
         // Request reboot
@@ -749,6 +774,14 @@ void PrettyOTA::BackgroundTask(void* parameter)
 #if (PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
 bool PrettyOTA::DoFirmwarePull(const char* const customFilter)
 {
+    if(m_IsUpdateRunning)
+        return false;
+
+    m_IsUpdateRunning = true;
+
+
+    m_IsUpdateRunning = false;
+
     return false;
 }
 #endif
@@ -760,11 +793,6 @@ void PrettyOTA::UseDefaultCallbacks(bool printWithColor)
     m_OnStartUpdate = OnOTAStart;
     m_OnProgressUpdate = OnOTAProgress;
     m_OnEndUpdate = OnOTAEnd;
-}
-
-void PrettyOTA::SetSerialOutputStream(Stream* const serialStream)
-{
-    m_SerialMonitorStream = serialStream;
 }
 
 void PrettyOTA::SetAppBuildTimeAndDate(const char *const appBuildTime, const char *const appBuildDate)

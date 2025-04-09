@@ -132,11 +132,11 @@ private:
 #endif
 
     bool                m_IsInitialized = false;
+    bool                m_IsUpdateRunning = false;
     bool                m_AutoRebootEnabled = true;
     bool                m_RequestReboot = false;
     static bool         m_DefaultCallbackPrintWithColor;
     uint32_t            m_RebootRequestTime = 0;
-    uint32_t            m_WrittenBytes = 0;
 
     // Authentication
     bool                m_AuthenticationEnabled = false;
@@ -184,6 +184,9 @@ public:
     bool DoFirmwarePull(const char* const customFilter);
 #endif
 
+    // Is an update running? (web interface or pulling in background)
+    bool IsUpdateRunning() const { return m_IsUpdateRunning; }
+
     // Set user callbacks
     void OnStart(std::function<void(NSPrettyOTA::UPDATE_MODE updateMode)> func) { m_OnStartUpdate = func; }
     void OnProgress(std::function<void(uint32_t currentSize, uint32_t totalSize)> func) { m_OnProgressUpdate = func; }
@@ -195,20 +198,20 @@ public:
     // Set the HardwareID. It should be a unique identifier for your hardware/board
     void SetHardwareID(const char* const hardwareID) { m_HardwareID = hardwareID; }
 
-    // Set the app version
+    // Set app version
     static void SetAppVersion(const char* const appVersion);
-    // Alias for backwards compatibility
+    // Alias for backwards compatibility. DO NOT USE
     [[deprecated("Use SetAppVersion() instead.")]]
     static constexpr auto OverwriteAppVersion = SetAppVersion;
 
-    // Set the build time and date
+    // Set build time and date
     static void SetAppBuildTimeAndDate(const char* const appBuildTime, const char* const appBuildDate);
-    // Alias for backwards compatibility
+    // Alias for backwards compatibility. DO NOT USE
     [[deprecated("Use SetAppBuildTimeAndDate() instead.")]]
     static constexpr auto OverwriteAppBuildTimeAndDate = SetAppBuildTimeAndDate;
 
     // Set the Stream to write log messages too (Example: Use &Serial as argument)
-    void SetSerialOutputStream(Stream* const serialStream);
+    void SetSerialOutputStream(Stream* const serialStream) { m_SerialMonitorStream = serialStream; }
 };
 
 // ********************************************************

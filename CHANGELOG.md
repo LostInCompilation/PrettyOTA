@@ -6,8 +6,8 @@
 - Added compile switch to disable ArduinoOTA functionality `#define PRETTY_OTA_ENABLE_ARDUINO_OTA 1`
 - Changed default hardwareID to `ARDUINO_BOARD` symbol
 - Optimized duplicate strings in default callbacks
-- Deprecated `OverwriteAppVersion()` and `OverwriteAppBuildTimeAndDate()`. Use `SetAppVersion()` and `SetAppBuildTimeAndDate()` instead. The deprecated functions will be removed in a future release
-
+- ⚠️ Deprecated `OverwriteAppVersion()` and `OverwriteAppBuildTimeAndDate()`. Use `SetAppVersion()` and `SetAppBuildTimeAndDate()` instead. The deprecated functions will be removed in a future release
+- Added `IsUpdateRunning()` function
 
 ## Version: 1.1.2
 
