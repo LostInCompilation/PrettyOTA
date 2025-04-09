@@ -92,7 +92,7 @@ std::string PrettyOTA::UUIDToString(const UUID_t uuid) const
 
 // ********************************************************
 // SHA256 helpers
-std::string PrettyOTA::SHA256ToString(const uint8_t hash[32]) const
+/*std::string PrettyOTA::SHA256ToString(const uint8_t hash[32]) const
 {
     static const char* const SHA256StringLookup = "0123456789abcdef";
 
@@ -103,4 +103,4 @@ std::string PrettyOTA::SHA256ToString(const uint8_t hash[32]) const
         result += SHA256StringLookup[hash[i] & 0x0F];
     }
     return result;
-}
+}*/

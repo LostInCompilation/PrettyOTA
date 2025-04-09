@@ -34,6 +34,8 @@ Description:
 
 #include "PrettyOTA.h"
 
+const char* const ROW_OF_STARS = "************************************************";
+
 // ********************************************************
 // OTA default callbacks
 void PrettyOTA::OnOTAStart(NSPrettyOTA::UPDATE_MODE updateMode)
@@ -41,7 +43,8 @@ void PrettyOTA::OnOTAStart(NSPrettyOTA::UPDATE_MODE updateMode)
     if (!m_SerialMonitorStream)
         return;
 
-    m_SerialMonitorStream->println("\n\n************************************************");
+    m_SerialMonitorStream->println("\n");
+    m_SerialMonitorStream->println(ROW_OF_STARS);
 
     if(m_DefaultCallbackPrintWithColor)
         m_SerialMonitorStream->println("*                 \033[1;7m OTA UPDATE \033[0m                 *");
@@ -63,8 +66,9 @@ void PrettyOTA::OnOTAStart(NSPrettyOTA::UPDATE_MODE updateMode)
             m_SerialMonitorStream->println("*                  Filesystem                  *");
     }
 
-    m_SerialMonitorStream->println("************************************************\n");
-    m_SerialMonitorStream->println("Starting OTA update...\n");
+    m_SerialMonitorStream->println(ROW_OF_STARS);
+    m_SerialMonitorStream->println("\n");
+    m_SerialMonitorStream->println("Starting OTA update...");
 }
 
 void PrettyOTA::OnOTAProgress(uint32_t currentSize, uint32_t totalSize)
@@ -76,7 +80,7 @@ void PrettyOTA::OnOTAProgress(uint32_t currentSize, uint32_t totalSize)
     const float percentage = 100.0f * static_cast<float>(currentSize) / static_cast<float>(totalSize);
     const uint8_t numBarsToShow = static_cast<uint8_t>(percentage / 3.3333f);
 
-    if(percentage - lastPercentage >= 1.0f)
+    if(percentage - lastPercentage >= 2.0f)
     {
         // Print progress bar
         m_SerialMonitorStream->print("Updating... [");
@@ -104,7 +108,8 @@ void PrettyOTA::OnOTAEnd(bool successful)
     if (successful)
         m_SerialMonitorStream->println("Updating... [==============================] 100%");
 
-    m_SerialMonitorStream->println("\n************************************************");
+    m_SerialMonitorStream->println("");
+    m_SerialMonitorStream->println(ROW_OF_STARS);
 
     if(m_DefaultCallbackPrintWithColor)
     {
@@ -121,5 +126,6 @@ void PrettyOTA::OnOTAEnd(bool successful)
             m_SerialMonitorStream->println("*              OTA UPDATE FAILED               *");
     }
 
-    m_SerialMonitorStream->println("************************************************\n\n");
+    m_SerialMonitorStream->println(ROW_OF_STARS);
+    m_SerialMonitorStream->println("");
 }
