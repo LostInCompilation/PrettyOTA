@@ -541,9 +541,9 @@ With the code above you can reach PrettyOTA under `http://YOUR_IP/myCustomUpdate
 
 #### ArduinoIDE
 
-Inside the ArduinoIDE make sure you select a partition scheme *with OTA*. For example you can use `Minimal SPIFFS (APP with OTA)`. However having a separate SPIFFS is not a requirement.
+Inside the ArduinoIDE make sure you select a partition scheme *with OTA*. For example you can use `Minimal SPIFFS (APP with OTA)`. However having a separate SPIFFS partition is not a requirement.
 
-#### PlatformIO
+#### PlatformIO / Custom
 
 To be able to use OTA updates you need (at least) two app partitions (for the firmware) and one ota_data partition (for configuration).
 
