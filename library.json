@@ -51,7 +51,8 @@
             "website_compressor",
             "arduino-lint",
             "library.json",
-            "library.properties"
+            "library.properties",
+            "Readme ToDo.md"
         ]
     },
     "frameworks": ["arduino"],

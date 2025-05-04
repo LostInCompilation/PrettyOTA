@@ -79,6 +79,7 @@ You can view the changelog here: [Changelog](CHANGELOG.md)
 
 ### What's planned for the future?
 
+- A **completely new design** is currently work in progress. Check the Discussions to see a preview
 - Optional **firmware pulling from server**: Configure PrettyOTA to automatically check a server for a new firmware version and install it. This is useful for many devices which all need updates at the same time. No manual firmware upload required anymore
 - Show/hide specific board infos
 - Disable/enable filesystem updates in code
