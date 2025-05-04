@@ -1,0 +1,5 @@
+markdown-it-py==3.0.0
+mdurl==0.1.2
+Pygments==2.19.1
+pyperclip==1.9.0
+rich==14.0.0
