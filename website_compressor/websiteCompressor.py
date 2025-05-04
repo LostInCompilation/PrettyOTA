@@ -47,8 +47,8 @@
 #   and is copied to the clipboard automatically.                                     #
 #                                                                                     #
 #   Usage:                                                                            #
-#       python websiteCompressor.py <html_filename> -login                            #
-#       python websiteCompressor.py <html_filename> -main                             #
+#       python websiteCompressor.py <htmlFilename> -login                            #
+#       python websiteCompressor.py <htmlFilename> -main                             #
 #                                                                                     #
 #######################################################################################
 
@@ -64,16 +64,16 @@ from rich.text import Text
 # Initialize Rich console
 console = Console(width=70)
 
-def format_as_cpp_array(compressed_content, array_name, values_per_line=35):
+def formatAsCppArray(compressedContent, arrayName, valuesPerLine=35):
     result = []
 
     # Array declaration
-    array_decl = f"const uint8_t PrettyOTA::{array_name}[{len(compressed_content)}] = {{"
-    result.append(array_decl)
+    arrayDecl = f"const uint8_t PrettyOTA::{arrayName}[{len(compressedContent)}] = {{"
+    result.append(arrayDecl)
 
     # Array content
-    for i in range(0, len(compressed_content), values_per_line):
-        chunk = compressed_content[i:i + values_per_line]
+    for i in range(0, len(compressedContent), valuesPerLine):
+        chunk = compressedContent[i:i + valuesPerLine]
         line = ", ".join([str(b) for b in chunk])
         line = "    " + line
         result.append(line)
@@ -82,28 +82,28 @@ def format_as_cpp_array(compressed_content, array_name, values_per_line=35):
 
     return "\n".join(result)
 
-def compress_html(input_filename, output_filename, output_mode_is_main):
+def compressHTML(inputFilename, outputFilename, isMainMode):
     try:
         # Read the HTML file
-        with open(input_filename, 'rb') as f:
-            html_content = f.read()
+        with open(inputFilename, 'rb') as f:
+            htmlContent = f.read()
 
         # Compress the content with gzip
-        compressed_content = gzip.compress(html_content)
+        compressedContent = gzip.compress(htmlContent)
 
         # Convert compressed bytes to comma-separated integers
-        array_name = "PRETTY_OTA_WEBSITE_DATA" if output_mode_is_main else "PRETTY_OTA_LOGIN_DATA"
-        result = format_as_cpp_array(compressed_content, array_name)
+        arrayName = "PRETTY_OTA_WEBSITE_DATA" if isMainMode else "PRETTY_OTA_LOGIN_DATA"
+        result = formatAsCppArray(compressedContent, arrayName)
 
         # Save to output file
-        with open(output_filename, 'w') as f:
+        with open(outputFilename, 'w') as f:
             f.write(result)
 
         # Copy to clipboard
         pyperclip.copy(result)
 
         # Calculate compression ratio
-        compression_ratio = (1 - len(compressed_content) / len(html_content)) * 100
+        compressionRatio = (1 - len(compressedContent) / len(htmlContent)) * 100
 
         # Print success message
         console.print(Panel(
@@ -111,9 +111,9 @@ def compress_html(input_filename, output_filename, output_mode_is_main):
                 Text.from_markup(
                     f"[green]     ✅ Successfully compressed[/green]\n\n" +
                     f"[highlight]  Result has been copied to clipboard[/highlight]\n\n" +
-                    f"[cyan]    Original size:[/cyan] [green]{len(html_content)}[/green] [dim]bytes[/dim]\n" +
-                    f"[cyan]  Compressed size:[/cyan] [green]{len(compressed_content)}[/green] [dim]bytes[/dim]\n\n" +
-                    f"[cyan]Compression ratio:[/cyan] [green]{compression_ratio:.2f}[/green] [dim]%[/dim]"
+                    f"[cyan]    Original size:[/cyan] [green]{len(htmlContent)}[/green] [dim]bytes[/dim]\n" +
+                    f"[cyan]  Compressed size:[/cyan] [green]{len(compressedContent)}[/green] [dim]bytes[/dim]\n\n" +
+                    f"[cyan]Compression ratio:[/cyan] [green]{compressionRatio:.2f}[/green] [dim]%[/dim]"
                 )
             ),
             border_style="green",
@@ -123,7 +123,7 @@ def compress_html(input_filename, output_filename, output_mode_is_main):
     except FileNotFoundError:
         console.print(Panel(
             f"[bold red]ERROR[/bold red]\n\n" +
-            f"[bold red]File not found:[/bold red] [highlight]'{input_filename}'[/highlight]",
+            f"[bold red]File not found:[/bold red] [highlight]'{inputFilename}'[/highlight]",
             border_style="red",
             padding=(1)
         ))
@@ -140,14 +140,14 @@ def compress_html(input_filename, output_filename, output_mode_is_main):
 def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Compresses a HTML file with gzip and converts the result into a C++ array for direct embedding into the source code. The result is saved as a .txt file and is copied to the clipboard automatically.')
-    parser.add_argument('html_filename', help='The HTML file to compress')
+    parser.add_argument('htmlFilename', help='The HTML file to compress')
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-login', action='store_true', help='For the log in website')
     group.add_argument('-main', action='store_true', help='For the main website')
     args = parser.parse_args()
 
     # Prepare parameters
-    output_filename = "main_compressed.txt" if args.main else "login_compressed.txt"
+    outputFilename = "mainCompressed.txt" if args.main else "loginCompressed.txt"
     mode = "Main page" if args.main else "Log-In page"
 
     # Print header
@@ -155,8 +155,8 @@ def main():
         Align.center(
             Text.from_markup(
                 f"[bold cyan] PrettyOTA Website Compression Tool[/bold cyan]\n\n" +
-                f"     [dim] Input:[/dim] [highlight]{args.html_filename}[/highlight]\n" +
-                f"     [dim]Output:[/dim] [highlight]{output_filename}[/highlight]\n\n"
+                f"     [dim] Input:[/dim] [highlight]{args.htmlFilename}[/highlight]\n" +
+                f"     [dim]Output:[/dim] [highlight]{outputFilename}[/highlight]\n\n"
                 f"     [dim]  Mode:[/dim] [highlight]{mode}[/highlight]"
             )
         ),
@@ -165,7 +165,7 @@ def main():
     ))
 
     # Compress the HTML file
-    compress_html(args.html_filename, output_filename, args.main)
+    compressHTML(args.htmlFilename, outputFilename, args.main)
 
 if __name__ == "__main__":
     main()
