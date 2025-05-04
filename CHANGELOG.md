@@ -1,13 +1,27 @@
 # Changelog
 
-## Version: 1.2.0 (WIP)
+## Upcoming (unreleased, work in progress for next version)
 
 - (WIP) Added FirmwarePull function to PrettyOTA. See README for details
-- Added compile switch to disable ArduinoOTA functionality `#define PRETTY_OTA_ENABLE_ARDUINO_OTA 1`
-- Changed default hardwareID to `ARDUINO_BOARD` symbol
-- Optimized duplicate strings in default callbacks
+- Reworked license for clarity
+
+#### Website
+- (Changed JS codestyle to match C++ codestyle)
+- Optimized CSS code
+- New success checkmark symbol with animation and reduced flash usage
+- Added pointer cursor when hovering OTA-Mode drop down menu
+- Footer has glassomorphic design now (glossy transparency)
+- Small UI improvements for an even prettier look
+- Small renamings in code
+
+## Version: 1.1.3
+
 - ⚠️ Deprecated `OverwriteAppVersion()` and `OverwriteAppBuildTimeAndDate()`. Use `SetAppVersion()` and `SetAppBuildTimeAndDate()` instead. The deprecated functions will be removed in a future release
-- Added `IsUpdateRunning()` function
+- Added `IsUpdateRunning()` method
+- Removed duplicate strings in default callbacks
+- Changed default hardwareID to `ARDUINO_BOARD` symbol
+- Added compile switch to disable ArduinoOTA functionality: `#define PRETTY_OTA_ENABLE_ARDUINO_OTA 1`. Set it to zero to disable ArduinoOTA and only use the web interface
+- Added a new python script for compressing the HTML file and convert it to the C++ array. See the new `website_compressor` directory
 
 ## Version: 1.1.2
 

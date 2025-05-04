@@ -1,9 +1,9 @@
 {
     "name": "PrettyOTA",
-    "version": "1.2.0",
+    "version": "1.1.3",
     "license": "Custom",
-    "description": "OTA (over-the-air) update library. A modern looking OTA web interface for easy updates (with automatic firmware pulling feature for updating many devices at once), rollbacks and infos about your board and firmware, directly inside your browser. Includes support for OTA upload directly inside PlatformIO.",
-    "keywords": "OTA, update, upgrade, wifi, web update, server, website, firmware",
+    "description": "OTA (over the air) update library. A modern looking OTA web interface to easily upload firmware updates and configure automatic firmware pulling for updating many devices at once in the background (WIP). One-click firmware rollbacks and infos about your board and firmware, directly inside your browser. Includes support for OTA upload directly inside PlatformIO.",
+    "keywords": "OTA, update, upgrade, wifi, web update, server, website, firmware, automatic",
     "headers": "PrettyOTA.h",
     "repository":
     {
@@ -44,15 +44,16 @@
     }],
     "export": {
         "exclude": [
+            ".git",
             ".github",
             ".gitignore",
             "website",
+            "website_compressor",
+            "arduino-lint",
             "library.json",
-            "library.properties",
-            "arduino-lint"
+            "library.properties"
         ]
     },
-    "license": "MIT",
     "frameworks": ["arduino"],
     "platforms": "espressif32"
 }

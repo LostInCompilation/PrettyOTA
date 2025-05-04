@@ -8,18 +8,17 @@ PULL_RESULT     KEYWORD1
 # Methods and Functions (KEYWORD2)
 Begin                           KEYWORD2
 SetAuthenticationDetails        KEYWORD2
+IsUpdateRunning                 KEYWORD2
 OnStart                         KEYWORD2
 OnProgress                      KEYWORD2
 OnEnd                           KEYWORD2
 UseDefaultCallbacks             KEYWORD2
-SetSerialOutputStream           KEYWORD2
 SetHardwareID                   KEYWORD2
-OverwriteAppBuildTimeAndDate    KEYWORD2
-OverwriteAppVersion             KEYWORD2
-SetAppBuildTimeAndDate          KEYWORD2
 SetAppVersion                   KEYWORD2
+SetAppBuildTimeAndDate          KEYWORD2
+SetSerialOutputStream           KEYWORD2
+
 PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE KEYWORD2
-IsUpdateRunning                 KEYWORD2
 
 # Instances (KEYWORD2)
 
