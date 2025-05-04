@@ -462,7 +462,7 @@ To use the built-in default callbacks:
 
 ```cpp
 // Use built-in default callbacks.
-// Do not call OnStart, OnProgress or OnEnd anymore, since they would override the built-in default callbacks
+// Do not call OnStart, OnProgress or OnEnd anymore, since they would override using the built-in default callbacks
 OTAUpdates.UseDefaultCallbacks();
 ```
 
