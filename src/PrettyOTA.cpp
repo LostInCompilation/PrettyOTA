@@ -243,7 +243,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
     EnableArduinoOTA(password, passwordIsMD5Hash, OTAport);
 
 
-#if (PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
+#if (DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
     // Initialize firmware pulling backend
     m_FirmwarePullManager.Begin(m_SerialMonitorStream, m_OnStartUpdate, m_OnProgressUpdate, m_OnEndUpdate);
 
@@ -771,7 +771,7 @@ void PrettyOTA::BackgroundTask(void* parameter)
     }
 }
 
-#if (PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
+#if (DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
 bool PrettyOTA::DoFirmwarePull(const char* const customFilter)
 {
     if(m_IsUpdateRunning)

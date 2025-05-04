@@ -38,7 +38,7 @@ Description:
 // ********************************************************
 // Settings
 #define PRETTY_OTA_ENABLE_ARDUINO_OTA 1
-#define PRETTY_OTA_ENABLE_FIRMWARE_PULLING 1
+#define DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING 0 // Do not change
 
 // std-lib
 #include <string>
@@ -69,7 +69,7 @@ Description:
 #include "MD5Hasher.h"
 #include "ESPUpdateManager.h"
 
-#if (PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
+#if (DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
     #include "FirmwarePullManager.h"
 #endif
 
@@ -81,7 +81,7 @@ Description:
 
 // Is it the correct version and fork of ESP32AsyncWebServer?
 #if !defined(ASYNCWEBSERVER_VERSION) || ASYNCWEBSERVER_VERSION_MAJOR < 3
-    #error PrettyOTA needs the "ESPAsyncWebServer" library (from ESP32Async) version 3.0 or newer.
+    #error PrettyOTA needs the "ESPAsyncWebServer" library (from ESP32Async) version 3.0 or newer. If you have it installed, make sure you only have one library with the name "ESPAsyncWebServer" installed (there are two libraries with the same name).
 #endif
 
 // Is it the correct version of ArduinoJson?
@@ -94,8 +94,8 @@ class PrettyOTA
 private:
     // Constants
     static const uint8_t    PRETTY_OTA_VERSION_MAJOR = 1;
-    static const uint8_t    PRETTY_OTA_VERSION_MINOR = 2;
-    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 0;
+    static const uint8_t    PRETTY_OTA_VERSION_MINOR = 1;
+    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 3;
 
     static const uint32_t   BACKGROUND_TASK_STACK_SIZE = 3072;
     static const uint8_t    BACKGROUND_TASK_PRIORITY = 4;
@@ -127,7 +127,7 @@ private:
     AsyncWebServer*     m_Server = nullptr;
     NSPrettyOTA::ESPUpdateManager m_UpdateManager;
 
-#if (PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
+#if (DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
     NSPrettyOTA::FirmwarePullManager m_FirmwarePullManager;
 #endif
 
@@ -180,7 +180,7 @@ public:
     bool Begin(AsyncWebServer* const server, const char* const username = "", const char* const password = "", bool passwordIsMD5Hash = false, const char* const mainURL = "/update", const char* const loginURL = "/login", uint16_t OTAport = 3232);
     void SetAuthenticationDetails(const char* const username, const char* const password, bool passwordIsMD5Hash = false);
 
-#if (PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
+#if (DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
     bool DoFirmwarePull(const char* const customFilter);
 #endif
 

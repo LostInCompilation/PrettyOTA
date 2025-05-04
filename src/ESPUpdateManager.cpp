@@ -268,7 +268,7 @@ bool NSPrettyOTA::ESPUpdateManager::WriteBufferToFlash()
         }
     }
 
-    // Try skipping empty blocks on uencrypted partitions
+    // Try skipping empty blocks on unencrypted partitions
     if ((m_TargetPartition->encrypted || CheckDataAlignment(m_Buffer + (skipSize / sizeof(uint32_t)), m_BufferSize - skipSize))
         && (esp_partition_write(m_TargetPartition, m_UpdateProgress + skipSize, reinterpret_cast<const uint32_t*>(m_Buffer) + (skipSize / sizeof(uint32_t)), m_BufferSize - skipSize) != ESP_OK))
     {
