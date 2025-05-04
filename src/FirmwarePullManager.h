@@ -43,6 +43,8 @@ Description:
 
 #pragma once
 
+#if (DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
+
 // C++ API
 #include <cstdint>
 //#include <functional>
@@ -91,3 +93,4 @@ namespace NSPrettyOTA
         void SetAllowDowngrade(bool allowDowngrade) { m_AllowDowngrade = allowDowngrade; }
     };
 }
+#endif

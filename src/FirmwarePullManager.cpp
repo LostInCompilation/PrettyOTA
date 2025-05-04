@@ -77,6 +77,8 @@ Example Json file:
 
 */
 
+#if (DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
+
 #include "FirmwarePullManager.h"
 
 using namespace NSPrettyOTA;
@@ -282,8 +284,12 @@ PULL_RESULT FirmwarePullManager::RunPullUpdate(const char* const jsonURL)
     const int32_t firmwareSize = http.getSize();
     uint8_t buffer[1280] = { 0 };
 
+
+
+
     // End connection
     http.end();
 
     return PULL_RESULT::OK;
 }
+#endif
