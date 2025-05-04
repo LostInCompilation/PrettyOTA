@@ -37,8 +37,11 @@ Description:
 
 // ********************************************************
 // Settings
-#define PRETTY_OTA_ENABLE_ARDUINO_OTA 1
-#define DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING 0 // Do not change
+#ifndef PRETTY_OTA_ENABLE_ARDUINO_OTA
+    #define PRETTY_OTA_ENABLE_ARDUINO_OTA 1
+#endif
+
+#define DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING 0 // Do not change. WIP
 
 // std-lib
 #include <string>

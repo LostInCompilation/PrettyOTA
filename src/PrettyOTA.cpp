@@ -242,7 +242,6 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
     // Enable ArduinoOTA support
     EnableArduinoOTA(password, passwordIsMD5Hash, OTAport);
 
-
 #if (DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
     // Initialize firmware pulling backend
     m_FirmwarePullManager.Begin(m_SerialMonitorStream, m_OnStartUpdate, m_OnProgressUpdate, m_OnEndUpdate);
@@ -330,7 +329,8 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
                 m_AuthenticatedSessionIDs.erase(it);
 
                 // Save sessionIDs to NVS
-                SaveSessionIDsToNVS();
+                if(!SaveSessionIDsToNVS())
+                    return request->send(400, "text/plain", "Could not delete this session from NVS storage");
 
                 return request->send(200);
             }
@@ -341,7 +341,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         }
         else
         {
-            return request->send(400, "text/plain", "No cookie with sessionID found");
+            return request->send(400, "text/plain", "No cookie with sessionID found. Reload the page");
         }
     });
 
@@ -457,8 +457,6 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         if(m_OnEndUpdate)
             m_OnEndUpdate(!m_UpdateManager.HasError());
 
-        m_IsUpdateRunning = false;
-
         // Response
         AsyncWebServerResponse* response;
         if(m_UpdateManager.HasError())
@@ -469,6 +467,8 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         response->addHeader("Connection", "close");
         response->addHeader("Access-Control-Allow-Origin", "*");
         request->send(response);
+
+        m_IsUpdateRunning = false;
 
         // Set reboot flag if requested
         if(!m_UpdateManager.HasError() && m_AutoRebootEnabled)
@@ -685,7 +685,7 @@ void PrettyOTA::EnableArduinoOTA(const char* const password, bool passwordIsMD5H
 
         // Enable ArduinoOTA on mDNS
         mdns_txt_item_t arduTxtData[4] = {
-            {"board", "esp32"},
+            {"board", "esp32"}, // ToDo: Board identifier
             {"tcp_check", "no"},
             {"ssh_upload", "no"},
             {"auth_upload", "no"}
@@ -699,7 +699,7 @@ void PrettyOTA::EnableArduinoOTA(const char* const password, bool passwordIsMD5H
         if(strlen(password) > 0)
         {
             if(mdns_service_txt_item_set("_arduino", "_tcp", "auth_upload", "yes") != ESP_OK)
-                P_LOG_E("Could not set ArduinoOTA mDNS txt item");
+                P_LOG_E("Could not set mDNS txt item");
         }
     }
     else
@@ -740,6 +740,8 @@ void PrettyOTA::EnableArduinoOTA(const char* const password, bool passwordIsMD5H
     });
 
     ArduinoOTA.begin();
+#else
+    P_LOG_W("ArduinoOTA is disabled in code. Set #define PRETTY_OTA_ENABLE_ARDUINO_OTA 1 to enable ArduinoOTA functionality.");
 #endif
 }
 
@@ -758,9 +760,10 @@ void PrettyOTA::BackgroundTask(void* parameter)
         if(me->m_RequestReboot && (millis() - me->m_RebootRequestTime >= 2000))
         {
             me->P_LOG_I("Rebooting...");
+            m_SerialMonitorStream->flush();
 
             yield();
-            delay(2000);
+            delay(1000);
 
             me->m_RequestReboot = false;
             ESP.restart();
