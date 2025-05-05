@@ -1,4 +1,5 @@
 .DS_Store
 arduino-lint
-websiteCompressor/venv
+utils/websiteCompressor/venv
+utils/firmwareUploadScript/venv
 Readme ToDo.md
