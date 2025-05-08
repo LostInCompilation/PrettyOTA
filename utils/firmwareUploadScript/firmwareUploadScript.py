@@ -69,6 +69,7 @@ from rich.control import Control
 console = Console(width=70)
 
 
+# Get MD5 hash from string
 def getMD5FromString(input_string):
     # Convert the input string to bytes using utf-8 encoding
     input_bytes = input_string.encode("utf-8")
@@ -106,7 +107,6 @@ def makeRequest(method, url, session=None, **kwargs):
         printErrorPanel(f"[highlight]Request timed out after 10 seconds[/highlight]")
         return None
     except requests.exceptions.HTTPError as e:
-        # Ensure response object exists before accessing attributes
         errorMsg = f"[highlight]An HTTP error occurred[/highlight]"
         if e.response is not None:
             errorMsg = f"[bold red]HTTP error:[/bold red] [highlight]'{e.response.text} ({e.response.status_code})'[/highlight]"
@@ -122,11 +122,18 @@ def makeRequest(method, url, session=None, **kwargs):
 
 # Authenticate with the current session
 def authenticate(loginURL, session, username, password):
+    # Get MD5 hash of password
+    password = getMD5FromString(password)
+
     # Create JSON payload
     payload = {"userId": username, "password": password}
 
     # Set header
-    headers = {"Content-Type": "application/json"}
+    headers = {
+        "Content-Type": "application/json"
+        # "Accept": "*/*",
+        # "Connection": "keep-alive"
+    }
 
     # Make request
     response = makeRequest("POST", loginURL, session=session, data=json.dumps(payload), headers=headers)
@@ -209,6 +216,8 @@ def main():
     # Parse command line arguments
     args = parseCommandLine()
 
+    console.set_window_title("PrettyOTA firmware upload")
+
     # Validate that the input file exists
     # if not os.path.isfile(args.filename):
     #     print(f"Error: The file '{args.filename}' does not exist.")
@@ -221,11 +230,9 @@ def main():
     # Fetch PrettyOTA information
     console.print(f"\n[bold white]Connecting to [italic]{TARGET}[/italic]...[/bold white]")
     prettyOTAInfo = getPrettyOTAInfo(INFO_URL)
+
     if not prettyOTAInfo:
         sys.exit(1)
-
-    console.control(Control.move(0, -1))
-    console.print(" [bold white][[/bold white][green]OK[/green][bold white]][/bold white]")
 
     # Extract PrettyOTA information and print it
     PRETTYOTA_VERSION = prettyOTAInfo["prettyotaVersion"]
@@ -236,7 +243,7 @@ def main():
         Panel(
             Align.center(
                 Text.from_markup(
-                    f"[bold cyan]   PrettyOTA information[/bold cyan]\n\n"
+                    "[bold cyan]   PrettyOTA information[/bold cyan]\n\n"
                     + f"[dim]PrettyOTA version:[/dim] [highlight]{PRETTYOTA_VERSION}[/highlight]\n"
                     + f"[dim]Authentication:[/dim]    [highlight]{'Enabled' if AUTH_ENABLED else 'Disabled'}[/highlight]"
                 )
@@ -252,20 +259,18 @@ def main():
     # Authenticate
     if AUTH_ENABLED:
         if args.username == None and args.password == None:
-            printErrorPanel(f"[highlight]Authentication is required but no username and password has been given[/highlight]")
+            printErrorPanel("[highlight]Authentication is required but no username and password has been given[/highlight]")
             sys.exit(1)
 
         # Get username and password
         username = args.username if args.username != None else ""
         password = args.password if args.password != None else ""
-        password = getMD5FromString(password)
 
-        console.print("\nAuthenticating...", style="bold white")
+        console.print("\n[bold white]Authenticating...[/bold white]")
         if not authenticate(LOGIN_URL, session, username, password):
             sys.exit(1)
 
-        console.control(Control.move(0, -1))
-        console.print(" [bold white][[/bold white][green]OK[/green][bold white]][/bold white]")
+        console.print("[bold green]Authentication successful[/bold green]")
 
 
 if __name__ == "__main__":
