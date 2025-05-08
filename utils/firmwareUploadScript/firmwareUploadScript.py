@@ -157,7 +157,31 @@ def getPrettyOTAInfo(infoURL):
                 "prettyotaVersion": data.get("prettyotaVersion", "N/A"),
                 "authenticationEnabled": data.get("authenticationEnabled", False),
                 "loginURL": data.get("loginURL", ""),
-                "mainURL": data.get("mainURL", ""),
+                "mainURL": data.get("mainURL", "")
+            }
+
+        except json.JSONDecodeError as e:
+            printErrorPanel(f"[bold red]Invalid JSON response:[/bold red] [highlight]{str(e)}[/highlight]")
+            return {}
+    else:
+        return {}
+
+
+# Get information about firmware and board
+def getFirmwareInfo(infoURL, session):
+    # Make request
+    response = makeRequest("GET", infoURL, session=session)
+
+    if response is not None:
+        try:
+            # Parse JSON response
+            data = response.json()
+            return {
+                "hardwareID": data.get("hardwareID", "N/A"),
+                "rollbackPossible": data.get("rollbackPossible", False),
+                "firmwareVersion": data.get("firmwareVersion", "N/A"),
+                "buildDate": data.get("buildDate", "N/A"),
+                "buildTime": data.get("buildTime", "N/A")
             }
 
         except json.JSONDecodeError as e:
@@ -225,11 +249,12 @@ def main():
 
     # Format URL
     TARGET = formatTargetURL(args.target)
-    INFO_URL = TARGET + "/prettyota/queryPrettyOTAInfo"
+    GENERAL_INFO_URL = TARGET + "/prettyota/queryPrettyOTAInfo"
+    FIRMWARE_INFO_URL = TARGET + "/prettyota/queryInfo"
 
     # Fetch PrettyOTA information
     console.print(f"\n[bold white]Connecting to [italic]{TARGET}[/italic]...[/bold white]")
-    prettyOTAInfo = getPrettyOTAInfo(INFO_URL)
+    prettyOTAInfo = getPrettyOTAInfo(GENERAL_INFO_URL)
 
     if not prettyOTAInfo:
         sys.exit(1)
@@ -243,7 +268,7 @@ def main():
         Panel(
             Align.center(
                 Text.from_markup(
-                    "[bold cyan]   PrettyOTA information[/bold cyan]\n\n"
+                    "[bold cyan]         PrettyOTA[/bold cyan]\n\n"
                     + f"[dim]PrettyOTA version:[/dim] [highlight]{PRETTYOTA_VERSION}[/highlight]\n"
                     + f"[dim]Authentication:[/dim]    [highlight]{'Enabled' if AUTH_ENABLED else 'Disabled'}[/highlight]"
                 )
@@ -270,8 +295,29 @@ def main():
         if not authenticate(LOGIN_URL, session, username, password):
             sys.exit(1)
 
-        console.print("[bold green]Authentication successful[/bold green]")
+    # Fetch firmware information
+    console.print(f"[bold white]Fetching information...[/bold white]")
+    firmwareInfo = getFirmwareInfo(FIRMWARE_INFO_URL, session)
 
+    if not firmwareInfo:
+        sys.exit(1)
+
+    console.print(
+        Panel(
+            Align.center(
+                Text.from_markup(
+                    "[bold cyan]               Board[/bold cyan]\n\n"
+                    + f" [dim]Hardware ID:[/dim]       [highlight]{firmwareInfo["hardwareID"]}[/highlight]\n\n"
+                    + f" [dim]Firmware version:[/dim]  [highlight]{firmwareInfo["firmwareVersion"]}[/highlight]\n"
+                    + f" [dim]Build date:[/dim]        [highlight]{firmwareInfo["buildDate"]}[/highlight]\n"
+                    + f" [dim]Build time:[/dim]        [highlight]{firmwareInfo["buildTime"]}[/highlight]\n\n"
+                    + f" [dim]Rollback possible:[/dim] [highlight]{'[bold green]Yes[/bold green]' if firmwareInfo["rollbackPossible"] else '[bold red]No[/bold red]'}[/highlight]"
+                )
+            ),
+            border_style="blue",
+            padding=(1),
+        )
+    )
 
 if __name__ == "__main__":
     main()
