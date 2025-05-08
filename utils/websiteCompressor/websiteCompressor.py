@@ -47,8 +47,8 @@
 #   and is copied to the clipboard automatically.                                     #
 #                                                                                     #
 #   Usage:                                                                            #
-#       python websiteCompressor.py <htmlFilename> -login                            #
-#       python websiteCompressor.py <htmlFilename> -main                             #
+#       python websiteCompressor.py <htmlFilename> -login                             #
+#       python websiteCompressor.py <htmlFilename> -main                              #
 #                                                                                     #
 #######################################################################################
 
@@ -64,6 +64,7 @@ from rich.text import Text
 # Initialize Rich console
 console = Console(width=70)
 
+
 def formatAsCppArray(compressedContent, arrayName, valuesPerLine=35):
     result = []
 
@@ -73,7 +74,7 @@ def formatAsCppArray(compressedContent, arrayName, valuesPerLine=35):
 
     # Array content
     for i in range(0, len(compressedContent), valuesPerLine):
-        chunk = compressedContent[i:i + valuesPerLine]
+        chunk = compressedContent[i : i + valuesPerLine]
         line = ", ".join([str(b) for b in chunk])
         line = "    " + line
         result.append(line)
@@ -82,10 +83,11 @@ def formatAsCppArray(compressedContent, arrayName, valuesPerLine=35):
 
     return "\n".join(result)
 
+
 def compressHTML(inputFilename, outputFilename, isMainMode):
     try:
         # Read the HTML file
-        with open(inputFilename, 'rb') as f:
+        with open(inputFilename, "rb") as f:
             htmlContent = f.read()
 
         # Compress the content with gzip
@@ -96,7 +98,7 @@ def compressHTML(inputFilename, outputFilename, isMainMode):
         result = formatAsCppArray(compressedContent, arrayName)
 
         # Save to output file
-        with open(outputFilename, 'w') as f:
+        with open(outputFilename, "w") as f:
             f.write(result)
 
         # Copy to clipboard
@@ -106,44 +108,52 @@ def compressHTML(inputFilename, outputFilename, isMainMode):
         compressionRatio = (1 - len(compressedContent) / len(htmlContent)) * 100
 
         # Print success message
-        console.print(Panel(
-            Align.center(
-                Text.from_markup(
-                    f"[green]     ✅ Successfully compressed[/green]\n\n" +
-                    f"[highlight]  Result has been copied to clipboard[/highlight]\n\n" +
-                    f"[cyan]    Original size:[/cyan] [green]{len(htmlContent)}[/green] [dim]bytes[/dim]\n" +
-                    f"[cyan]  Compressed size:[/cyan] [green]{len(compressedContent)}[/green] [dim]bytes[/dim]\n\n" +
-                    f"[cyan]Compression ratio:[/cyan] [green]{compressionRatio:.2f}[/green] [dim]%[/dim]"
-                )
-            ),
-            border_style="green",
-            padding=(1)
-        ))
+        console.print(
+            Panel(
+                Align.center(
+                    Text.from_markup(
+                        f"[green]     ✅ Successfully compressed[/green]\n\n"
+                        + f"[highlight]  Result has been copied to clipboard[/highlight]\n\n"
+                        + f"[cyan]    Original size:[/cyan] [green]{len(htmlContent)}[/green] [dim]bytes[/dim]\n"
+                        + f"[cyan]  Compressed size:[/cyan] [green]{len(compressedContent)}[/green] [dim]bytes[/dim]\n\n"
+                        + f"[cyan]Compression ratio:[/cyan] [green]{compressionRatio:.2f}[/green] [dim]%[/dim]"
+                    )
+                ),
+                border_style="green",
+                padding=(1),
+            )
+        )
 
     except FileNotFoundError:
-        console.print(Panel(
-            f"[bold red]ERROR[/bold red]\n\n" +
-            f"[bold red]File not found:[/bold red] [highlight]'{inputFilename}'[/highlight]",
-            border_style="red",
-            padding=(1)
-        ))
+        console.print(
+            Panel(
+                f"[bold red]ERROR[/bold red]\n\n"
+                + f"[bold red]File not found:[/bold red] [highlight]'{inputFilename}'[/highlight]",
+                border_style="red",
+                padding=(1),
+            )
+        )
         sys.exit(1)
     except Exception as e:
-        console.print(Panel(
-            f"[bold red]ERROR[/bold red]\n\n" +
-            f"[bold red]Exception:[/bold red] [highlight]'{e}'[/highlight]",
-            border_style="red",
-            padding=(1)
-        ))
+        console.print(
+            Panel(
+                f"[bold red]ERROR[/bold red]\n\n" + f"[bold red]Exception:[/bold red] [highlight]'{e}'[/highlight]",
+                border_style="red",
+                padding=(1),
+            )
+        )
         sys.exit(1)
+
 
 def main():
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Compresses a HTML file with gzip and converts the result into a C++ array for direct embedding into the source code. The result is saved as a .txt file and is copied to the clipboard automatically.')
-    parser.add_argument('htmlFilename', help='The HTML file to compress')
+    parser = argparse.ArgumentParser(
+        description="Compresses a HTML file with gzip and converts the result into a C++ array for direct embedding into the source code. The result is saved as a .txt file and is copied to the clipboard automatically."
+    )
+    parser.add_argument("htmlFilename", help="The HTML file to compress")
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-login', action='store_true', help='For the log in website')
-    group.add_argument('-main', action='store_true', help='For the main website')
+    group.add_argument("-login", action="store_true", help="For the log in website")
+    group.add_argument("-main", action="store_true", help="For the main website")
     args = parser.parse_args()
 
     # Prepare parameters
@@ -151,21 +161,24 @@ def main():
     mode = "Main page" if args.main else "Log-In page"
 
     # Print header
-    console.print(Panel(
-        Align.center(
-            Text.from_markup(
-                f"[bold cyan] PrettyOTA Website Compression Tool[/bold cyan]\n\n" +
-                f"     [dim] Input:[/dim] [highlight]{args.htmlFilename}[/highlight]\n" +
-                f"     [dim]Output:[/dim] [highlight]{outputFilename}[/highlight]\n\n"
-                f"     [dim]  Mode:[/dim] [highlight]{mode}[/highlight]"
-            )
-        ),
-        border_style="blue",
-        padding=(1)
-    ))
+    console.print(
+        Panel(
+            Align.center(
+                Text.from_markup(
+                    f"[bold cyan] PrettyOTA Website Compression Tool[/bold cyan]\n\n"
+                    + f"     [dim] Input:[/dim] [highlight]{args.htmlFilename}[/highlight]\n"
+                    + f"     [dim]Output:[/dim] [highlight]{outputFilename}[/highlight]\n\n"
+                    f"     [dim]  Mode:[/dim] [highlight]{mode}[/highlight]"
+                )
+            ),
+            border_style="blue",
+            padding=(1),
+        )
+    )
 
     # Compress the HTML file
     compressHTML(args.htmlFilename, outputFilename, args.main)
+
 
 if __name__ == "__main__":
     main()
