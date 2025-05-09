@@ -42,11 +42,13 @@
 #                                                                                     #
 #   Upload Firmware Script                                                            #
 #                                                                                     #
-#   Desc                                                                              #
+#   Description:                                                                      #
+#   This script allows you to update your devices directly from the command line,     #
+#   without using the PrettyOTA web interface. It supports both firmware and          #
+#   filesystem updates, as well as rollback, with authentication if enabled.          #
 #                                                                                     #
 #   Usage:                                                                            #
-#       python uploadFirmwareScript.py <html_filename> -login                         #
-#       python uploadFirmwareScript.py <html_filename> -main                          #
+#       python uploadFirmwareScript.py -h                                             #
 #                                                                                     #
 #######################################################################################
 
@@ -350,17 +352,17 @@ The script will verify the update process and can automatically reboot the devic
   python firmwareUploadScript.py -target 192.168.0.42 firmware.bin
   python firmwareUploadScript.py -target esp32.local -port 8080 -username admin -password secret firmware.bin
   python firmwareUploadScript.py -target 192.168.0.42 -filesystem filesystem.bin --no-reboot
-  python firmwareUploadScript.py -target 192.168.0.42 -rollback""", # Added example for rollback
+  python firmwareUploadScript.py -target 192.168.0.42 -rollback""",  # Added example for rollback
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
         "filename",
-        nargs='?', # Makes it optional at the parser level
-        default=None, # Default to None if not provided
+        nargs="?",  # Makes it optional at the parser level
+        default=None,  # Default to None if not provided
         help="Path to the firmware or filesystem file (.bin) to upload. "
-             "Required if -firmware or -filesystem is specified (or by default, which is firmware update). "
-             "Ignored if -rollback is specified.",
-        type=str
+        "Required if -firmware or -filesystem is specified (or by default, which is firmware update). "
+        "Ignored if -rollback is specified.",
+        type=str,
     )
     parser.add_argument(
         "-target",
@@ -400,17 +402,13 @@ The script will verify the update process and can automatically reboot the devic
     group.add_argument(
         "-firmware",
         action="store_true",
-        help="Upload firmware file. This is the default operation if no mode (-firmware, -filesystem, -rollback) is specified."
+        help="Upload firmware file. This is the default operation if no mode (-firmware, -filesystem, -rollback) is specified.",
     )
     group.add_argument(
-        "-filesystem",
-        action="store_true",
-        help="Upload filesystem file. Use this mode to update the device's filesystem (e.g., SPIFFS, LittleFS)."
+        "-filesystem", action="store_true", help="Upload filesystem file. Use this mode to update the device's filesystem (e.g., SPIFFS, LittleFS)."
     )
     group.add_argument(
-        "-rollback",
-        action="store_true",
-        help="Rollback to previous firmware (if possible). Filename argument is ignored if provided."
+        "-rollback", action="store_true", help="Rollback to previous firmware (if possible). Filename argument is ignored if provided."
     )
 
     args = parser.parse_args()
