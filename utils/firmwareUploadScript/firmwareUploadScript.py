@@ -83,7 +83,7 @@ signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
 
-# --- Get MD5 hash from string ---
+# --- Get MD5 hash from input ---
 def getMD5Hash(input):
     md5_hash = hashlib.md5()
 
@@ -124,7 +124,7 @@ def printErrorPanel(errorMsg: str):
 def makeRequest(method, url, session=None, showErrorPanel=True, **kwargs):
     try:
         requester = session or requests
-        timeout = kwargs.pop("timeout", 10)  # Default timeout of 10 seconds, remove from kwargs
+        timeout = kwargs.pop("timeout", 10)  # Default timeout of 10 seconds
         response = requester.request(method, url, timeout=timeout, **kwargs)
         response.raise_for_status()
         return response
@@ -132,22 +132,20 @@ def makeRequest(method, url, session=None, showErrorPanel=True, **kwargs):
     except requests.exceptions.Timeout:
         if showErrorPanel:
             printErrorPanel(f"[highlight]Request timed out after {timeout} seconds[/highlight]")
-        return None
     except requests.exceptions.HTTPError as e:
         if showErrorPanel:
             errorMsg = f"[highlight]An HTTP error occurred[/highlight]"
             if e.response is not None:
                 errorMsg = f"[bold red]HTTP error:[/bold red] [highlight]'{e.response.text} ({e.response.status_code})'[/highlight]"
             printErrorPanel(errorMsg)
-        return None
     except requests.exceptions.ConnectionError:
         if showErrorPanel:
             printErrorPanel(f"[highlight]Failed to connect to the server[/highlight]")
-        return None
     except requests.exceptions.RequestException as e:
         if showErrorPanel:
             printErrorPanel(f"[bold red]Sending request failed:[/bold red] [highlight]{str(e)}[/highlight]")
-        return None
+
+    return None
 
 
 # --- Authenticate with the current session ---
@@ -235,40 +233,38 @@ def getFirmwareInfo(infoURL, session):
         return {}
 
 
-# --- Reboot device remotely ---
+# --- Reboot device remotely and wait for it to come back online ---
 def doReboot(doRebootURL, rebootCheckURL, session):
     with console.status("[bold white]Rebooting device...[/bold white]", spinner="dots") as status:
-        padded_message = ("Rebooting device...").ljust(25)
-
-        # Make request to trigger reboot
+        # Trigger reboot
         response = makeRequest("POST", doRebootURL, session=session)
         if response is None:
-            console.print(f"[bold white]{padded_message} [[/bold white][bold red]FAILED[/bold red][bold white]][/bold white]")
+            printStatusMessage("Rebooting device...", False)
             return False
 
+        # Wait for device to start rebooting
         status.update(f"[bold white]{("Rebooting device...").ljust(23)} [[/bold white][bold blue]WAITING[/bold blue][bold white]][/bold white]")
         time.sleep(5)
 
-        # Wait for server to come back online
+        # Wait for device to come back online
         MAX_ATTEMPTS = 6
         attempt = 0
 
         while attempt < MAX_ATTEMPTS:
-            # Try to connect to reboot check endpoint
             response = makeRequest("GET", rebootCheckURL, timeout=5, showErrorPanel=False)
             if response is not None:
-                console.print(f"[bold white]{padded_message} [[/bold white][bold green]OK[/bold green][bold white]][/bold white]")
+                printStatusMessage("Rebooting device...", True)
                 return True
 
-            time.sleep(0.5)  # Small sleep to prevent CPU load
+            time.sleep(0.5)
             attempt += 1
 
-        console.print(f"[bold white]{padded_message} [[/bold white][bold red]FAILED[/bold red][bold white]][/bold white]")
+        printStatusMessage("Rebooting device...", False)
         printErrorPanel("[highlight]Device did not come back online within the expected time[/highlight]")
         return False
 
 
-# --- Rollback device remotely ---
+# --- Rollback firmware remotely ---
 def doRollback(rollbackURL, session):
     headers = {"Accept": "*/*", "Connection": "keep-alive"}
 
@@ -284,14 +280,12 @@ def doRollback(rollbackURL, session):
 def uploadFirmware(startURL, uploadURL, mode, session, filename):
     startHeaders = {"Accept": "*/*", "Connection": "keep-alive"}
 
-    console.print("Mode: ", mode)
-
     with open(filename, "rb") as file:
-        # Construct start URL
+        # Calculate MD5 hash
         md5Hash = getMD5Hash(file.read())
         startURL = urljoin(startURL, f"?mode={mode}&reboot=false&hash={md5Hash}")
 
-        # --- Start update ---
+        # Start update
         with console.status("[bold white]Starting update...[/bold white]", spinner="dots"):
             response = makeRequest("GET", startURL, session=session, headers=startHeaders)
 
@@ -299,21 +293,18 @@ def uploadFirmware(startURL, uploadURL, mode, session, filename):
         if response is None:
             return False
 
-        # --- Upload firmware ---
+        # Upload firmware
         file.seek(0)
         encoder = MultipartEncoder(fields={"MD5": md5Hash, "file": ("file", file, "application/octet-stream")})
-        monitor = MultipartEncoderMonitor(encoder, lambda m: progress.update(task, completed=m.bytes_read))
+        monitor = MultipartEncoderMonitor(encoder)
 
         postHeaders = {"Accept": "*/*", "Connection": "keep-alive", "Content-Type": monitor.content_type, "Content-Length": str(monitor.len)}
 
         with Progress(
-            SpinnerColumn(),
-            TextColumn("[bold white]Uploading firmware...[/bold white]"),
-            BarColumn(bar_width=40),
-            TaskProgressColumn(),
-            transient=True,
+            SpinnerColumn(), TextColumn("[bold white]Uploading firmware...[/bold white]"), BarColumn(), TaskProgressColumn(), transient=True
         ) as progress:
-            task = progress.add_task("", total=os.path.getsize(filename))
+            task = progress.add_task("", total=monitor.len)
+            monitor.callback = lambda m: progress.update(task, completed=m.bytes_read)
             response = makeRequest("POST", uploadURL, session=session, headers=postHeaders, data=monitor)
 
         printStatusMessage("Uploading firmware...", response is not None)
@@ -350,31 +341,57 @@ def formatTargetURL(url, port):
 # --- Setup and parse command line arguments ---
 def parseCommandLine():
     parser = argparse.ArgumentParser(
-        description="Directly uploads a firmware or filesystem (.bin) file to PrettyOTA.\
-        You can update your devices with this script, without the need for the web interface.",
-        epilog="Example: python firmwareUploadScript.py -target 192.168.0.42 -firmware <filename>",
+        description="""Upload firmware or filesystem to a device running PrettyOTA.
+
+This script allows you to update your devices directly from the command line, without using the PrettyOTA web interface.
+It supports both firmware and filesystem updates, with authentication if enabled.
+The script will verify the update process and can automatically reboot the device when complete.""",
+        epilog="""Examples:
+  python firmwareUploadScript.py -target 192.168.0.42 firmware.bin
+  python firmwareUploadScript.py -target esp32.local -port 8080 -username admin -password secret firmware.bin
+  python firmwareUploadScript.py -target 192.168.0.42 -filesystem filesystem.bin --no-reboot""",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("filename", help="The firmware or filesystem (.bin) file to upload")
+    parser.add_argument("filename", help="Path to the firmware or filesystem file (.bin) to upload. The file must exist and be readable.")
     parser.add_argument(
         "-target",
-        help="The address or IP of the target running PrettyOTA (Example: '192.168.0.42', 'myesp.local')",
+        help="Device address where PrettyOTA is running. Can be an IP address (e.g., 192.168.0.42) or hostname (e.g., esp32.local).",
         required=True,
     )
-    parser.add_argument("-port", help="The port where PrettyOTA is running. Default is 80", type=int, default=80)
-    parser.add_argument("-username", help="The username for authentication (if enabled)", type=str)
-    parser.add_argument("-password", help="The password for authentication (if enabled)", type=str)
+    parser.add_argument(
+        "-port",
+        help="Port number where PrettyOTA is running. Default is 80, but can be changed if PrettyOTA is configured to use a different port.",
+        type=int,
+        default=80,
+    )
+    parser.add_argument(
+        "-username",
+        help="Username for authentication. Required only if PrettyOTA has authentication enabled. Leave empty if authentication is disabled.",
+    )
+    parser.add_argument(
+        "-password",
+        help="Password for authentication. Required only if PrettyOTA has authentication enabled. Leave empty if authentication is disabled.",
+    )
 
-    # parser.add_argument("-rollback", action="store_true", help="Rollback to previous firmware (if possible)")
-    parser.add_argument("--no-reboot", action="store_true", help="Don't automatically reboot after update or rollback. Default is to reboot")
+    parser.add_argument(
+        "--no-reboot",
+        action="store_true",
+        help="Skip automatic reboot after update. By default, the device will reboot automatically to apply changes. Use this option if you want to reboot manually later.",
+    )
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Don't actually upload the firmware or do a rollback, just print information about the firmware and the device",
+        help="Show device information without making any changes. Useful for checking device status and compatibility before performing an actual update.",
     )
 
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("-firmware", action="store_true", help="Upload firmware (.bin)")
-    group.add_argument("-filesystem", action="store_true", help="Upload filesystem (.bin))")
+    group.add_argument(
+        "-firmware", action="store_true", help="Upload firmware file. This is the default mode and updates the device's main firmware."
+    )
+    group.add_argument(
+        "-filesystem", action="store_true", help="Upload filesystem file. Use this mode to update the device's filesystem (e.g., SPIFFS, LittleFS)."
+    )
+    group.add_argument("-rollback", action="store_true", help="Rollback to previous firmware (if possible)")
 
     return parser.parse_args()
 
@@ -382,39 +399,48 @@ def parseCommandLine():
 # --- Main function ---
 def main():
     try:
-        console.set_window_title("PrettyOTA firmware upload")
-
         # Parse command line arguments
         args = parseCommandLine()
+        console.set_window_title("PrettyOTA firmware upload")
 
-        # Validate that the input file exists
+        # Validate input file
         if not os.path.isfile(args.filename):
             printErrorPanel(f"[highlight]The file '{args.filename}' does not exist.[/highlight]")
             sys.exit(1)
 
-        # --- Format URL ---
+        # Format URL and set mode
         TARGET = formatTargetURL(args.target, args.port)
+        MODE = "fs" if args.filesystem else "fw"
 
-        MODE = "fw" if args.firmware else "fs"
-        GENERAL_INFO_URL = TARGET + "/prettyota/queryPrettyOTAInfo"
-        FIRMWARE_INFO_URL = TARGET + "/prettyota/queryInfo"
-        LOGOUT_URL = TARGET + "/prettyota/logout"
-        REBOOT_URL = TARGET + "/prettyota/doManualReboot"
-        REBOOT_CHECK_URL = TARGET + "/prettyota/rebootCheck"
-        ROLLBACK_URL = TARGET + "/prettyota/doRollback"
-        UPDATE_START_URL = TARGET + "/prettyota/start"
-        UPLOAD_URL = TARGET + "/prettyota/upload"
+        console.print("FW: ", args.firmware)
+        console.print("FS: ", args.filesystem)
+        console.print("Rollback: ", args.rollback)
+        console.print("Mode: ", MODE)
+
+        # Define all URLs
+        URLs = {
+            "GENERAL_INFO": urljoin(TARGET, "/prettyota/queryPrettyOTAInfo"),
+            "FIRMWARE_INFO": urljoin(TARGET, "/prettyota/queryInfo"),
+            "LOGOUT": urljoin(TARGET, "/prettyota/logout"),
+            "REBOOT": urljoin(TARGET, "/prettyota/doManualReboot"),
+            "REBOOT_CHECK": urljoin(TARGET, "/prettyota/rebootCheck"),
+            "ROLLBACK": urljoin(TARGET, "/prettyota/doRollback"),
+            "UPDATE_START": urljoin(TARGET, "/prettyota/start"),
+            "UPLOAD": urljoin(TARGET, "/prettyota/upload"),
+        }
 
         console.print("")
 
-        # --- Fetch PrettyOTA information ---
-        prettyOTAInfo = getPrettyOTAInfo(GENERAL_INFO_URL)
+        # Get PrettyOTA information
+        prettyOTAInfo = getPrettyOTAInfo(URLs["GENERAL_INFO"])
         if not prettyOTAInfo:
             sys.exit(1)
 
+        # Extract PrettyOTA information
         AUTH_ENABLED = prettyOTAInfo["authenticationEnabled"]
-        LOGIN_URL = TARGET + prettyOTAInfo["loginURL"]
+        LOGIN_URL = urljoin(TARGET, prettyOTAInfo["loginURL"])
 
+        # Print PrettyOTA information
         console.print(
             Panel(
                 Align.center(
@@ -429,27 +455,25 @@ def main():
             )
         )
 
-        # Create a session to persist cookies (needed for authentication)
+        # Create session and authenticate if needed
         session = requests.Session()
-
-        # --- Authenticate ---
         if AUTH_ENABLED:
             if args.username is None and args.password is None:
                 printErrorPanel("[highlight]Authentication is required but no username and password has been given[/highlight]")
                 sys.exit(1)
 
-            # Get username and password
             username = args.username if args.username is not None else ""
             password = args.password if args.password is not None else ""
 
             if not authenticate(LOGIN_URL, session, username, password):
                 sys.exit(1)
 
-        # --- Fetch firmware information and print it ---
-        firmwareInfo = getFirmwareInfo(FIRMWARE_INFO_URL, session)
+        # Get firmware information
+        firmwareInfo = getFirmwareInfo(URLs["FIRMWARE_INFO"], session)
         if not firmwareInfo:
             sys.exit(1)
 
+        # Print firmware information
         console.print(
             Panel(
                 Align.center(
@@ -459,7 +483,7 @@ def main():
                         + f" [dim]Firmware version:[/dim]  [highlight]{firmwareInfo["firmwareVersion"]}[/highlight]\n"
                         + f" [dim]Build date:[/dim]        [highlight]{firmwareInfo["buildDate"]}[/highlight]\n"
                         + f" [dim]Build time:[/dim]        [highlight]{firmwareInfo["buildTime"]}[/highlight]\n\n"
-                        + f" [dim]Rollback possible:[/dim] [highlight]{"[bold green]Yes[/bold green]" if firmwareInfo["rollbackPossible"] else "[bold red]No[/bold red]"}[/highlight]"
+                        + f" [dim]Rollback possible:[/dim] [highlight]{'[bold green]Yes[/bold green]' if firmwareInfo['rollbackPossible'] else '[bold red]No[/bold red]'}[/highlight]"
                     )
                 ),
                 border_style="blue",
@@ -469,28 +493,35 @@ def main():
 
         console.print("")
 
-        # --- Stop here if dry run is enabled ---
+        # Stop here if dry run is enabled
         if args.dry_run:
             console.print("[bold white]Dry run mode enabled. No changes have been made.[/bold white]")
             if AUTH_ENABLED:
-                logout(LOGOUT_URL, session)
+                logout(URLs["LOGOUT"], session)
             sys.exit(0)
 
-        # --- Upload firmware ---
-        if not uploadFirmware(UPDATE_START_URL, UPLOAD_URL, MODE, session, args.filename):
-            sys.exit(1)
+        if args.rollback:
+            # Do rollback
+            if not doRollback(URLs["ROLLBACK"], session):
+                sys.exit(1)
+        else:
+            # Upload firmware
+            if not uploadFirmware(URLs["UPDATE_START"], URLs["UPLOAD"], MODE, session, args.filename):
+                sys.exit(1)
 
-        # --- Reboot device ---
+        # Reboot device if needed
         if not args.no_reboot:
-            if not doReboot(REBOOT_URL, REBOOT_CHECK_URL, session):
+            if not doReboot(URLs["REBOOT"], URLs["REBOOT_CHECK"], session):
                 sys.exit(1)
         else:
             console.print("[bold white]Device reboot has been skipped. Please reboot the device manually to apply the changes.[/bold white]")
 
-        # --- Log out ---
+        # Log out if authenticated
         if AUTH_ENABLED:
-            if not logout(LOGOUT_URL, session):
+            if not logout(URLs["LOGOUT"], session):
                 sys.exit(1)
+
+        console.print("\n[bold white]Firmware update completed successfully.[/bold white]\n")
 
     except Exception as e:
         console.print(f"\n[bold red]An unexpected error occurred:[/bold red] {str(e)}")
