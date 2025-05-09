@@ -344,19 +344,29 @@ def parseCommandLine():
         description="""Upload firmware or filesystem to a device running PrettyOTA.
 
 This script allows you to update your devices directly from the command line, without using the PrettyOTA web interface.
-It supports both firmware and filesystem updates, with authentication if enabled.
+It supports both firmware and filesystem updates, as well as rollback, with authentication if enabled.
 The script will verify the update process and can automatically reboot the device when complete.""",
         epilog="""Examples:
   python firmwareUploadScript.py -target 192.168.0.42 firmware.bin
   python firmwareUploadScript.py -target esp32.local -port 8080 -username admin -password secret firmware.bin
-  python firmwareUploadScript.py -target 192.168.0.42 -filesystem filesystem.bin --no-reboot""",
+  python firmwareUploadScript.py -target 192.168.0.42 -filesystem filesystem.bin --no-reboot
+  python firmwareUploadScript.py -target 192.168.0.42 -rollback""", # Added example for rollback
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("filename", help="Path to the firmware or filesystem file (.bin) to upload. The file must exist and be readable.")
+    parser.add_argument(
+        "filename",
+        nargs='?', # Makes it optional at the parser level
+        default=None, # Default to None if not provided
+        help="Path to the firmware or filesystem file (.bin) to upload. "
+             "Required if -firmware or -filesystem is specified (or by default, which is firmware update). "
+             "Ignored if -rollback is specified.",
+        type=str
+    )
     parser.add_argument(
         "-target",
         help="Device address where PrettyOTA is running. Can be an IP address (e.g., 192.168.0.42) or hostname (e.g., esp32.local).",
         required=True,
+        type=str,
     )
     parser.add_argument(
         "-port",
@@ -367,33 +377,54 @@ The script will verify the update process and can automatically reboot the devic
     parser.add_argument(
         "-username",
         help="Username for authentication. Required only if PrettyOTA has authentication enabled. Leave empty if authentication is disabled.",
+        type=str,
     )
     parser.add_argument(
         "-password",
         help="Password for authentication. Required only if PrettyOTA has authentication enabled. Leave empty if authentication is disabled.",
+        type=str,
     )
 
     parser.add_argument(
         "--no-reboot",
         action="store_true",
-        help="Skip automatic reboot after update. By default, the device will reboot automatically to apply changes. Use this option if you want to reboot manually later.",
+        help="Skip automatic reboot after update/rollback. By default, the device will reboot automatically. Use this option if you want to reboot manually later.",
     )
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Show device information without making any changes. Useful for checking device status and compatibility before performing an actual update.",
+        help="Show device information without making any changes. Useful for checking device status and compatibility before performing an actual update or rollback.",
     )
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
-        "-firmware", action="store_true", help="Upload firmware file. This is the default mode and updates the device's main firmware."
+        "-firmware",
+        action="store_true",
+        help="Upload firmware file. This is the default operation if no mode (-firmware, -filesystem, -rollback) is specified."
     )
     group.add_argument(
-        "-filesystem", action="store_true", help="Upload filesystem file. Use this mode to update the device's filesystem (e.g., SPIFFS, LittleFS)."
+        "-filesystem",
+        action="store_true",
+        help="Upload filesystem file. Use this mode to update the device's filesystem (e.g., SPIFFS, LittleFS)."
     )
-    group.add_argument("-rollback", action="store_true", help="Rollback to previous firmware (if possible)")
+    group.add_argument(
+        "-rollback",
+        action="store_true",
+        help="Rollback to previous firmware (if possible). Filename argument is ignored if provided."
+    )
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    if not args.rollback and args.filename is None:
+        parser.error("filename is required for firmware or filesystem update")
+
+    # Validate input file
+    if args.filename is not None:
+        if not os.path.isfile(args.filename):
+            printErrorPanel(f"[highlight]The file '{args.filename}' does not exist.[/highlight]")
+            sys.exit(1)
+
+    return args
 
 
 # --- Main function ---
@@ -403,19 +434,9 @@ def main():
         args = parseCommandLine()
         console.set_window_title("PrettyOTA firmware upload")
 
-        # Validate input file
-        if not os.path.isfile(args.filename):
-            printErrorPanel(f"[highlight]The file '{args.filename}' does not exist.[/highlight]")
-            sys.exit(1)
-
         # Format URL and set mode
         TARGET = formatTargetURL(args.target, args.port)
         MODE = "fs" if args.filesystem else "fw"
-
-        console.print("FW: ", args.firmware)
-        console.print("FS: ", args.filesystem)
-        console.print("Rollback: ", args.rollback)
-        console.print("Mode: ", MODE)
 
         # Define all URLs
         URLs = {
@@ -521,7 +542,11 @@ def main():
             if not logout(URLs["LOGOUT"], session):
                 sys.exit(1)
 
-        console.print("\n[bold white]Firmware update completed successfully.[/bold white]\n")
+        # Print success message
+        if args.rollback:
+            console.print("\n[bold white]Rollback completed successfully.[/bold white]\n")
+        else:
+            console.print("\n[bold white]Firmware update completed successfully.[/bold white]\n")
 
     except Exception as e:
         console.print(f"\n[bold red]An unexpected error occurred:[/bold red] {str(e)}")
