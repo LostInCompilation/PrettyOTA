@@ -247,6 +247,7 @@ def doReboot(doRebootURL, rebootCheckURL, session):
             return False
 
         status.update(f"[bold white]{("Rebooting device...").ljust(23)} [[/bold white][bold blue]WAITING[/bold blue][bold white]][/bold white]")
+        time.sleep(5)
 
         # Wait for server to come back online
         MAX_ATTEMPTS = 6
@@ -267,15 +268,23 @@ def doReboot(doRebootURL, rebootCheckURL, session):
         return False
 
 
+# --- Rollback device remotely ---
+def doRollback(rollbackURL, session):
+    headers = {"Accept": "*/*", "Connection": "keep-alive"}
+
+    # Make request
+    with console.status("[bold white]Rolling back...[/bold white]", spinner="dots"):
+        response = makeRequest("POST", rollbackURL, session=session, headers=headers)
+
+    printStatusMessage("Rolling back...", response is not None)
+    return response is not None
+
+
 # --- Upload firmware ---
 def uploadFirmware(startURL, uploadURL, mode, session, filename):
     startHeaders = {"Accept": "*/*", "Connection": "keep-alive"}
-    postHeaders = {
-        "Accept": "*/*",
-        "Connection": "keep-alive",
-        "Content-Type": "application/octet-stream",
-        "Content-Length": str(os.path.getsize(filename)),
-    }
+
+    console.print("Mode: ", mode)
 
     with open(filename, "rb") as file:
         # Construct start URL
@@ -294,6 +303,8 @@ def uploadFirmware(startURL, uploadURL, mode, session, filename):
         file.seek(0)
         encoder = MultipartEncoder(fields={"MD5": md5Hash, "file": ("file", file, "application/octet-stream")})
         monitor = MultipartEncoderMonitor(encoder, lambda m: progress.update(task, completed=m.bytes_read))
+
+        postHeaders = {"Accept": "*/*", "Connection": "keep-alive", "Content-Type": monitor.content_type, "Content-Length": str(monitor.len)}
 
         with Progress(
             SpinnerColumn(),
@@ -362,7 +373,7 @@ def parseCommandLine():
     )
 
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("-firmware", action="store_true", help="Upload firmware (.bin) - Default", default=True)
+    group.add_argument("-firmware", action="store_true", help="Upload firmware (.bin)")
     group.add_argument("-filesystem", action="store_true", help="Upload filesystem (.bin))")
 
     return parser.parse_args()
@@ -448,7 +459,7 @@ def main():
                         + f" [dim]Firmware version:[/dim]  [highlight]{firmwareInfo["firmwareVersion"]}[/highlight]\n"
                         + f" [dim]Build date:[/dim]        [highlight]{firmwareInfo["buildDate"]}[/highlight]\n"
                         + f" [dim]Build time:[/dim]        [highlight]{firmwareInfo["buildTime"]}[/highlight]\n\n"
-                        + f" [dim]Rollback possible:[/dim] [highlight]{'[bold green]Yes[/bold green]' if firmwareInfo["rollbackPossible"] else '[bold red]No[/bold red]'}[/highlight]"
+                        + f" [dim]Rollback possible:[/dim] [highlight]{"[bold green]Yes[/bold green]" if firmwareInfo["rollbackPossible"] else "[bold red]No[/bold red]"}[/highlight]"
                     )
                 ),
                 border_style="blue",
@@ -466,9 +477,8 @@ def main():
             sys.exit(0)
 
         # --- Upload firmware ---
-        if args.firmware:
-            if not uploadFirmware(UPDATE_START_URL, UPLOAD_URL, MODE, session, args.filename):
-                sys.exit(1)
+        if not uploadFirmware(UPDATE_START_URL, UPLOAD_URL, MODE, session, args.filename):
+            sys.exit(1)
 
         # --- Reboot device ---
         if not args.no_reboot:
