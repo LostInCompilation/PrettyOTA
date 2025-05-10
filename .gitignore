@@ -2,4 +2,5 @@
 arduino-lint
 utils/websiteCompressor/venv
 utils/firmwareUploadScript/venv
+test_project
 Readme ToDo.md
