@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="A better looking OTA web updater." />
+        <title>Login - PrettyOTA</title>
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512px' height='512px' xmlns:v='https://vecta.io/nano'%3E%3Cpath d='M0 0h512v512H0V0z' fill='%23454545'/%3E%3Cpath d='M155.358 89.853l3.371-.022 3.702-.008 3.899-.02 12.826-.041 4.433-.012 20.87-.042 23.966-.077 18.589-.048 11.066-.036C292.726 89.32 320.276 95.427 346 120c11.511 11.857 19.348 26.184 24 42l.965 3.105c5.562 21.043 2.684 44.2-5.965 63.895l-1.305 3.02C353.52 253.952 333.683 272.57 311 281c-18.677 6.795-36.629 7.29-56.312 7.195l-6.927-.009-18.07-.049-18.503-.04L175 288l.008 1.852.147 44.672.071 21.603.056 18.836.035 9.967.023 11.146.033 3.313c-.029 7.064-.542 13.21-5.24 18.853-5.864 4.769-10.089 7.293-17.797 7.063-6.109-.797-10.049-3.552-13.773-8.367-3.032-4.304-3.689-7.59-3.71-12.825l-.022-3.726-.008-4.095-.02-4.307-.041-14.153-.012-4.876-.042-22.912-.077-26.427-.048-20.439-.036-12.201-.017-11.487-.02-4.204c-.077-8.341-.097-15.383 5.902-21.797 4.622-4.136 8.932-5.74 15.055-5.742l3.291-.016 3.581.012 3.796-.011 8.165-.008 12.956-.029 36.842-.077 20.356-.055 10.746-.017c23.798.055 43.383-.912 61.55-18.176 10.626-11.198 16.528-25.929 16.207-41.452-.849-16.206-6.779-30.028-17.957-41.919-13.741-11.13-27.272-15.31-44.812-15.271l-3.802-.016-8.137-.018-12.889-.041-32.003-.101-24.901-.083-12.79-.028-9.852-.042-3.543.014c-7.426-.066-14.612-.496-20.61-5.282-4.68-5.881-7.194-10.13-6.965-17.797.797-6.109 3.552-10.049 8.367-13.773 4.115-2.899 7.286-3.688 12.296-3.71z' fill='%232cb3a6'/%3E%3C/svg%3E" />
+        <script type="module" crossorigin>
+            const md5 = (function() {
+                var MD5 = function (d) {
+                    return M(V(Y(X(d), 8 * d.length)))
+                }
+                function M (d) {
+                    for (var _, m = '0123456789abcdef', f = '', r = 0; r < d.length; r++) {
+                        _ = d.charCodeAt(r)
+                        f += m.charAt(_ >>> 4 & 15) + m.charAt(15 & _)
+                    }
+                    return f
+                }
+                function X (d) {
+                    for (var _ = Array(d.length >> 2), m = 0; m < _.length; m++) {
+                        _[m] = 0
+                    }
+                    for (m = 0; m < 8 * d.length; m += 8) {
+                        _[m >> 5] |= (255 & d.charCodeAt(m / 8)) << m % 32
+                    }
+                    return _
+                }
+                function V (d) {
+                    for (var _ = '', m = 0; m < 32 * d.length; m += 8) _ += String.fromCharCode(d[m >> 5] >>> m % 32 & 255)
+                    return _
+                }
+                function Y (d, _) {
+                    d[_ >> 5] |= 128 << _ % 32
+                    d[14 + (_ + 64 >>> 9 << 4)] = _
+                    for (var m = 1732584193, f = -271733879, r = -1732584194, i = 271733878, n = 0; n < d.length; n += 16) {
+                        var h = m
+                        var t = f
+                        var g = r
+                        var e = i
+                        f = md5ii(f = md5ii(f = md5ii(f = md5ii(f = md5hh(f = md5hh(f = md5hh(f = md5hh(f = md5gg(f = md5gg(f = md5gg(f = md5gg(f = md5ff(f = md5ff(f = md5ff(f = md5ff(f, r = md5ff(r, i = md5ff(i, m = md5ff(m, f, r, i, d[n + 0], 7, -680876936), f, r, d[n + 1], 12, -389564586), m, f, d[n + 2], 17, 606105819), i, m, d[n + 3], 22, -1044525330), r = md5ff(r, i = md5ff(i, m = md5ff(m, f, r, i, d[n + 4], 7, -176418897), f, r, d[n + 5], 12, 1200080426), m, f, d[n + 6], 17, -1473231341), i, m, d[n + 7], 22, -45705983), r = md5ff(r, i = md5ff(i, m = md5ff(m, f, r, i, d[n + 8], 7, 1770035416), f, r, d[n + 9], 12, -1958414417), m, f, d[n + 10], 17, -42063), i, m, d[n + 11], 22, -1990404162), r = md5ff(r, i = md5ff(i, m = md5ff(m, f, r, i, d[n + 12], 7, 1804603682), f, r, d[n + 13], 12, -40341101), m, f, d[n + 14], 17, -1502002290), i, m, d[n + 15], 22, 1236535329), r = md5gg(r, i = md5gg(i, m = md5gg(m, f, r, i, d[n + 1], 5, -165796510), f, r, d[n + 6], 9, -1069501632), m, f, d[n + 11], 14, 643717713), i, m, d[n + 0], 20, -373897302), r = md5gg(r, i = md5gg(i, m = md5gg(m, f, r, i, d[n + 5], 5, -701558691), f, r, d[n + 10], 9, 38016083), m, f, d[n + 15], 14, -660478335), i, m, d[n + 4], 20, -405537848), r = md5gg(r, i = md5gg(i, m = md5gg(m, f, r, i, d[n + 9], 5, 568446438), f, r, d[n + 14], 9, -1019803690), m, f, d[n + 3], 14, -187363961), i, m, d[n + 8], 20, 1163531501), r = md5gg(r, i = md5gg(i, m = md5gg(m, f, r, i, d[n + 13], 5, -1444681467), f, r, d[n + 2], 9, -51403784), m, f, d[n + 7], 14, 1735328473), i, m, d[n + 12], 20, -1926607734), r = md5hh(r, i = md5hh(i, m = md5hh(m, f, r, i, d[n + 5], 4, -378558), f, r, d[n + 8], 11, -2022574463), m, f, d[n + 11], 16, 1839030562), i, m, d[n + 14], 23, -35309556), r = md5hh(r, i = md5hh(i, m = md5hh(m, f, r, i, d[n + 1], 4, -1530992060), f, r, d[n + 4], 11, 1272893353), m, f, d[n + 7], 16, -155497632), i, m, d[n + 10], 23, -1094730640), r = md5hh(r, i = md5hh(i, m = md5hh(m, f, r, i, d[n + 13], 4, 681279174), f, r, d[n + 0], 11, -358537222), m, f, d[n + 3], 16, -722521979), i, m, d[n + 6], 23, 76029189), r = md5hh(r, i = md5hh(i, m = md5hh(m, f, r, i, d[n + 9], 4, -640364487), f, r, d[n + 12], 11, -421815835), m, f, d[n + 15], 16, 530742520), i, m, d[n + 2], 23, -995338651), r = md5ii(r, i = md5ii(i, m = md5ii(m, f, r, i, d[n + 0], 6, -198630844), f, r, d[n + 7], 10, 1126891415), m, f, d[n + 14], 15, -1416354905), i, m, d[n + 5], 21, -57434055), r = md5ii(r, i = md5ii(i, m = md5ii(m, f, r, i, d[n + 12], 6, 1700485571), f, r, d[n + 3], 10, -1894986606), m, f, d[n + 10], 15, -1051523), i, m, d[n + 1], 21, -2054922799), r = md5ii(r, i = md5ii(i, m = md5ii(m, f, r, i, d[n + 8], 6, 1873313359), f, r, d[n + 15], 10, -30611744), m, f, d[n + 6], 15, -1560198380), i, m, d[n + 13], 21, 1309151649), r = md5ii(r, i = md5ii(i, m = md5ii(m, f, r, i, d[n + 4], 6, -145523070), f, r, d[n + 11], 10, -1120210379), m, f, d[n + 2], 15, 718787259), i, m, d[n + 9], 21, -343485551)
+                        m = safeadd(m, h)
+                        f = safeadd(f, t)
+                        r = safeadd(r, g)
+                        i = safeadd(i, e)
+                    }
+                    return [m, f, r, i]
+                }
+                function md5cmn (d, _, m, f, r, i) {
+                    return safeadd(bitrol(safeadd(safeadd(_, d), safeadd(f, i)), r), m)
+                }
+                function md5ff (d, _, m, f, r, i, n) {
+                    return md5cmn(_ & m | ~_ & f, d, _, r, i, n)
+                }
+                function md5gg (d, _, m, f, r, i, n) {
+                    return md5cmn(_ & f | m & ~f, d, _, r, i, n)
+                }
+                function md5hh (d, _, m, f, r, i, n) {
+                    return md5cmn(_ ^ m ^ f, d, _, r, i, n)
+                }
+                function md5ii (d, _, m, f, r, i, n) {
+                    return md5cmn(m ^ (_ | ~f), d, _, r, i, n)
+                }
+                function safeadd (d, _) {
+                    var m = (65535 & d) + (65535 & _)
+                    return (d >> 16) + (_ >> 16) + (m >> 16) << 16 | 65535 & m
+                }
+                function bitrol (d, _) {
+                    return d << _ | d >>> 32 - _
+                }
+                function MD5Unicode(buffer){
+                    if (!(buffer instanceof Uint8Array)) {
+                        buffer = new TextEncoder().encode(typeof buffer==='string' ? buffer : JSON.stringify(buffer));
+                    }
+                    var binary = [];
+                    var bytes = new Uint8Array(buffer);
+                    for (var i = 0, il = bytes.byteLength; i < il; i++) {
+                        binary.push(String.fromCharCode(bytes[i]));
+                    }
+                    return MD5(binary.join(''));
+                }
+                return MD5Unicode;
+            })();
+
+            // Button event
+            document.getElementById("loginButton").addEventListener("click", function (e) {
+                let xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4) {
+                        if (xhr.status == 200) {
+                            const mainURL = localStorage.getItem("main_url");
+                            window.location.replace(mainURL);
+                        } else if (xhr.status == 401) {
+                            showCustomAlert(xhr.responseText);
+                            document.getElementById("userid").value = "";
+                            document.getElementById("pwd").value = "";
+                        } else {
+                            showCustomAlert("Login failed. Server response: " + xhr.responseText);
+                        }
+                    }
+                };
+
+                const loginURL = localStorage.getItem("login_url");
+                xhr.open("POST", loginURL);
+                xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+
+                // Build JSON
+                const body = JSON.stringify({
+                    userId: document.getElementById("userid").value,
+                    password: md5(document.getElementById("pwd").value)
+                });
+
+                xhr.send(body);
+            });
+
+            // Keyboard events
+            document.getElementById("userid").addEventListener("keyup", function (event) {
+                if (event.keyCode === 13) // Enter key
+                    document.getElementById("loginButton").click();
+            });
+            document.getElementById("pwd").addEventListener("keyup", function (event) {
+                if (event.keyCode === 13) // Enter key
+                    document.getElementById("loginButton").click();
+            });
+
+            // Notification bar (alert)
+            let showTimeout;
+            function showCustomAlert(msg) {
+                document.getElementById("notificationMessage").innerText = msg;
+                document.getElementById("notificationBar").classList.add("show");
+                clearTimeout(showTimeout);
+                showTimeout = setTimeout(function() {
+                    document.getElementById("notificationBar").classList.remove("show");
+                }, 7000);
+            }
+            function hideCustomAlert() {
+                clearTimeout(showTimeout);
+                document.getElementById("notificationBar").classList.remove("show");
+            }
+
+            // Query info about PrettyOTA (version, URLs)
+            async function queryPrettyOTAInfo() {
+                let xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        let jsonObj = JSON.parse(this.responseText);
+                        document.getElementById("versionString").innerText = jsonObj.prettyotaVersion;
+                        localStorage.setItem("version_string", jsonObj.prettyotaVersion);
+                        localStorage.setItem("main_url", jsonObj.mainURL);
+                        localStorage.setItem("login_url", jsonObj.loginURL);
+                    }
+                };
+                xhr.open("GET", "/prettyota/queryPrettyOTAInfo");
+                xhr.send();
+            }
+
+            // On page load
+            function onLoad() {
+                if (!("version_string" in localStorage))
+                    localStorage.setItem("version_string", "1.0.0");
+                if (!("main_url" in localStorage))
+                    localStorage.setItem("main_url", "/update");
+                if (!("login_url" in localStorage))
+                    localStorage.setItem("login_url", "/login");
+
+                document.getElementById("versionString").innerText = localStorage.getItem("version_string");
+
+                queryPrettyOTAInfo();
+            }
+
+            // Publish functions
+            window.hideCustomAlert = hideCustomAlert;
+            window.onload = onLoad;
+        </script>
+        <style>
+            body{
+                background: #191919;
+                font-family: sans-serif;
+                font-size: 14px;
+                color: #adadad;
+            }
+            .footer {
+                position: fixed;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                height: 28px;
+                line-height: 2px;
+                background-color: #313131;
+                color: #898989;
+                text-align: center;
+                font-size: 13px;
+            }
+            .mainDiv {
+                display: flex;
+                margin-top: 3rem;
+                margin-bottom: 4rem;
+                flex-direction: column;
+                align-items: center;
+            }
+            form {
+                border: 1px solid #e6e6e633;
+                width: 280px;
+                height: 260px;
+                margin-top: 50px;
+                padding: 30px;
+                border-radius: 12px;
+                text-align: center;
+            }
+            .headerRow {
+                border-bottom: 1px solid #e6e6e61c;
+                width: 100%;
+                margin-left: 0px;
+                margin-right: 0px;
+                margin-top: 7px;
+            }
+            h1 {
+                margin-top: -5px;
+                margin-bottom: 0px;
+            }
+            .inputDiv {
+                margin-top: 15px;
+                margin-left: 0px;
+                margin-right: 0px;
+                margin-bottom: 35px;
+            }
+            input {
+                background: #242424;
+                color: #b3b3b3;
+                width: 250px;
+                height: 44px;
+                margin-top: 18px;
+                padding-left: 15px;
+                padding-right: 15px;
+                border: 0px;
+                border-radius: 4px;
+                font-size: 14px;
+                overflow: hidden;
+            }
+            .loginButton {
+                display: inline-flex;
+                background: #2d5fec;
+                color: #e4e6eb;
+                cursor: pointer;
+                width: 150px;
+                height: 45px;
+                padding: 20px 45px;
+                gap: 10px;
+                font-weight: bold;
+                font-size: 16px;
+                border: 0;
+                border-radius: 13px;
+                align-items: center;
+                box-shadow: 0 5px 15px #00000092;
+                transition: all 0.25s ease;
+            }
+            .loginButton .arrow-wrapper {
+                display: flex;
+            }
+            .loginButton .arrow {
+                margin-top: 1px;
+                width: 10px;
+                height: 2px;
+                background: #2d5fec;
+                position: relative;
+                transition: 0.25s;
+            }
+            .loginButton .arrow::before {
+                content: "";
+                box-sizing: border-box;
+                position: absolute;
+                border: solid #e4e6eb;
+                border-width: 0 2px 2px 0;
+                top: -3px;
+                right: 3px;
+                transition: 0.25s;
+                padding: 3px;
+                transform: rotate(-45deg);
+            }
+            .loginButton:hover {
+                background-color: #4d82ff;
+            }
+            .loginButton:hover .arrow {
+                background: #e4e6eb;
+            }
+            .loginButton:hover .arrow:before {
+                right: 0;
+            }
+            .loginButton:active {
+                background-color: #0045e6;
+                transform: scale(0.97);
+            }
+            .notificationBar {
+                position: fixed;
+                top: 0px;
+                height: 38px;
+                line-height: 38px;
+                width: 80%;
+                background: #cc3445;
+                text-align: center;
+                color: #ffffff;
+                font-size: 14px;
+                font-weight: lighter;
+                display: inline-block;
+                visibility: hidden;
+                opacity: 0;
+                transition: opacity 250ms ease-in, visibility 0ms ease-in 250ms;
+                border-radius: 7px;
+            }
+            .notificationBar.show {
+                visibility: visible;
+                opacity: 1;
+                transition-delay: 0ms;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="mainDiv">
+            <!-- Logo -->
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="340px" height="69px" viewBox="0 0 27190 5630">
+                <path d="M6340 773a194 194 0 00-40 320c62 57 60 57 755 57 700 0 706 0 830 60a590 590 0 01 4 1053c-135 66-140 67-857 67-904 0-801-113-802 886v730l23 45a194 194 0 00 320 40c57-63 57-65 57-709V2730h503c703 0 812-18 1038-170a990 990 0 00-167-1733c-174-74-143-71-920-75l-700-3-44 24m7240 10c-30 16-51 37-67 67l-24 44 4 1200c3 1340-3 1224 72 1421 193 513 927 848 930 424 0-118-36-163-165-204a648 648 0 01-413-419c-20-59-21-84-25-719l-3-657h235a1880 1880 0 00 263-10c127-49 142-230 26-310-36-25-40-25-280-28l-243-3v-342c0-373-3-390-61-444-55-50-174-60-250-20m1490-3c-20 10-48 34-60 52l-24 33-3 1175c-4 1366-6 1333 108 1560 240 478 890 727 890 340 0-112-40-164-156-204a631 631 0 01-430-456c-17-60-19-119-19-700v-635l245-5c305-6 360-31 360-167 0-152-63-182-377-183H15370l-3-364c-3-410 0-396-84-443-52-30-162-31-216-3m-3560 756c-1460 227-1404 2434 65 2605 588 68 1356-430 1104-717-94-108-205-95-336 40a871 871 0 01-1495-422l-8-32H11840c1215 0 1140 14 1139-216 0-766-715-1376-1473-1258m-1601 30c-480 131-830 523-932 1039-21 106-33 1239-14 1330 40 190 290 225 371 50 17-37 19-77 19-600 0-712 6-762 100-961a864 864 0 01 600-485c123-33 180-96 180-200 0-163-123-228-324-173m6520 10a242 242 0 00-126 110c-41 84-50 60 440 1179l450 1030-162 380c-216 507-210 646 31 645 122 0 143-33 340-497a13328 13328 0 01 206-473c4-14 208-498 453-1075 258-610 447-1068 450-1092 20-176-228-283-345-150-18 20-156 336-392 895-341 807-365 860-377 835-158-368-732-1670-750-1700-40-69-140-108-219-86m-4890 360c-334 71-695 442-695 714 0 5 326 9 865 9h865l-7-33c-87-459-576-787-1028-690" fill="#2cb4a4" fill-rule="evenodd"/>
+                <path d="M2330 599a154420 154420 0 01-773 446 32852 32852 0 01-497 287l-380 220c-170 98-176 108-98 155l554 320 60 33 205-123c170-102 326-194 410-242a161187 161187 0 00 554-320c138-76 778-445 784-451 13-12-616-388-668-400a720 720 0 00-151 75m17974 117C18947 900 18380 2630 19344 3637c872 911 2374 555 2780-660 402-1202-586-2430-1820-2261m1995 57a193 193 0 00-56 304c68 78-9 73 1118 73h1006l44-23a200 200 0 00-2-357c-37-20-66-20-1052-20h-1014l-44 23m3296-9a250 250 0 00-108 108 264260 264260 0 00-1220 2988 205 205 0 00 114 220c62 32 1550 30 1617-1 110-54 140-206 60-304-64-77-40-75-697-75-520 0-583-2-577-15 14-39 938-2290 940-2292 1-2 233 559 516 1245 641 1558 571 1405 655 1443 142 65 310-50 292-200-7-60-1210-3004-1246-3051-57-74-246-110-346-66m-22450 288c-127 75-150 88-620 358a590130 590130 0 00-1030 595C1228 2160 1260 2090 1260 2517v362l58 32 130 76c115 70 107 94 108-317l2-355 98-59 141-82a40360 40360 0 00 445-255 726790 726790 0 00 1242-717c94-54 98-48-81-151-146-85-113-85-258 0m17240 60c-1055 143-1498 1463-753 2244 798 836 2172 247 2172-930 0-792-674-1416-1419-1314M3450 1347l-485 280a478065 478065 0 00-1117 644c-153 85-153 81-17 158l289 166c405 234 334 218 510 116 74-43 153-89 175-100A113105 113105 0 01 3846 2010c580-332 596-343 563-375-8-7-90-57-184-110-440-252-500-287-510-296-20-20-57-3-265 118m19836 208c-20 7-51 26-67 40-63 60-60-2-57 1245l3 1135 23 33c92 128 277 120 349-17l23-44V2826c0-1257 5-1164-73-1233-58-50-128-64-200-38M474 1743c-3 6-4 516-3 1131l3 1120 180 104a27377 27377 0 00 300 172c5 5 102 60 215 125a116150 116150 0 01 1070 617c150 87 173 98 193 87 22-13 27-2223 4-2250-6-10-106-70-222-136a26643 26643 0 01-468-270c-92-56-87-75-87 385 0 217 0 396-3 398-5 5-500-277-510-290-3-6-7-198-7-427v-417l-88-50-122-70c-20-10-102-58-183-106-256-149-262-151-272-123m3840 59-165 96a40221 40221 0 00-522 300 112703 112703 0 00-688 400 6501 6501 0 00-432 255c-18 29-10 2235 9 2245 22 13 36 7 173-73a51094 51094 0 01 630-365 250144 250144 0 01 1090-628c25-13 50-30 58-35 24-20 12-2261-13-2264-11-1-74 30-140 69" fill="#ededed" fill-rule="evenodd"/>
+            </svg>
+
+            <!-- Login form -->
+            <form>
+                <h1>Authentication</h1>
+                <div class="headerRow"></div>
+                <div class="inputDiv">
+                    <input id="userid" name="userid" placeholder="Username">
+                    <input id="pwd" name="pwd" placeholder=Password type="Password">
+                </div>
+                <button type="button" id="loginButton" class="loginButton">
+                    Login
+                    <span class="arrow-wrapper">
+                        <span class="arrow"></span>
+                    </span>
+                </button>
+            </form>
+
+            <!-- Notification Bar -->
+            <div id="notificationBar" class="notificationBar">
+                <span id="notificationMessage"></span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>PrettyOTA - Version <span id="versionString">1.0.0</span> - © 2025</p>
+        </div>
+    </body>
+</html>
