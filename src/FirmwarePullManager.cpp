@@ -287,6 +287,68 @@ PULL_RESULT FirmwarePullManager::RunPullUpdate(const char* const jsonURL)
 
 
 
+    // Send HTTP GET request
+    // int httpResponseCode = http.GET();
+
+    // if (httpResponseCode == 200)
+    // {
+    //     int totalLength = http.getSize();
+
+    //     // this is required to start firmware update process
+    //     if (!Update.begin(UPDATE_SIZE_UNKNOWN))
+    //         return OTA_UPDATE_FAIL;
+
+    //     // create buffer for read
+    //     uint8_t buff[1280] = { 0 };
+
+    //     // get tcp stream
+    //     WiFiClient* stream = http.getStreamPtr();
+
+    //     // read all data from server
+    //     int offset = 0;
+    //     while (http.connected() && offset < totalLength)
+    //     {
+    //         size_t sizeAvail = stream->available();
+    //         if (sizeAvail > 0)
+    //         {
+    //             size_t bytes_to_read = min(sizeAvail, sizeof(buff));
+    //             size_t bytes_read = stream->readBytes(buff, bytes_to_read);
+    //             size_t bytes_written = Update.write(buff, bytes_read);
+    //             if (bytes_read != bytes_written)
+    //             {
+    //                 if(SerialDebug)
+    //     {
+    //         Serial.printf("Unexpected error in OTA: %d %d %d\n", bytes_to_read, bytes_read, bytes_written);
+    //         Serial.printf("Write returned 0? Common causes are:\n");
+    //         Serial.printf("Using merged .bin file instead of just the app .bin from Arduino\n");
+    //         Serial.printf("Flash encryption configuration issues.\n");
+    //     }
+    //                 break;
+    //             }
+    //             offset += bytes_written;
+    //             if (Callback != NULL)
+    //                 Callback(offset, totalLength);
+    //         }
+    //     }
+
+    //     if (offset == totalLength)
+    //     {
+    //         Update.end(true);
+    //         delay(1000);
+
+    //         // Restart ESP32 to see changes
+    //         if (Action == UPDATE_BUT_NO_BOOT)
+    //             return UPDATE_OK;
+    //         ESP.restart();
+    //     }
+    //     return WRITE_ERROR;
+    // }
+
+    // http.end();
+    // return httpResponseCode;
+
+
+
     // End connection
     http.end();
 

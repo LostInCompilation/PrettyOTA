@@ -309,8 +309,9 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
             // Add session ID to known (authenticated) session IDs
             m_AuthenticatedSessionIDs.push_back(sessionIDstr);
 
-            // Save session IDs to NVS
-            SaveSessionIDsToNVS();
+            // Save sessionIDs to NVS
+            if(!SaveSessionIDsToNVS())
+                P_LOG_W("Could not save this log in to NVS storage. Client must log in again after reboot or update");
 
             // Send response and set session ID cookie
             AsyncWebServerResponse* response = request->beginResponse(200);
@@ -319,6 +320,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         }
         else
         {
+            P_LOG_W("Log in attempt with wrong credentials");
             return request->send(401, "text/plain", "Wrong username or password");
         }
     });
@@ -338,7 +340,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
 
                 // Save sessionIDs to NVS
                 if(!SaveSessionIDsToNVS())
-                    return request->send(400, "text/plain", "Could not delete this session from NVS storage");
+                    P_LOG_W("Could not delete this session from NVS storage. Client could still be logged in");
 
                 return request->send(200);
             }
@@ -402,7 +404,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         else
         {
             m_IsUpdateRunning = false;
-            P_LOG_E("Missing parameter: mode");
+            P_LOG_E("Missing parameter in URL: mode");
             return request->send(400, "text/plain", "Missing parameter in URL: mode");
         }
 
@@ -415,7 +417,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         else
         {
             m_IsUpdateRunning = false;
-            P_LOG_E("Missing parameter: reboot");
+            P_LOG_E("Missing parameter in URL: reboot");
             return request->send(400, "text/plain", "Missing parameter in URL: reboot");
         }
 
@@ -428,7 +430,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         else
         {
             m_IsUpdateRunning = false;
-            P_LOG_E("Missing parameter: hash");
+            P_LOG_E("Missing parameter in URL: hash");
             return request->send(400, "text/plain", "Missing parameter in URL: hash");
         }
 
@@ -472,7 +474,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
         else
             response = request->beginResponse(200);
 
-        response->addHeader("Connection", "close");
+        //response->addHeader("Connection", "close"); // Testing
         response->addHeader("Access-Control-Allow-Origin", "*");
         request->send(response);
 
@@ -771,7 +773,7 @@ void PrettyOTA::BackgroundTask(void* parameter)
             m_SerialMonitorStream->flush();
 
             yield();
-            delay(1000);
+            delay(200);
 
             me->m_RequestReboot = false;
             ESP.restart();

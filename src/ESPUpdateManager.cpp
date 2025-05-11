@@ -372,13 +372,13 @@ std::string NSPrettyOTA::ESPUpdateManager::GetLastErrorAsString() const
             return "Aborted";
         break;
         case UPDATE_ERROR::ERROR_OUT_OF_MEMORY:
-            return "ERROR_OUT_OF_MEMORY: No available memory for allocation";
+            return "ERROR_OUT_OF_MEMORY: No available RAM for allocation";
         break;
         case UPDATE_ERROR::ERROR_NO_PARTITION:
             return "ERROR_NO_PARTITION: Partition could not be found";
         break;
         case UPDATE_ERROR::ERROR_NO_SPACE:
-            return "ERROR_NO_SPACE: Not enough free space";
+            return "ERROR_NO_SPACE: Not enough free space on partition";
         break;
         case UPDATE_ERROR::ERROR_INVALID_HASH:
             return "ERROR_INVALID_HASH: Invalid MD5 hash";
@@ -387,16 +387,16 @@ std::string NSPrettyOTA::ESPUpdateManager::GetLastErrorAsString() const
             return "ERROR_HASH_MISMATCH: The firmware hash does not match the expected hash";
         break;
         case UPDATE_ERROR::ERROR_READ:
-            return "ERROR_READ: Could not read flash";
+            return "ERROR_READ: Could not read from flash";
         break;
         case UPDATE_ERROR::ERROR_WRITE:
-            return "ERROR_WRITE: Could not write flash";
+            return "ERROR_WRITE: Could not write to flash";
         break;
         case UPDATE_ERROR::ERROR_ERASE:
             return "ERROR_ERASE: Could not erase flash";
         break;
         case UPDATE_ERROR::ERROR_ACTIVATE:
-            return "ERROR_ACTIVATE: Could not activate target partition";
+            return "ERROR_ACTIVATE: Could not activate target partition for booting";
         break;
         case UPDATE_ERROR::ERROR_MAGIC_BYTE:
             return "ERROR_MAGIC_BYTE: Magic byte is invalid";
