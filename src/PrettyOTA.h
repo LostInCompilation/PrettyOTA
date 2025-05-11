@@ -37,6 +37,8 @@ dealings in the software.
 ******************************************************
 
 Description:
+    PrettyOTA is a modern, user-friendly Over-The-Air (OTA) update solution for ESP32 devices.
+
     The main header file. Include this file in your project.
 
 */
@@ -44,19 +46,22 @@ Description:
 #pragma once
 
 // ********************************************************
-// Settings
+// Library configuration options
 #ifndef PRETTY_OTA_ENABLE_ARDUINO_OTA
     #define PRETTY_OTA_ENABLE_ARDUINO_OTA 1
 #endif
 
-#define DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING 0 // Do not change. WIP
+// Development features (not for public use)
+#define DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING 0 // Work in progress feature
 
-// std-lib
+
+// ********************************************************
+// Standard library includes
 #include <string>
 #include <vector>
 #include <new> //std::nothrow
 
-// Arduino include
+// Arduino core includes
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
@@ -64,18 +69,18 @@ Description:
     #include <ArduinoOTA.h>
 #endif
 
-// ESP-IDF
+// ESP-IDF includes
 #include <esp_err.h>
 #include <esp_ota_ops.h>
 #include <nvs.h>
 #include <nvs_flash.h>
 #include <mdns.h>
 
-// Arduino dependencies
+// External dependencies
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 
-// PrettyOTA includes
+// PrettyOTA internal includes
 #include "CustomTypes.h"
 #include "MD5Hasher.h"
 #include "ESPUpdateManager.h"
@@ -90,143 +95,288 @@ Description:
     #error PrettyOTA only supports ESP32 devices. Support for RaspberryPi Pico W will follow soon.
 #endif
 
-// Is it the correct version and fork of ESP32AsyncWebServer?
+// Dependency version checks
 #if !defined(ASYNCWEBSERVER_VERSION) || ASYNCWEBSERVER_VERSION_MAJOR < 3
     #error PrettyOTA needs the "ESPAsyncWebServer" library (from ESP32Async) version 3.0 or newer. If you have it installed, make sure you only have one library with the name "ESPAsyncWebServer" installed (there are two libraries with the same name).
 #endif
 
-// Is it the correct version of ArduinoJson?
 #if !defined(ARDUINOJSON_VERSION_MAJOR) || ARDUINOJSON_VERSION_MAJOR < 7
     #error PrettyOTA needs the "ArduinoJson" library version 7.0 or newer.
 #endif
 
+/**
+ * @class PrettyOTA
+ * @brief Main class for handling OTA updates with a beautiful web interface
+ *
+ * PrettyOTA provides a modern and user-friendly way to perform Over-The-Air updates
+ * on ESP32 devices.
+ */
 class PrettyOTA
 {
 private:
-    // Constants
-    static const uint8_t    PRETTY_OTA_VERSION_MAJOR = 1;
-    static const uint8_t    PRETTY_OTA_VERSION_MINOR = 1;
-    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 3;
+    // Version information
+    static const uint8_t    PRETTY_OTA_VERSION_MAJOR = 2;
+    static const uint8_t    PRETTY_OTA_VERSION_MINOR = 0;
+    static const uint8_t    PRETTY_OTA_VERSION_REVISION = 0;
 
+    // Task configuration
     static const uint32_t   BACKGROUND_TASK_STACK_SIZE = 3072;
     static const uint8_t    BACKGROUND_TASK_PRIORITY = 4;
 
+    // Authentication limits
     static const uint8_t    MAX_NUM_LOGGED_IN_CLIENTS = 5;
 
-    // Website code
+    // Embedded web resources
     static const uint8_t    PRETTY_OTA_WEBSITE_DATA[12706];
     static const uint8_t    PRETTY_OTA_LOGIN_DATA[6208];
 
 private:
-    // UUID generation
+    // UUID type definition and helper methods
     using UUID_t = uint8_t[16];
 
+    /**
+     * @brief Generates a new UUID
+     * @param out_uuid Pointer to store the generated UUID
+     */
     void        GenerateUUID(UUID_t* out_uuid) const;
+
+    /**
+     * @brief Converts a UUID to a string representation
+     * @param uuid The UUID to convert
+     * @return String representation of the UUID
+     */
     std::string UUIDToString(const UUID_t uuid) const;
 
 private:
-    // Variables
-    static std::string  m_AppBuildTime;
-    static std::string  m_AppBuildDate;
-    static std::string  m_AppVersion;
-    static std::string  m_HardwareID;
+    // Static configuration variables
+    static std::string  m_AppBuildTime;    // Application build time
+    static std::string  m_AppBuildDate;    // Application build date
+    static std::string  m_AppVersion;      // Application version
+    static std::string  m_HardwareID;      // Unique hardware identifier
 
-    std::string         m_LoginURL = "";
-    std::string         m_MainURL = "";
+    // URL configuration
+    std::string         m_LoginURL = "";   // URL for login page
+    std::string         m_MainURL = "";    // URL for main update page
 
-    static Stream*      m_SerialMonitorStream;
-    AsyncWebServer*     m_Server = nullptr;
-    NSPrettyOTA::ESPUpdateManager m_UpdateManager;
+    // Core components
+    static Stream*      m_SerialMonitorStream;  // Stream for logging
+    AsyncWebServer*     m_Server = nullptr;     // Web server instance
+    NSPrettyOTA::ESPUpdateManager m_UpdateManager;  // Manages ESP32 updates
 
 #if (DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
-    NSPrettyOTA::FirmwarePullManager m_FirmwarePullManager;
+    NSPrettyOTA::FirmwarePullManager m_FirmwarePullManager;  // Manages firmware pulling
 #endif
 
-    bool                m_IsInitialized = false;
-    bool                m_IsUpdateRunning = false;
-    bool                m_AutoRebootEnabled = true;
-    bool                m_RequestReboot = false;
-    static bool         m_DefaultCallbackPrintWithColor;
-    uint32_t            m_RebootRequestTime = 0;
+    // State tracking
+    bool                m_IsInitialized = false;     // Whether PrettyOTA is initialized
+    bool                m_IsUpdateRunning = false;   // Whether an update is in progress
+    bool                m_AutoRebootEnabled = true;  // Whether to auto-reboot after update
+    bool                m_RequestReboot = false;     // Whether a reboot has been requested
+    static bool         m_DefaultCallbackPrintWithColor;  // Whether to use colored output
+    uint32_t            m_RebootRequestTime = 0;     // Time when reboot was requested
 
     // Authentication
-    bool                m_AuthenticationEnabled = false;
-    std::string         m_Username = "";
-    std::string         m_Password = "";
-    std::vector<std::string> m_AuthenticatedSessionIDs;
+    bool                m_AuthenticationEnabled = false;  // Whether authentication is enabled
+    std::string         m_Username = "";    // Username for authentication
+    std::string         m_Password = "";    // Password for authentication
+    std::vector<std::string> m_AuthenticatedSessionIDs;  // List of active session IDs
 
-    // User callbacks
+    // User callback functions
     std::function<void(NSPrettyOTA::UPDATE_MODE updateMode)> m_OnStartUpdate = nullptr;
     std::function<void(uint32_t currentSize, uint32_t totalSize)> m_OnProgressUpdate = nullptr;
     std::function<void(bool successful)> m_OnEndUpdate = nullptr;
 
 private:
-    // Default callback functions
+    // Default callback implementations
     static void OnOTAStart(NSPrettyOTA::UPDATE_MODE updateMode);
     static void OnOTAProgress(uint32_t currentSize, uint32_t totalSize);
     static void OnOTAEnd(bool successful);
 
-    // Log functions
+    // Internal logging methods
     static void P_LOG_I(const std::string& message);
     static void P_LOG_W(const std::string& message);
     static void P_LOG_E(const std::string& message);
 
     // Methods
-    static void BackgroundTask(void* parameter);
+    static void BackgroundTask(void* parameter);  // Background task for updates
 
+    /**
+     * @brief Enables Arduino OTA functionality
+     * @param password Password for Arduino OTA
+     * @param passwordIsMD5Hash Whether the password is already an MD5 hash
+     * @param OTAport Port for Arduino OTA
+     */
     void EnableArduinoOTA(const char* const password, bool passwordIsMD5Hash, uint16_t OTAport);
+
+    /**
+     * @brief Checks if a request is authenticated
+     * @param request The web request to check
+     * @return true if authenticated, false otherwise
+     */
     bool IsAuthenticated(const AsyncWebServerRequest* const request) const;
 
-    // NVS storage
+    /**
+     * @brief Saves session IDs to NVS storage
+     * @return true if successful, false otherwise
+     */
     bool SaveSessionIDsToNVS();
+
+    /**
+     * @brief Loads session IDs from NVS storage
+     * @return true if successful, false otherwise
+     */
     bool LoadSessionIDsFromNVS();
 
-    // Helper
+    /**
+     * @brief Gets the version as a string
+     * @return Version string in format "major.minor.revision"
+     */
     std::string GetVersionAsString() const;
+
     //std::string SHA256ToString(const uint8_t hash[32]) const;
 
 public:
+    /**
+     * @brief Default constructor
+     */
     PrettyOTA() = default;
 
-    bool Begin(AsyncWebServer* const server, const char* const username = "", const char* const password = "", bool passwordIsMD5Hash = false, const char* const mainURL = "/update", const char* const loginURL = "/login", uint16_t OTAport = 3232);
-    void SetAuthenticationDetails(const char* const username, const char* const password, bool passwordIsMD5Hash = false);
+    /**
+     * @brief Initializes the PrettyOTA update system
+     *
+     * Sets up the web server routes, authentication, and Arduino OTA if enabled.
+     * This method must be called before using any other PrettyOTA functionality.
+     *
+     * @param server Pointer to an existing AsyncWebServer instance
+     * @param username Optional username for web interface authentication
+     * @param password Optional password for web interface authentication
+     * @param passwordIsMD5Hash Whether the password is already an MD5 hash
+     * @param mainURL URL path for the main update page (default: "/update")
+     * @param loginURL URL path for the login page (default: "/login")
+     * @param OTAport Port for Arduino OTA (default: 3232)
+     * @return true if initialization successful, false otherwise
+     */
+    bool Begin(AsyncWebServer* const server,
+               const char* const username = "",
+               const char* const password = "",
+               bool passwordIsMD5Hash = false,
+               const char* const mainURL = "/update",
+               const char* const loginURL = "/login",
+               uint16_t OTAport = 3232);
+
+    /**
+     * @brief Sets or changes authentication details
+     *
+     * Updates the username and password required for accessing the web interface.
+     * Can be called after Begin() to change authentication settings.
+     *
+     * @param username Username for authentication
+     * @param password Password for authentication
+     * @param passwordIsMD5Hash Whether the password is already an MD5 hash
+     */
+    void SetAuthenticationDetails(const char* const username,
+                                  const char* const password,
+                                  bool passwordIsMD5Hash = false);
 
 #if (DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
+    /**
+     * @brief Initiates a firmware pull operation (development feature)
+     *
+     * @param customFilter Custom filter for firmware selection
+     * @return true if pull operation started successfully
+     */
     bool DoFirmwarePull(const char* const customFilter);
 #endif
 
-    // Is an update running? (web interface or pulling in background)
+    /**
+     * @brief Checks if an update is currently in progress
+     *
+     * @return true if an update is running, false otherwise
+     */
     bool IsUpdateRunning() const { return m_IsUpdateRunning; }
 
-    // Set user callbacks
+    /**
+     * @brief Sets callback function for update start events
+     *
+     * This callback is triggered when an OTA update begins.
+     *
+     * @param func Function to call when update starts
+     */
     void OnStart(std::function<void(NSPrettyOTA::UPDATE_MODE updateMode)> func) { m_OnStartUpdate = func; }
+
+    /**
+     * @brief Sets callback function for update progress events
+     *
+     * This callback is triggered periodically during an update to report progress.
+     *
+     * @param func Function to call during update progress
+     */
     void OnProgress(std::function<void(uint32_t currentSize, uint32_t totalSize)> func) { m_OnProgressUpdate = func; }
+
+    /**
+     * @brief Sets callback function for update completion events
+     *
+     * This callback is triggered when an update finishes, either successfully or with failure.
+     *
+     * @param func Function to call when update completes
+     */
     void OnEnd(std::function<void(bool successful)> func) { m_OnEndUpdate = func; }
 
-    // Use built in callbacks that print info to the serial monitor
+    /**
+     * @brief Configures PrettyOTA to use the built-in callback implementations
+     *
+     * The default callbacks display formatted progress information in the serial monitor.
+     *
+     * @param printWithColor Whether to use ANSI color codes in the output
+     */
     void UseDefaultCallbacks(bool printWithColor = false);
 
-    // Set the HardwareID. It should be a unique identifier for your hardware/board
+    /**
+     * @brief Sets the hardware ID
+     *
+     * This ID is displayed in the web interface and can help identify different devices.
+     *
+     * @param hardwareID Unique identifier for the hardware/board
+     */
     void SetHardwareID(const char* const hardwareID) { m_HardwareID = hardwareID; }
 
-    // Set app version
+    /**
+     * @brief Sets the application version string
+     *
+     * This version is displayed in the web interface.
+     *
+     * @param appVersion Version string (e.g., "1.0.0")
+     */
     static void SetAppVersion(const char* const appVersion);
-    // Alias for backwards compatibility. DO NOT USE
+
+    // Deprecated alias for backwards compatibility
     [[deprecated("Use SetAppVersion() instead.")]]
     static constexpr auto OverwriteAppVersion = SetAppVersion;
 
-    // Set build time and date
+    /**
+     * @brief Sets the application build time and date
+     * @param appBuildTime Build time string
+     * @param appBuildDate Build date string
+     */
     static void SetAppBuildTimeAndDate(const char* const appBuildTime, const char* const appBuildDate);
-    // Alias for backwards compatibility. DO NOT USE
+
+    // Deprecated alias for backwards compatibility
     [[deprecated("Use SetAppBuildTimeAndDate() instead.")]]
     static constexpr auto OverwriteAppBuildTimeAndDate = SetAppBuildTimeAndDate;
 
-    // Set the Stream to write log messages too (Example: Use &Serial as argument)
+    /**
+     * @brief Sets the stream for log messages
+     *
+     * @param serialStream Pointer to Stream object (e.g., &Serial)
+     */
     void SetSerialOutputStream(Stream* const serialStream) { m_SerialMonitorStream = serialStream; }
 };
 
-// ********************************************************
-// Helper macro to be able to set current build time and date.
+/**
+ * @brief Helper macro to set the current build time and date
+ *
+ * Uses the __TIME__ and __DATE__ compiler macros to set the build information.
+ */
 #define PRETTY_OTA_SET_CURRENT_BUILD_TIME_AND_DATE() PrettyOTA::SetAppBuildTimeAndDate(__TIME__, __DATE__)
 
 const char version[6+1] =

@@ -37,7 +37,7 @@ dealings in the software.
 ******************************************************
 
 Description:
-    Custom type declarations.
+    Common type definitions used throughout the PrettyOTA library.
 
 */
 
@@ -47,35 +47,54 @@ Description:
 
 namespace NSPrettyOTA
 {
+    /**
+     * @enum UPDATE_MODE
+     * @brief Defines the type of update operation
+     *
+     * Determines whether the update targets the firmware (application code)
+     * or the filesystem (SPIFFS/LittleFS data partition).
+     */
     enum class UPDATE_MODE : uint8_t
     {
-        FIRMWARE = 0,
-        FILESYSTEM
+        FIRMWARE = 0,   ///< Update the firmware/application code
+        FILESYSTEM      ///< Update the filesystem (SPIFFS or LittleFS)
     };
 
-    // Return type for ESPUpdateManager
+    /**
+     * @enum UPDATE_ERROR
+     * @brief Error codes for the ESPUpdateManager
+     *
+     * Detailed error codes that can occur during the update process,
+     * allowing for specific error handling and user feedback.
+     */
     enum class UPDATE_ERROR : uint8_t
     {
-        OK = 0,
-        ABORT,
-        ERROR_OUT_OF_MEMORY,
-        ERROR_NO_PARTITION,
-        ERROR_NO_SPACE,
-        ERROR_INVALID_HASH,
-        ERROR_HASH_MISMATCH,
-        ERROR_READ,
-        ERROR_WRITE,
-        ERROR_ERASE,
-        ERROR_ACTIVATE,
-        ERROR_MAGIC_BYTE
+        OK = 0,                 ///< No error, operation successful
+        ABORT,                  ///< Update was manually aborted
+        ERROR_OUT_OF_MEMORY,    ///< Failed to allocate required memory
+        ERROR_NO_PARTITION,     ///< Target partition not found
+        ERROR_NO_SPACE,         ///< Not enough space in target partition
+        ERROR_INVALID_HASH,     ///< MD5 hash format is invalid
+        ERROR_HASH_MISMATCH,    ///< Calculated MD5 hash doesn't match expected hash
+        ERROR_READ,             ///< Error reading from flash
+        ERROR_WRITE,            ///< Error writing to flash
+        ERROR_ERASE,            ///< Error erasing flash
+        ERROR_ACTIVATE,         ///< Error setting new boot partition
+        ERROR_MAGIC_BYTE        ///< Invalid firmware header magic byte
     };
 
-    // Return type for FirmwarePullManager
+    /**
+     * @enum PULL_RESULT
+     * @brief Result codes for firmware pull operations
+     *
+     * Status codes returned by the firmware pull mechanism when
+     * checking for and downloading updates from a remote server.
+     */
     enum class PULL_RESULT : uint8_t
     {
-        OK = 0,
-        NO_UPDATE_AVAILABLE = 1,
-        NO_CONFIGURATION_PROFILE_MATCH_FOUND = 2,
-        ERROR = 3
+        OK = 0,                             ///< Pull operation successful
+        NO_UPDATE_AVAILABLE = 1,            ///< No newer firmware available
+        NO_CONFIGURATION_PROFILE_MATCH_FOUND = 2, ///< Device configuration doesn't match available updates
+        ERROR = 3                           ///< General error during pull operation
     };
 }

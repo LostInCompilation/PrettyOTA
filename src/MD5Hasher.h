@@ -51,23 +51,66 @@ Description:
 
 namespace NSPrettyOTA
 {
+    /**
+     * @brief Utility class for generating MD5 hash values
+     *
+     * This class provides a simple interface for calculating MD5 hashes
+     * of data streams. It wraps the ESP-ROM MD5 implementation.
+     */
     class MD5Hasher
     {
     private:
-        md5_context_t m_Context;
-        uint8_t       m_Buffer[ESP_ROM_MD5_DIGEST_LEN] = {0};
+        md5_context_t m_Context;                                  // MD5 calculation context
+        uint8_t       m_Buffer[ESP_ROM_MD5_DIGEST_LEN] = {0};     // Buffer to store the calculated hash
 
     public:
+        /** Size of MD5 hash string including null terminator (33 bytes) */
         static const uint8_t MD5_HASH_STR_SIZE = (2 * ESP_ROM_MD5_DIGEST_LEN + 1);
 
         MD5Hasher() = default;
 
+        /**
+         * @brief Initialize the MD5 hasher
+         *
+         * Must be called before adding any data to calculate a new hash.
+         */
         void Begin();
+
+        /**
+         * @brief Add binary data to the hash calculation
+         *
+         * @param data Pointer to the data buffer
+         * @param size Size of the data in bytes
+         */
         void AddData(const uint8_t* data, uint32_t size);
+
+        /**
+         * @brief Add character data to the hash calculation
+         *
+         * @param data Pointer to the character data
+         * @param size Size of the data in bytes
+         */
         void AddData(const char* data, uint32_t size);
+
+        /**
+         * @brief Finalize the hash calculation
+         *
+         * Call this after all data has been added to generate the final hash.
+         */
         void Calculate();
 
+        /**
+         * @brief Get the calculated hash as a byte array
+         *
+         * @param out Buffer to store the hash (must be at least ESP_ROM_MD5_DIGEST_LEN bytes)
+         */
         void GetHashAsBytes(uint8_t out[ESP_ROM_MD5_DIGEST_LEN]) const;
+
+        /**
+         * @brief Get the calculated hash as a hexadecimal string
+         *
+         * @return std::string Hash value as a 32-character hex string
+         */
         std::string GetHashAsString() const;
     };
 }

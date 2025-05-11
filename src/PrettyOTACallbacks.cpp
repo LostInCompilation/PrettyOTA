@@ -37,16 +37,22 @@ dealings in the software.
 ******************************************************
 
 Description:
-    Default callbacks for PrettyOTA.
+    Default callbacks for PrettyOTA that provide visual feedback
+    during OTA update processes via the serial monitor.
 
 */
 
 #include "PrettyOTA.h"
 
+// Constant used for visual formatting in the serial output
 const char* const ROW_OF_STARS = "************************************************";
 
-// ********************************************************
-// OTA default callbacks
+/**
+ * Default callback triggered when an OTA update begins.
+ * Displays a formatted header in the serial monitor with update type information.
+ *
+ * @param updateMode Specifies whether this is a FIRMWARE or FILESYSTEM update
+ */
 void PrettyOTA::OnOTAStart(NSPrettyOTA::UPDATE_MODE updateMode)
 {
     if (!m_SerialMonitorStream)
@@ -55,11 +61,13 @@ void PrettyOTA::OnOTAStart(NSPrettyOTA::UPDATE_MODE updateMode)
     m_SerialMonitorStream->println("\n");
     m_SerialMonitorStream->println(ROW_OF_STARS);
 
+    // Display header with or without ANSI color formatting
     if(m_DefaultCallbackPrintWithColor)
         m_SerialMonitorStream->println("*                 \033[1;7m OTA UPDATE \033[0m                 *");
     else
         m_SerialMonitorStream->println("*                  OTA UPDATE                  *");
 
+    // Display update type with or without ANSI color formatting
     if(m_DefaultCallbackPrintWithColor)
     {
         if(updateMode == NSPrettyOTA::UPDATE_MODE::FIRMWARE)
@@ -80,6 +88,13 @@ void PrettyOTA::OnOTAStart(NSPrettyOTA::UPDATE_MODE updateMode)
     m_SerialMonitorStream->println("Starting OTA update...");
 }
 
+/**
+ * Default callback triggered during an OTA update to show progress.
+ * Displays an ASCII progress bar that updates when progress changes by at least 2%.
+ *
+ * @param currentSize Number of bytes transferred so far
+ * @param totalSize Total number of bytes to transfer
+ */
 void PrettyOTA::OnOTAProgress(uint32_t currentSize, uint32_t totalSize)
 {
     if (!m_SerialMonitorStream)
@@ -87,11 +102,11 @@ void PrettyOTA::OnOTAProgress(uint32_t currentSize, uint32_t totalSize)
 
     static float lastPercentage = 0.0f;
     const float percentage = 100.0f * static_cast<float>(currentSize) / static_cast<float>(totalSize);
-    const uint8_t numBarsToShow = static_cast<uint8_t>(percentage / 3.3333f);
+    const uint8_t numBarsToShow = static_cast<uint8_t>(percentage / 3.3333f); // 30 bars for 100%
 
+    // Only update the progress bar when there's at least 2% change
     if(percentage - lastPercentage >= 2.0f)
     {
-        // Print progress bar
         m_SerialMonitorStream->print("Updating... [");
         for(uint8_t i = 0; i < 30; i++)
         {
@@ -102,24 +117,33 @@ void PrettyOTA::OnOTAProgress(uint32_t currentSize, uint32_t totalSize)
         }
         m_SerialMonitorStream->printf("] %02u%%\n", static_cast<uint8_t>(percentage));
 
+        // When using color mode, move cursor up to overwrite the previous line
         if(m_DefaultCallbackPrintWithColor)
-            m_SerialMonitorStream->print("\033[1F"); // Move cursor to begining of previous line
+            m_SerialMonitorStream->print("\033[1F");
 
         lastPercentage = percentage;
     }
 }
 
+/**
+ * Default callback triggered when an OTA update completes.
+ * Displays a formatted footer in the serial monitor with the update result.
+ *
+ * @param successful Whether the update completed successfully
+ */
 void PrettyOTA::OnOTAEnd(bool successful)
 {
     if (!m_SerialMonitorStream)
         return;
 
+    // Show 100% completion for successful updates
     if (successful)
         m_SerialMonitorStream->println("Updating... [==============================] 100%");
 
     m_SerialMonitorStream->println("");
     m_SerialMonitorStream->println(ROW_OF_STARS);
 
+    // Display result with or without ANSI color formatting
     if(m_DefaultCallbackPrintWithColor)
     {
         if (successful)

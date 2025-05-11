@@ -47,27 +47,32 @@ using namespace NSPrettyOTA;
 
 void MD5Hasher::Begin()
 {
+    // Reset hash buffer and initialize MD5 context
     memset(m_Buffer, 0x00, ESP_ROM_MD5_DIGEST_LEN);
     esp_rom_md5_init(&m_Context);
 }
 
 void MD5Hasher::AddData(const uint8_t* data, uint32_t size)
 {
+    // Update MD5 context with binary data
     esp_rom_md5_update(&m_Context, data, size);
 }
 
 void MD5Hasher::AddData(const char* data, uint32_t size)
 {
+    // Convert char pointer to uint8_t pointer and delegate to binary version
     AddData(reinterpret_cast<const uint8_t*>(data), size);
 }
 
 void MD5Hasher::Calculate()
 {
+    // Finalize MD5 calculation and store result in buffer
     esp_rom_md5_final(m_Buffer, &m_Context);
 }
 
 void MD5Hasher::GetHashAsBytes(uint8_t out[ESP_ROM_MD5_DIGEST_LEN]) const
 {
+    // Copy raw MD5 hash to output buffer
     memcpy(out, m_Buffer, ESP_ROM_MD5_DIGEST_LEN);
 }
 
@@ -75,6 +80,7 @@ std::string MD5Hasher::GetHashAsString() const
 {
     char out_MD5Str[MD5_HASH_STR_SIZE];
 
+    // Convert each byte to a 2-character hex representation
     for(uint8_t i = 0; i < ESP_ROM_MD5_DIGEST_LEN; i++)
         sprintf(out_MD5Str + (i * 2), "%02x", m_Buffer[i]);
 

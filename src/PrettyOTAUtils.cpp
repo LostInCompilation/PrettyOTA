@@ -37,14 +37,19 @@ dealings in the software.
 ******************************************************
 
 Description:
-    Utils and helpers for PrettyOTA.
+    Utility functions for PrettyOTA including logging, version management,
+    and UUID generation/formatting.
 
 */
 
 #include "PrettyOTA.h"
 
-// ********************************************************
-// Log functions
+/**
+ * Logs an informational message to the configured serial monitor stream.
+ * Messages are prefixed with "[PrettyOTA] Info: ".
+ *
+ * @param message The information message to log
+ */
 void PrettyOTA::P_LOG_I(const std::string& message)
 {
     if (!m_SerialMonitorStream)
@@ -53,6 +58,12 @@ void PrettyOTA::P_LOG_I(const std::string& message)
     m_SerialMonitorStream->println(("[PrettyOTA] Info: " + message).c_str());
 }
 
+/**
+ * Logs a warning message to the configured serial monitor stream.
+ * Messages are prefixed with "[PrettyOTA] Warning: ".
+ *
+ * @param message The warning message to log
+ */
 void PrettyOTA::P_LOG_W(const std::string& message)
 {
     if (!m_SerialMonitorStream)
@@ -61,6 +72,12 @@ void PrettyOTA::P_LOG_W(const std::string& message)
     m_SerialMonitorStream->println(("[PrettyOTA] Warning: " + message).c_str());
 }
 
+/**
+ * Logs an error message to the configured serial monitor stream.
+ * Messages are prefixed with "[PrettyOTA] Error: ".
+ *
+ * @param message The error message to log
+ */
 void PrettyOTA::P_LOG_E(const std::string& message)
 {
     if (!m_SerialMonitorStream)
@@ -69,8 +86,11 @@ void PrettyOTA::P_LOG_E(const std::string& message)
     m_SerialMonitorStream->println(("[PrettyOTA] Error: " + message).c_str());
 }
 
-// ********************************************************
-// Get PrettyOTA version string
+/**
+ * Returns the current PrettyOTA version as a formatted string.
+ *
+ * @return String in format "major.minor.revision"
+ */
 std::string PrettyOTA::GetVersionAsString() const
 {
     return std::to_string(PRETTY_OTA_VERSION_MAJOR) + "." +
@@ -78,22 +98,38 @@ std::string PrettyOTA::GetVersionAsString() const
         std::to_string(PRETTY_OTA_VERSION_REVISION);
 }
 
-// ********************************************************
-// UUID helpers
+/**
+ * Generates a RFC4122 v4 compliant UUID using ESP32's random number generator.
+ * Sets version bits (6) and variant bits (8) according to the RFC specification.
+ *
+ * @param out_uuid Pointer to a UUID array where the result will be stored
+ */
 void PrettyOTA::GenerateUUID(UUID_t* out_uuid) const
 {
+    // Fill the UUID with random bytes
     esp_fill_random(*out_uuid, sizeof(UUID_t));
 
-    (*out_uuid)[6] = 0x40 | ((*out_uuid)[6] & 0xF);   // UUID version
-    (*out_uuid)[8] = (0x80 | (*out_uuid)[8]) & ~0x40; // UUID variant
+    // Set the version bits (version 4 - random UUID)
+    (*out_uuid)[6] = 0x40 | ((*out_uuid)[6] & 0xF);
+
+    // Set the variant bits (RFC4122 variant)
+    (*out_uuid)[8] = (0x80 | (*out_uuid)[8]) & ~0x40;
 }
 
+/**
+ * Converts a binary UUID to its standard string representation.
+ * Format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx (8-4-4-4-12 hex digits)
+ *
+ * @param uuid The binary UUID to convert
+ * @return Formatted UUID string
+ */
 std::string PrettyOTA::UUIDToString(const UUID_t uuid) const
 {
-    char out[37] = {};
+    char out[37] = {}; // 36 chars + null terminator
 
     snprintf(out, 37, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-        uuid[0], uuid[1], uuid[2], uuid[3], uuid[4], uuid[5], uuid[6], uuid[7], uuid[8], uuid[9], uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]);
+        uuid[0], uuid[1], uuid[2], uuid[3], uuid[4], uuid[5], uuid[6], uuid[7],
+        uuid[8], uuid[9], uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]);
 
     return out;
 }

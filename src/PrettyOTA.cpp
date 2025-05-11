@@ -37,6 +37,9 @@ dealings in the software.
 ******************************************************
 
 Description:
+    PrettyOTA is a modern, user-friendly Over-The-Air (OTA) update solution for ESP32 devices.
+    It provides a beautiful web interface for firmware updates.
+
     The main source file.
 
 */
