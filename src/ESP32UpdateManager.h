@@ -64,14 +64,14 @@ Description:
 namespace NSPrettyOTA
 {
     /**
-     * @class ESPUpdateManager
+     * @class ESP32UpdateManager
      * @brief Manages the low-level process of writing updates to ESP32 flash memory
      *
      * This class handles the safe writing of firmware and filesystem updates to flash,
      * including partition selection, error handling, MD5 verification, and rollback support.
      * It implements safety mechanisms to prevent bricking the device during updates.
      */
-    class ESPUpdateManager
+    class ESP32UpdateManager
     {
     private:
         // Flash memory constants
@@ -113,12 +113,21 @@ namespace NSPrettyOTA
 
         /**
          * @brief Writes buffered data to flash memory
+         *
+         * Handles the special case of firmware header stashing for safety.
+         * Erases flash as needed before writing and optimizes by skipping writes
+         * to regions that contain only 0xFF bytes.
+         *
          * @return true if successful, false on error
          */
         bool WriteBufferToFlash();
 
         /**
          * @brief Checks if a partition contains valid bootable firmware
+         *
+         * Reads the first bytes of the partition and verifies the ESP32 firmware
+         * magic byte (0xE9) is present at the beginning.
+         *
          * @param partition Partition to check
          * @return true if partition is bootable, false otherwise
          */
@@ -126,8 +135,12 @@ namespace NSPrettyOTA
 
         /**
          * @brief Checks if a data block contains non-empty content
-         * @param data Pointer to data block
-         * @param size Size of data block
+         *
+         * Determines if a block of data needs to be written to flash by checking
+         * if it contains any bytes that are not 0xFF (erased flash state).
+         *
+         * @param data Pointer to data block (must not be nullptr)
+         * @param size Size of data block (must be > 0)
          * @return true if data contains non-empty content, false if all bytes are 0xFF
          */
         bool CheckDataAlignment(const uint8_t* data, uint64_t size) const;
@@ -136,7 +149,7 @@ namespace NSPrettyOTA
         /**
          * @brief Default constructor
          */
-        ESPUpdateManager() = default;
+        ESP32UpdateManager() = default;
 
         /**
          * @brief Begins an update process
@@ -145,7 +158,7 @@ namespace NSPrettyOTA
          * target partition and initializing buffers and verification.
          *
          * @param updateMode Type of update (FIRMWARE or FILESYSTEM)
-         * @param expectedMD5Hash MD5 hash that the update should match when complete
+         * @param expectedMD5Hash MD5 hash that the update should match when complete (must not be nullptr)
          * @param SPIFFSPartitionLabel Optional label for SPIFFS partition (for filesystem updates)
          * @return true if update initialization was successful, false otherwise
          */
@@ -155,7 +168,8 @@ namespace NSPrettyOTA
          * @brief Finalizes the update process
          *
          * Writes any remaining data, verifies the MD5 hash, and activates the new firmware
-         * or filesystem partition if verification passes.
+         * or filesystem partition if verification passes. For firmware updates, writes the
+         * previously stashed header to make the partition bootable.
          *
          * @return true if update was successful, false if errors occurred
          */
@@ -172,9 +186,10 @@ namespace NSPrettyOTA
          * @brief Writes a block of update data to the flash buffer
          *
          * Data is buffered until a full sector is available, then written to flash.
+         * Handles partial writes and automatically flushes the buffer when appropriate.
          *
-         * @param data Pointer to data block
-         * @param size Size of data block in bytes
+         * @param data Pointer to data block (must not be nullptr)
+         * @param size Size of data block in bytes (must be > 0)
          * @return Number of bytes successfully written
          */
         uint64_t Write(const uint8_t* const data, uint64_t size);
@@ -199,12 +214,19 @@ namespace NSPrettyOTA
 
         /**
          * @brief Checks if rollback to previous firmware is possible
+         *
+         * Verifies that a valid bootable firmware exists in the alternate OTA partition.
+         *
          * @return true if rollback is possible, false otherwise
          */
         bool IsRollbackPossible() const;
 
         /**
          * @brief Performs a rollback to previous firmware
+         *
+         * Sets the alternate OTA partition as the boot partition for the next restart
+         * if it contains valid bootable firmware.
+         *
          * @return true if rollback was successful, false otherwise
          */
         bool DoRollback();

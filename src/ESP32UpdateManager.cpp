@@ -42,19 +42,21 @@ Description:
 
 */
 
-#include "ESPUpdateManager.h"
+#include "ESP32UpdateManager.h"
 
 using namespace NSPrettyOTA;
 
-bool ESPUpdateManager::IsPartitionBootable(const esp_partition_t* const partition) const
+bool ESP32UpdateManager::IsPartitionBootable(const esp_partition_t* const partition) const
 {
-    if(!partition)
+    if (!partition)
         return false;
 
-    uint8_t partitionData[UM_ENCRYPTED_BLOCK_SIZE] = {0};
+    // Use aligned buffer to prevent memory alignment issues
+    uint8_t partitionData[UM_ENCRYPTED_BLOCK_SIZE] __attribute__((aligned(4))) = {0};
+    //uint8_t partitionData[UM_ENCRYPTED_BLOCK_SIZE] = {0};
 
     // Read the first bytes of the partition to check header
-    if(esp_partition_read(partition, 0, reinterpret_cast<uint32_t*>(partitionData), UM_ENCRYPTED_BLOCK_SIZE) != ESP_OK)
+    if (esp_partition_read(partition, 0, partitionData, UM_ENCRYPTED_BLOCK_SIZE) != ESP_OK)
         return false;
 
     // Verify the ESP32 firmware magic byte (0xE9) at the beginning of the partition
@@ -64,41 +66,44 @@ bool ESPUpdateManager::IsPartitionBootable(const esp_partition_t* const partitio
     return true;
 }
 
-bool ESPUpdateManager::CheckDataAlignment(const uint8_t* data, uint64_t size) const
+bool ESP32UpdateManager::CheckDataAlignment(const uint8_t* data, uint64_t size) const
 {
-    // Skip check for empty or non-aligned data blocks
-    if (size == 0 || size % sizeof(uint32_t))
+    if (!data || size == 0)
+        return false;
+
+    // Skip check for non-aligned data blocks
+    if (size % sizeof(uint32_t))
         return true;
 
+    // Optimize by checking 32-bit words at a time
+    const uint32_t* wordData = reinterpret_cast<const uint32_t*>(data);
+    const uint32_t wordCount = size / sizeof(uint32_t);
+
     // Check if the data block contains only 0xFF bytes (erased flash state)
-    // This optimization allows skipping writes to already-erased flash regions
-    uint64_t dwl = size / sizeof(uint32_t);
-
-    do {
-        // If any 32-bit word is not 0xFFFFFFFF, the block contains actual data
-        if (*reinterpret_cast<const uint32_t*>(data) ^ 0xffffffff)
-            return true;
-
-        data += sizeof(uint32_t);
-    } while (--dwl);
+    for (uint32_t i = 0; i < wordCount; i++) {
+        if (wordData[i] != 0xFFFFFFFF) {
+            return true; // Contains actual data
+        }
+    }
 
     // All bytes are 0xFF, no need to write this block
     return false;
 }
 
-void ESPUpdateManager::ResetState()
+void ESP32UpdateManager::ResetState()
 {
     // Free allocated memory
-    if(m_Buffer)
+    if (m_Buffer)
         delete[] m_Buffer;
 
-    if(m_SkipBuffer)
+    if (m_SkipBuffer)
         delete[] m_SkipBuffer;
 
     // Reset all member variables to initial state
     m_Buffer = nullptr;
     m_SkipBuffer = nullptr;
 
+    // Reset all member variables to initial state
     m_UpdateMode = UPDATE_MODE::FIRMWARE;
     m_UpdateSize = 0;
     m_UpdateProgress = 0;
@@ -107,11 +112,20 @@ void ESPUpdateManager::ResetState()
     m_TargetPartition = nullptr;
 }
 
-bool ESPUpdateManager::Begin(UPDATE_MODE updateMode, const char* const expectedMD5Hash, const char* SPIFFSPartitionLabel)
+bool ESP32UpdateManager::Begin(UPDATE_MODE updateMode, const char* const expectedMD5Hash, const char* const SPIFFSPartitionLabel)
 {
-    // Prevent starting a new update if one is already in progress
-    if(m_UpdateSize > 0)
+    // Validate input parameters
+    if (!expectedMD5Hash) {
+        m_LastError = UPDATE_ERROR::ERROR_INVALID_HASH;
         return false;
+    }
+
+    // Prevent starting a new update if one is already in progress
+    if (m_UpdateSize > 0)
+    {
+        m_LastError = UPDATE_ERROR::ABORT;
+        return false;
+    }
 
     // Initialize state for a new update
     ResetState();
@@ -119,18 +133,18 @@ bool ESPUpdateManager::Begin(UPDATE_MODE updateMode, const char* const expectedM
     m_ExpectedMD5Hash = expectedMD5Hash;
 
     // Convert hash to lowercase for case-insensitive comparison
-    for(char& c : m_ExpectedMD5Hash)
+    for (char& c : m_ExpectedMD5Hash)
         c = std::tolower(c);
 
     // Validate MD5 hash format (should be 32 hex characters)
-    if(m_ExpectedMD5Hash.length() != 32)
+    if (m_ExpectedMD5Hash.length() != 32)
     {
         m_LastError = UPDATE_ERROR::ERROR_INVALID_HASH;
         return false;
     }
 
     // Select appropriate target partition based on update type
-    if(updateMode == UPDATE_MODE::FIRMWARE)
+    if (updateMode == UPDATE_MODE::FIRMWARE)
     {
         // For firmware updates, use the next OTA partition
         m_TargetPartition = esp_ota_get_next_update_partition(nullptr);
@@ -140,16 +154,16 @@ bool ESPUpdateManager::Begin(UPDATE_MODE updateMode, const char* const expectedM
             return false;
         }
     }
-    else if(updateMode == UPDATE_MODE::FILESYSTEM)
+    else if (updateMode == UPDATE_MODE::FILESYSTEM)
     {
         // For filesystem updates, try SPIFFS first, then FAT as fallback
         m_TargetPartition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_SPIFFS, SPIFFSPartitionLabel);
-        if(!m_TargetPartition)
+        if (!m_TargetPartition)
         {
             // No SPIFFS partition found with the specified label
             // Try finding a FAT partition as fallback
             m_TargetPartition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_FAT, nullptr);
-            if(!m_TargetPartition)
+            if (!m_TargetPartition)
             {
                 m_LastError = UPDATE_ERROR::ERROR_NO_PARTITION;
                 return false;
@@ -173,10 +187,10 @@ bool ESPUpdateManager::Begin(UPDATE_MODE updateMode, const char* const expectedM
     return true;
 }
 
-bool ESPUpdateManager::End()
+bool ESP32UpdateManager::End()
 {
     // Cannot end an update that has errors or hasn't started
-    if(HasError() || m_UpdateSize == 0)
+    if (HasError() || m_UpdateSize == 0)
         return false;
 
     // Write any remaining data in the buffer
@@ -201,7 +215,7 @@ bool ESPUpdateManager::End()
     if(m_UpdateMode == UPDATE_MODE::FIRMWARE)
     {
         // Write the previously stashed header bytes to make the partition bootable
-        if(esp_partition_write(m_TargetPartition, 0, reinterpret_cast<uint32_t*>(m_SkipBuffer), UM_ENCRYPTED_BLOCK_SIZE) != ESP_OK)
+        if (esp_partition_write(m_TargetPartition, 0, m_SkipBuffer, UM_ENCRYPTED_BLOCK_SIZE) != ESP_OK)
         {
             Abort(UPDATE_ERROR::ERROR_WRITE);
             return false;
@@ -215,7 +229,7 @@ bool ESPUpdateManager::End()
         }
 
         // Set this partition as the boot partition for next restart
-        if(esp_ota_set_boot_partition(m_TargetPartition) != ESP_OK)
+        if (esp_ota_set_boot_partition(m_TargetPartition) != ESP_OK)
         {
             Abort(UPDATE_ERROR::ERROR_ACTIVATE);
             return false;
@@ -228,20 +242,20 @@ bool ESPUpdateManager::End()
     return true;
 }
 
-void ESPUpdateManager::Abort()
+void ESP32UpdateManager::Abort()
 {
     // Public abort method with default reason
     Abort(UPDATE_ERROR::ABORT);
 }
 
-void NSPrettyOTA::ESPUpdateManager::Abort(UPDATE_ERROR reason)
+void ESP32UpdateManager::Abort(UPDATE_ERROR reason)
 {
     // Reset state and set error code
     ResetState();
     m_LastError = reason;
 }
 
-bool NSPrettyOTA::ESPUpdateManager::WriteBufferToFlash()
+bool ESP32UpdateManager::WriteBufferToFlash()
 {
     uint8_t skipSize = 0;
 
@@ -308,7 +322,7 @@ bool NSPrettyOTA::ESPUpdateManager::WriteBufferToFlash()
     }
 
     // Restore magic byte in buffer for correct MD5 calculation
-    if((m_UpdateProgress == 0) && (m_UpdateMode == UPDATE_MODE::FIRMWARE))
+    if (m_UpdateProgress == 0 && m_UpdateMode == UPDATE_MODE::FIRMWARE)
         m_Buffer[0] = ESP_IMAGE_HEADER_MAGIC;
 
     // Update MD5 hash with the data
@@ -321,14 +335,19 @@ bool NSPrettyOTA::ESPUpdateManager::WriteBufferToFlash()
     return true;
 }
 
-uint64_t ESPUpdateManager::Write(const uint8_t* const data, uint64_t size)
+uint64_t ESP32UpdateManager::Write(const uint8_t* const data, uint64_t size)
 {
+    // Validate input parameters
+    if (!data || size == 0)
+        return 0;
+
     // Cannot write if there are errors or update hasn't started
-    if(HasError() || m_UpdateSize == 0)
+    if (HasError() || m_UpdateSize == 0 || !m_Buffer)
         return 0;
 
     // Check if there's enough space left in the partition
-    if(size > (m_UpdateSize - m_UpdateProgress))
+    const uint64_t remainingSpace = m_UpdateSize - m_UpdateProgress;
+    if(size > remainingSpace)
     {
         Abort(UPDATE_ERROR::ERROR_NO_SPACE);
         return 0;
@@ -366,60 +385,62 @@ uint64_t ESPUpdateManager::Write(const uint8_t* const data, uint64_t size)
     return size;
 }
 
-bool ESPUpdateManager::IsRollbackPossible() const
+bool ESP32UpdateManager::IsRollbackPossible() const
 {
     // Cannot rollback during an active update
-    if(m_Buffer)
+    if (m_Buffer)
         return false;
 
     // Check if the alternate OTA partition contains valid firmware
     const esp_partition_t* const partition = esp_ota_get_next_update_partition(nullptr);
 
-    return IsPartitionBootable(partition);
+    return partition && IsPartitionBootable(partition);
 }
 
-bool ESPUpdateManager::DoRollback()
+bool ESP32UpdateManager::DoRollback()
 {
     // Cannot rollback during an active update
-    if(m_Buffer)
+    if (m_Buffer)
         return false;
 
     // Get the alternate OTA partition
     const esp_partition_t* const partition = esp_ota_get_next_update_partition(nullptr);
+    if (!partition)
+        return false;
 
     // Verify it contains valid firmware
-    if(!IsPartitionBootable(partition))
+    if (!IsPartitionBootable(partition))
         return false;
 
     // Set it as the boot partition for next restart
-    if(esp_ota_set_boot_partition(partition) != ESP_OK)
+    if (esp_ota_set_boot_partition(partition) != ESP_OK)
         return false;
 
     return true;
 }
 
-std::string NSPrettyOTA::ESPUpdateManager::GetLastErrorAsString() const
+std::string ESP32UpdateManager::GetLastErrorAsString() const
 {
     // Convert error codes to human-readable messages
-    switch(m_LastError)
+    switch (m_LastError)
     {
         case UPDATE_ERROR::OK:
             return "No error";
 
         case UPDATE_ERROR::ABORT:
-            return "Aborted";
+            return "Update aborted";
 
         case UPDATE_ERROR::ERROR_OUT_OF_MEMORY:
             return "ERROR_OUT_OF_MEMORY: No available RAM for allocation";
 
         case UPDATE_ERROR::ERROR_NO_PARTITION:
-            return "ERROR_NO_PARTITION: Partition could not be found";
+            return "ERROR_NO_PARTITION: Partition could not be found or is invalid";
 
         case UPDATE_ERROR::ERROR_NO_SPACE:
             return "ERROR_NO_SPACE: Not enough free space on partition";
 
         case UPDATE_ERROR::ERROR_INVALID_HASH:
-            return "ERROR_INVALID_HASH: Invalid MD5 hash";
+            return "ERROR_INVALID_HASH: Invalid MD5 hash format";
 
         case UPDATE_ERROR::ERROR_HASH_MISMATCH:
             return "ERROR_HASH_MISMATCH: The firmware hash does not match the expected hash";
@@ -437,7 +458,7 @@ std::string NSPrettyOTA::ESPUpdateManager::GetLastErrorAsString() const
             return "ERROR_ACTIVATE: Could not activate target partition for booting";
 
         case UPDATE_ERROR::ERROR_MAGIC_BYTE:
-            return "ERROR_MAGIC_BYTE: Magic byte is invalid";
+            return "ERROR_MAGIC_BYTE: Invalid firmware header";
 
         default:
             return "Unknown error";
