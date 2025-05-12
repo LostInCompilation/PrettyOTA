@@ -83,7 +83,7 @@ Description:
 // PrettyOTA internal includes
 #include "CustomTypes.h"
 #include "MD5Hasher.h"
-#include "ESPUpdateManager.h"
+#include "ESP32UpdateManager.h"
 
 #if (DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
     #include "FirmwarePullManager.h"
@@ -161,7 +161,7 @@ private:
     // Core components
     static Stream*      m_SerialMonitorStream;  // Stream for logging
     AsyncWebServer*     m_Server = nullptr;     // Web server instance
-    NSPrettyOTA::ESPUpdateManager m_UpdateManager;  // Manages ESP32 updates
+    NSPrettyOTA::ESP32UpdateManager m_UpdateManager;  // Manages ESP32 updates
 
 #if (DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING == 1)
     NSPrettyOTA::FirmwarePullManager m_FirmwarePullManager;  // Manages firmware pulling
