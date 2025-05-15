@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <script type="module" crossorigin>
         // ******************************************************
         // MD5 hashing
@@ -86,22 +85,66 @@
         })();
 
         // Query info about PrettyOTA (version, URLs)
-        async function queryPrettyOTAInfo() {
-            let xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    let jsonObj = JSON.parse(this.responseText);
-                    //document.getElementById("versionString").innerText = jsonObj.prettyotaVersion;
+        async function queryPrettyOTAInfo(maxRetries = 5, delayMs = 1000, timeoutMs = 5000) {
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+                    const response = await fetch("/prettyota/queryPrettyOTAInfo", {signal: controller.signal});
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok)
+                        throw new Error(`Could not get PrettyOTA info. Status: ${response.status} ${response.statusText}`);
+
+                    const jsonObj = await response.json();
+
+                    // Validate response structure
+                    if (!jsonObj?.prettyotaVersion || !jsonObj?.mainURL || !jsonObj?.loginURL)
+                        throw new Error("Invalid JSON structure from PrettyOTA info query.");
+
                     localStorage.setItem("version_string", jsonObj.prettyotaVersion);
                     localStorage.setItem("main_url", jsonObj.mainURL);
                     localStorage.setItem("login_url", jsonObj.loginURL);
+                    return;
+                } catch (error) {
+                    console.warn(error.message);
+                    if (attempt >= maxRetries) {
+                        console.error("All retry attempts to get PrettyOTA info failed.");
+                        return;
+                    }
+
+                    // Wait before retry
+                    await new Promise(resolve => setTimeout(resolve, delayMs)); // Wait before retry
                 }
-            };
-            xhr.open("GET", "/prettyota/queryPrettyOTAInfo");
-            xhr.send();
+            }
         }
 
-        // ******************************************************
+        // On page load
+        function onLoad() {
+            // Setup background rendering
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            createNodes();
+            requestAnimationFrame(animate);
+
+            // Set default values if not set
+            if (!("version_string" in localStorage))
+                localStorage.setItem("version_string", "1.0.0");
+            if (!("main_url" in localStorage))
+                localStorage.setItem("main_url", "/update");
+            if (!("login_url" in localStorage))
+                localStorage.setItem("login_url", "/login");
+
+            //document.getElementById("versionString").innerText = localStorage.getItem("version_string");
+
+            queryPrettyOTAInfo();
+        }
+
+        // Publish functions
+        window.onload = onLoad;
+
+        // *********************************************************************
         // Background rendering
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
@@ -226,13 +269,13 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 // Draw nodes (with glow using shadow)
-                ctx.shadowBlur = 5;
+                ctx.shadowBlur = 7;
                 ctx.shadowColor = 'rgba(255, 255, 255, 1.0)';
                 nodes.forEach(node => {
                     node.update(canvas.width, canvas.height);
                     node.draw();
                 });
-                ctx.shadowBlur = 0; // Disable
+                ctx.shadowBlur = 0;
 
                 // Draw edges (lines)
                 const baseMaxDist = calculateMaxDistance(canvas.width, canvas.height);
@@ -267,35 +310,17 @@
             }
         }
 
-        // On page load
-        function onLoad() {
-            // Setup background rendering
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            createNodes();
-            requestAnimationFrame(animate);
-
-            // Set default values if not set
-            if (!("version_string" in localStorage))
-                localStorage.setItem("version_string", "1.0.0");
-            if (!("main_url" in localStorage))
-                localStorage.setItem("main_url", "/update");
-            if (!("login_url" in localStorage))
-                localStorage.setItem("login_url", "/login");
-
-            //document.getElementById("versionString").innerText = localStorage.getItem("version_string");
-
-            queryPrettyOTAInfo();
-        }
-
         // Add resize event
         window.addEventListener("resize", resizeCanvas);
-
-        // Publish functions
-        window.onload = onLoad;
     </script>
 
     <style>
+        * {
+            /* margin: 0; */
+            /* padding: 0; */
+            /* box-sizing: border-box; */
+            font-family: 'Helvetica Neue';
+        }
         body {
             background: radial-gradient(circle at center, hsl(224, 57%, 9%), #000);
             height: 100vh;
@@ -303,7 +328,7 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            color: #fff;
+            color: #000;
         }
         canvas {
             position: absolute;
@@ -313,10 +338,113 @@
             z-index: -1;
         }
 
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 400px;
+            /* min-width: 280px; */
+            margin: 20px;
+            background-color: rgba(25, 25, 28, 0.65);
+            border-radius: 20px;
+            backdrop-filter: blur(9px);
+            -webkit-backdrop-filter: blur(9px);
+            padding: 25px 40px 25px 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            animation: fadeInZoomIn 0.5s cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
+            gap: 20px;
+        }
+
+
+        .icon-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 84px;
+            height: 105px;
+            animation: fadeInZoomIn 1.2s ease-in-out forwards;
+            will-change: transform, opacity;
+        }
+        .icon-container svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+        .icon-text {
+            font-size: 2.8rem;
+            font-weight: 600;
+            fill: white;
+            text-anchor: middle;
+            animation: slideUp 1.2s ease-in-out forwards;
+            will-change: transform, opacity;
+        }
+
+        .lock-path {
+            opacity: 0;
+            fill: none;
+            stroke-width: 6.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            animation: fadeIn 0.7s ease-in-out 0.2s forwards,
+                       drawPath 2.8s cubic-bezier(0.2, 0.8, 0.2, 0.94) 0.3s forwards;
+            will-change: stroke-dashoffset, opacity;
+        }
+        #lock-group path:first-child {
+            stroke-dasharray: 150;
+            stroke-dashoffset: 150;
+        }
+        #lock-group path:nth-child(2) {
+            stroke-dasharray: 220;
+            stroke-dashoffset: 220;
+        }
+
+
+
+
+
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeInZoomIn {
+            from { opacity: 0; transform: scale(.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes drawPath {
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(20px); }
+        }
     </style>
 </head>
 
 <body>
     <canvas id="canvas"></canvas>
+
+    <div class="card">
+
+        <div class="icon-container">
+            <svg viewBox="0 0 100 190">
+                <g id="lock-group">
+                    <path class="lock-path" stroke="url(#lock-gradient)" d="M30 75V55a20 20 0 0140 0v20" />
+                    <path class="lock-path" stroke="url(#lock-gradient)" d="M30 75h40a10 10 0 0110 10v25a10 10 0 01-10 10H30a10 10 0 01-10-10V85a10 10 0 0110-10z" />
+                </g>
+                <text class="icon-text" x="50" y="185">Authenticate</text>
+                <defs>
+                    <lineargradient id="lock-gradient" x1="20" y1="40" x2="80" y2="55"
+                        gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#009CFF" />
+                        <stop offset="1" stop-color="#6257FF" />
+                    </lineargradient>
+                </defs>
+            </svg>
+        </div>
+
+
+    </div>
 </body>
 </html>
