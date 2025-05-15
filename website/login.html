@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
     <script type="module" crossorigin>
-        // ******************************************************
+        // *********************************************************************
         // MD5 hashing
         const md5 = (function() {
             var MD5 = function (d) {
@@ -83,12 +83,15 @@
             return MD5Unicode;
         })();
 
-        // ******************************************************
+        // *********************************************************************
         // Login form
         document.getElementById("loginForm").addEventListener("submit", function (e) {
             e.preventDefault();
 
             document.getElementById("loginButton").disabled = true;
+
+            // Show notifications
+            showNotification("Error", "Wrong username or password", 6000);
 
             // Trigger shake animation for lock
             document.getElementById("lockGroup").classList.add("shake");
@@ -104,12 +107,42 @@
             document.getElementById("loginButton").disabled = false;
         });
 
-        // Add event listeners to remove red border on click
-        document.querySelectorAll(".form-input").forEach(input => {
-            input.addEventListener("click", function() {
-                this.classList.remove("wrong-credential");
-            });
-        });
+        // *********************************************************************
+        // Notification popup
+        let notificationTimeout = null;
+        function showNotification(title, message, timeoutMs = 5000) {
+            const notification = document.querySelector("#notification");
+
+            // Update content
+            notification.querySelector(".notification-title").textContent = title;
+            notification.querySelector("#notificationMessage").textContent = message;
+
+            // Clear existing timeout if notification is already visible
+            if (notificationTimeout)
+                clearTimeout(notificationTimeout);
+
+            // Show notification
+            notification.classList.add("show");
+
+            // Set new timeout for auto-hide
+            notificationTimeout = setTimeout(() => {
+                hideNotification();
+            }, timeoutMs);
+        }
+
+        function hideNotification() {
+            // Clear timeout if it exists
+            if (notificationTimeout) {
+                clearTimeout(notificationTimeout);
+                notificationTimeout = null;
+            }
+
+            // Hide notification
+            document.querySelector("#notification").classList.remove("show");
+        }
+
+        // Attach click event to close button
+        document.querySelector(".notification-close").addEventListener("click", hideNotification);
 
         // Query info about PrettyOTA (version, URLs)
         async function queryPrettyOTAInfo(maxRetries = 5, delayMs = 1000, timeoutMs = 5000) {
@@ -166,6 +199,13 @@
             //document.getElementById("versionString").innerText = localStorage.getItem("version_string");
 
             queryPrettyOTAInfo();
+
+            // Add event listeners to remove red border on click
+            document.querySelectorAll(".form-input").forEach(input => {
+                input.addEventListener("focus", function() {
+                    this.classList.remove("wrong-credential");
+                });
+            });
         }
 
         // Publish functions
@@ -368,7 +408,7 @@
             flex-direction: column;
             align-items: center;
             width: 390px;
-            /* min-width: 280px; */
+            min-width: 330px;
             background-color: rgba(25, 25, 28, 0.65);
             border-radius: 20px;
             backdrop-filter: blur(10px);
@@ -378,6 +418,14 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             animation: fadeInZoomIn 0.5s cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
             gap: 20px;
+        }
+        .card-footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: default;
         }
 
         /* Lock icon */
@@ -389,7 +437,6 @@
             height: 105px;
             margin-bottom: 25px;
             animation: fadeInZoomIn 1.2s ease-in-out forwards;
-            will-change: transform, opacity;
         }
         .icon-container svg {
             width: 100%;
@@ -401,8 +448,8 @@
             font-weight: 600;
             fill: white;
             text-anchor: middle;
+            cursor: default;
             animation: slideUp 1.2s ease-in-out forwards;
-            will-change: transform, opacity;
         }
         .lock-path {
             opacity: 0;
@@ -420,13 +467,16 @@
             stroke-dasharray: 220;
             stroke-dashoffset: 220;
         }
+        #lockGroup.shake {
+            animation: shake 0.35s ease-in-out;
+            transform-origin: center;
+        }
 
         /* Form */
         .login-form {
             display: flex;
             flex-direction: column;
             width: 100%;
-            /* margin-bottom: 20px; */
         }
         .form-group {
             display: flex;
@@ -439,8 +489,6 @@
             font-size: 14px;
             color: rgba(255, 255, 255, 0.6);
             font-weight: 500;
-            user-select: none;
-            -webkit-user-select: none;
         }
         .form-input {
             width: 100%;
@@ -456,7 +504,7 @@
         .form-input:focus {
             border-color: rgba(64, 156, 255, 0.8);
             box-shadow: 0 0 0 2px rgba(64, 156, 255, 0.25);
-            /* background: rgba(35, 35, 35, 0.8); */
+            background: rgba(35, 35, 35, 0.8);
         }
         .form-input.wrong-credential {
             border-color: rgb(255, 0, 70);
@@ -505,12 +553,76 @@
             opacity: 0;
         }
 
-        .footer {
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 330px;
+            max-width: 390px;
+            min-height: 65px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 14px 20px 14px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            z-index: 10;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 500;
             display: flex;
+            align-items: center;
+            gap: 15px;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.42, 0, 0.58, 1);
+        }
+        .notification.show {
+            top: 20px;
+            opacity: 1;
+            transition: all 0.45s cubic-bezier(0.42, 0, 0.58, 1);
+        }
+        .notification-icon {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            min-height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 75, 75, 0.8);
+            display: flex;
+            align-items: center;
             justify-content: center;
-            margin-top: 20px;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.4);
+            font-size: 17px;
+            font-weight: 800;
+            cursor: default;
+        }
+        .notification-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .notification-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.02em;
+            color: hsl(0, 0%, 100%);
+        }
+        .notification-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0px;
+            margin-left: 10px;
+        }
+
+        /* Helper classes */
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         /* Animations */
@@ -530,32 +642,29 @@
             to { opacity: 1; transform: translateY(20px); }
         }
 
-         /* Shake animation for lock icon */
-         @keyframes shake {
+        /* Shake animation for lock icon */
+        @keyframes shake {
             0% { transform: translateX(0); }
             25% { transform: translateX(-8px); }
             50% { transform: translateX(8px); }
             75% { transform: translateX(-8px); }
             100% { transform: translateX(0); }
         }
-        .shake {
-            animation: shake 0.35s ease-in-out;
-            transform-origin: center;
-        }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
 
+    <!-- Card -->
     <div class="card">
-
+        <!-- Lock icon -->
         <div class="icon-container">
             <svg viewBox="0 0 100 190">
                 <g id="lockGroup">
                     <path class="lock-path" stroke="url(#lockGradient)" d="M30 75V55a20 20 0 0140 0v20" />
                     <path class="lock-path" stroke="url(#lockGradient)" d="M30 75h40a10 10 0 0110 10v25a10 10 0 01-10 10H30a10 10 0 01-10-10V85a10 10 0 0110-10z" />
                 </g>
-                <text class="icon-text" x="50" y="185">Authenticate</text>
+                <text class="icon-text no-select" x="50" y="185">Authenticate</text>
                 <defs>
                     <lineargradient id="lockGradient" x1="20" y1="30" x2="80" y2="55"
                         gradientUnits="userSpaceOnUse">
@@ -566,14 +675,15 @@
             </svg>
         </div>
 
+        <!-- Login form -->
         <form id="loginForm" class="login-form">
             <div class="form-group">
-                <label for="username" class="form-label">Username</label>
+                <label for="username" class="form-label no-select">Username</label>
                 <input type="text" id="username" class="form-input" placeholder="Enter your username">
             </div>
 
             <div class="form-group">
-                <label for="password" class="form-label">Password</label>
+                <label for="password" class="form-label no-select">Password</label>
                 <input type="password" id="password" class="form-input" placeholder="Enter your password">
             </div>
 
@@ -582,9 +692,20 @@
             <!-- <div class="loader" id="loader"></div> -->
         </form>
 
-        <div class="footer">
+        <!-- Card footer -->
+        <div class="card-footer no-select">
             PrettyOTA - Administrator page
         </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification" role="alert">
+        <div class="notification-icon no-select">!</div>
+        <div class="notification-content">
+            <span class="notification-title"></span>
+            <span id="notificationMessage"></span>
+        </div>
+        <button class="notification-close no-select">&times;</button>
     </div>
 </body>
 </html>
