@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -83,6 +82,34 @@
             }
             return MD5Unicode;
         })();
+
+        // ******************************************************
+        // Login form
+        document.getElementById("loginForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            document.getElementById("loginButton").disabled = true;
+
+            // Trigger shake animation for lock
+            document.getElementById("lockGroup").classList.add("shake");
+            // Remove shake class after animation completes to allow re-triggering
+            setTimeout(() => {
+                document.getElementById("lockGroup").classList.remove("shake");
+            }, 350);
+
+            // Red border on input fields
+            document.getElementById("username").classList.add("wrong-credential");
+            document.getElementById("password").classList.add("wrong-credential");
+
+            document.getElementById("loginButton").disabled = false;
+        });
+
+        // Add event listeners to remove red border on click
+        document.querySelectorAll(".form-input").forEach(input => {
+            input.addEventListener("click", function() {
+                this.classList.remove("wrong-credential");
+            });
+        });
 
         // Query info about PrettyOTA (version, URLs)
         async function queryPrettyOTAInfo(maxRetries = 5, delayMs = 1000, timeoutMs = 5000) {
@@ -316,9 +343,7 @@
 
     <style>
         * {
-            /* margin: 0; */
-            /* padding: 0; */
-            /* box-sizing: border-box; */
+            box-sizing: border-box;
             font-family: 'Helvetica Neue';
         }
         body {
@@ -342,27 +367,27 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 400px;
+            width: 390px;
             /* min-width: 280px; */
-            margin: 20px;
             background-color: rgba(25, 25, 28, 0.65);
             border-radius: 20px;
-            backdrop-filter: blur(9px);
-            -webkit-backdrop-filter: blur(9px);
-            padding: 25px 40px 25px 40px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 30px 40px 25px 40px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.08);
             animation: fadeInZoomIn 0.5s cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
             gap: 20px;
         }
 
-
+        /* Lock icon */
         .icon-container {
             display: flex;
             justify-content: center;
             align-items: center;
             width: 84px;
             height: 105px;
+            margin-bottom: 25px;
             animation: fadeInZoomIn 1.2s ease-in-out forwards;
             will-change: transform, opacity;
         }
@@ -379,31 +404,116 @@
             animation: slideUp 1.2s ease-in-out forwards;
             will-change: transform, opacity;
         }
-
         .lock-path {
             opacity: 0;
             fill: none;
             stroke-width: 6.5;
             stroke-linecap: round;
             stroke-linejoin: round;
+            stroke-dasharray: 150;
+            stroke-dashoffset: 150;
             animation: fadeIn 0.7s ease-in-out 0.2s forwards,
                        drawPath 2.8s cubic-bezier(0.2, 0.8, 0.2, 0.94) 0.3s forwards;
             will-change: stroke-dashoffset, opacity;
         }
-        #lock-group path:first-child {
-            stroke-dasharray: 150;
-            stroke-dashoffset: 150;
-        }
-        #lock-group path:nth-child(2) {
+        .lock-path:nth-child(2) {
             stroke-dasharray: 220;
             stroke-dashoffset: 220;
         }
 
+        /* Form */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            /* margin-bottom: 20px; */
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .form-label {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .form-input {
+            width: 100%;
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            border-color: rgba(64, 156, 255, 0.8);
+            box-shadow: 0 0 0 2px rgba(64, 156, 255, 0.25);
+            /* background: rgba(35, 35, 35, 0.8); */
+        }
+        .form-input.wrong-credential {
+            border-color: rgb(255, 0, 70);
+        }
 
+        /* Login button */
+        .login-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            background: linear-gradient(135deg, hsla(211, 100%, 63%, 0.9), hsla(244, 100%, 67%, 0.9));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .login-button::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, hsl(207, 100%, 64%), hsl(244, 100%, 70%));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .login-button:hover {
+            transform: scale(1.01);
+            box-shadow: 0 0 20px rgba(64, 156, 255, 0.4);
+        }
+        .login-button:hover::before {
+            opacity: 1;
+        }
+        .login-button:active {
+            transform: scale(0.98);
+        }
+        .login-button:active::before {
+            opacity: 0;
+        }
 
+        .footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+        }
 
-
-
+        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -419,9 +529,21 @@
             from { opacity: 0; transform: translateY(40px); }
             to { opacity: 1; transform: translateY(20px); }
         }
+
+         /* Shake animation for lock icon */
+         @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            50% { transform: translateX(8px); }
+            75% { transform: translateX(-8px); }
+            100% { transform: translateX(0); }
+        }
+        .shake {
+            animation: shake 0.35s ease-in-out;
+            transform-origin: center;
+        }
     </style>
 </head>
-
 <body>
     <canvas id="canvas"></canvas>
 
@@ -429,13 +551,13 @@
 
         <div class="icon-container">
             <svg viewBox="0 0 100 190">
-                <g id="lock-group">
-                    <path class="lock-path" stroke="url(#lock-gradient)" d="M30 75V55a20 20 0 0140 0v20" />
-                    <path class="lock-path" stroke="url(#lock-gradient)" d="M30 75h40a10 10 0 0110 10v25a10 10 0 01-10 10H30a10 10 0 01-10-10V85a10 10 0 0110-10z" />
+                <g id="lockGroup">
+                    <path class="lock-path" stroke="url(#lockGradient)" d="M30 75V55a20 20 0 0140 0v20" />
+                    <path class="lock-path" stroke="url(#lockGradient)" d="M30 75h40a10 10 0 0110 10v25a10 10 0 01-10 10H30a10 10 0 01-10-10V85a10 10 0 0110-10z" />
                 </g>
                 <text class="icon-text" x="50" y="185">Authenticate</text>
                 <defs>
-                    <lineargradient id="lock-gradient" x1="20" y1="40" x2="80" y2="55"
+                    <lineargradient id="lockGradient" x1="20" y1="30" x2="80" y2="55"
                         gradientUnits="userSpaceOnUse">
                         <stop offset="0" stop-color="#009CFF" />
                         <stop offset="1" stop-color="#6257FF" />
@@ -444,7 +566,25 @@
             </svg>
         </div>
 
+        <form id="loginForm" class="login-form">
+            <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" id="username" class="form-input" placeholder="Enter your username">
+            </div>
 
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" class="form-input" placeholder="Enter your password">
+            </div>
+
+            <button type="submit" class="login-button" id="loginButton">Log In</button>
+
+            <!-- <div class="loader" id="loader"></div> -->
+        </form>
+
+        <div class="footer">
+            PrettyOTA - Administrator page
+        </div>
     </div>
 </body>
 </html>
