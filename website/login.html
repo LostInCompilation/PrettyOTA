@@ -6,84 +6,6 @@
     <title>Admin Login</title>
     <script type="module" crossorigin>
         // *********************************************************************
-        // MD5 hashing
-        const md5 = (function() {
-            var MD5 = function (d) {
-                return M(V(Y(X(d), 8 * d.length)))
-            }
-            function M (d) {
-                for (var _, m = '0123456789abcdef', f = '', r = 0; r < d.length; r++) {
-                    _ = d.charCodeAt(r)
-                    f += m.charAt(_ >>> 4 & 15) + m.charAt(15 & _)
-                }
-                return f
-            }
-            function X (d) {
-                for (var _ = Array(d.length >> 2), m = 0; m < _.length; m++) {
-                    _[m] = 0
-                }
-                for (m = 0; m < 8 * d.length; m += 8) {
-                    _[m >> 5] |= (255 & d.charCodeAt(m / 8)) << m % 32
-                }
-                return _
-            }
-            function V (d) {
-                for (var _ = '', m = 0; m < 32 * d.length; m += 8) _ += String.fromCharCode(d[m >> 5] >>> m % 32 & 255)
-                return _
-            }
-            function Y (d, _) {
-                d[_ >> 5] |= 128 << _ % 32
-                d[14 + (_ + 64 >>> 9 << 4)] = _
-                for (var m = 1732584193, f = -271733879, r = -1732584194, i = 271733878, n = 0; n < d.length; n += 16) {
-                    var h = m
-                    var t = f
-                    var g = r
-                    var e = i
-                    f = md5ii(f = md5ii(f = md5ii(f = md5ii(f = md5hh(f = md5hh(f = md5hh(f = md5hh(f = md5gg(f = md5gg(f = md5gg(f = md5gg(f = md5ff(f = md5ff(f = md5ff(f = md5ff(f, r = md5ff(r, i = md5ff(i, m = md5ff(m, f, r, i, d[n + 0], 7, -680876936), f, r, d[n + 1], 12, -389564586), m, f, d[n + 2], 17, 606105819), i, m, d[n + 3], 22, -1044525330), r = md5ff(r, i = md5ff(i, m = md5ff(m, f, r, i, d[n + 4], 7, -176418897), f, r, d[n + 5], 12, 1200080426), m, f, d[n + 6], 17, -1473231341), i, m, d[n + 7], 22, -45705983), r = md5ff(r, i = md5ff(i, m = md5ff(m, f, r, i, d[n + 8], 7, 1770035416), f, r, d[n + 9], 12, -1958414417), m, f, d[n + 10], 17, -42063), i, m, d[n + 11], 22, -1990404162), r = md5ff(r, i = md5ff(i, m = md5ff(m, f, r, i, d[n + 12], 7, 1804603682), f, r, d[n + 13], 12, -40341101), m, f, d[n + 14], 17, -1502002290), i, m, d[n + 15], 22, 1236535329), r = md5gg(r, i = md5gg(i, m = md5gg(m, f, r, i, d[n + 1], 5, -165796510), f, r, d[n + 6], 9, -1069501632), m, f, d[n + 11], 14, 643717713), i, m, d[n + 0], 20, -373897302), r = md5gg(r, i = md5gg(i, m = md5gg(m, f, r, i, d[n + 5], 5, -701558691), f, r, d[n + 10], 9, 38016083), m, f, d[n + 15], 14, -660478335), i, m, d[n + 4], 20, -405537848), r = md5gg(r, i = md5gg(i, m = md5gg(m, f, r, i, d[n + 9], 5, 568446438), f, r, d[n + 14], 9, -1019803690), m, f, d[n + 3], 14, -187363961), i, m, d[n + 8], 20, 1163531501), r = md5gg(r, i = md5gg(i, m = md5gg(m, f, r, i, d[n + 13], 5, -1444681467), f, r, d[n + 2], 9, -51403784), m, f, d[n + 7], 14, 1735328473), i, m, d[n + 12], 20, -1926607734), r = md5hh(r, i = md5hh(i, m = md5hh(m, f, r, i, d[n + 5], 4, -378558), f, r, d[n + 8], 11, -2022574463), m, f, d[n + 11], 16, 1839030562), i, m, d[n + 14], 23, -35309556), r = md5hh(r, i = md5hh(i, m = md5hh(m, f, r, i, d[n + 1], 4, -1530992060), f, r, d[n + 4], 11, 1272893353), m, f, d[n + 7], 16, -155497632), i, m, d[n + 10], 23, -1094730640), r = md5hh(r, i = md5hh(i, m = md5hh(m, f, r, i, d[n + 13], 4, 681279174), f, r, d[n + 0], 11, -358537222), m, f, d[n + 3], 16, -722521979), i, m, d[n + 6], 23, 76029189), r = md5hh(r, i = md5hh(i, m = md5hh(m, f, r, i, d[n + 9], 4, -640364487), f, r, d[n + 12], 11, -421815835), m, f, d[n + 15], 16, 530742520), i, m, d[n + 2], 23, -995338651), r = md5ii(r, i = md5ii(i, m = md5ii(m, f, r, i, d[n + 0], 6, -198630844), f, r, d[n + 7], 10, 1126891415), m, f, d[n + 14], 15, -1416354905), i, m, d[n + 5], 21, -57434055), r = md5ii(r, i = md5ii(i, m = md5ii(m, f, r, i, d[n + 12], 6, 1700485571), f, r, d[n + 3], 10, -1894986606), m, f, d[n + 10], 15, -1051523), i, m, d[n + 1], 21, -2054922799), r = md5ii(r, i = md5ii(i, m = md5ii(m, f, r, i, d[n + 8], 6, 1873313359), f, r, d[n + 15], 10, -30611744), m, f, d[n + 6], 15, -1560198380), i, m, d[n + 13], 21, 1309151649), r = md5ii(r, i = md5ii(i, m = md5ii(m, f, r, i, d[n + 4], 6, -145523070), f, r, d[n + 11], 10, -1120210379), m, f, d[n + 2], 15, 718787259), i, m, d[n + 9], 21, -343485551)
-                    m = safeadd(m, h)
-                    f = safeadd(f, t)
-                    r = safeadd(r, g)
-                    i = safeadd(i, e)
-                }
-                return [m, f, r, i]
-            }
-            function md5cmn (d, _, m, f, r, i) {
-                return safeadd(bitrol(safeadd(safeadd(_, d), safeadd(f, i)), r), m)
-            }
-            function md5ff (d, _, m, f, r, i, n) {
-                return md5cmn(_ & m | ~_ & f, d, _, r, i, n)
-            }
-            function md5gg (d, _, m, f, r, i, n) {
-                return md5cmn(_ & f | m & ~f, d, _, r, i, n)
-            }
-            function md5hh (d, _, m, f, r, i, n) {
-                return md5cmn(_ ^ m ^ f, d, _, r, i, n)
-            }
-            function md5ii (d, _, m, f, r, i, n) {
-                return md5cmn(m ^ (_ | ~f), d, _, r, i, n)
-            }
-            function safeadd (d, _) {
-                var m = (65535 & d) + (65535 & _)
-                return (d >> 16) + (_ >> 16) + (m >> 16) << 16 | 65535 & m
-            }
-            function bitrol (d, _) {
-                return d << _ | d >>> 32 - _
-            }
-            function MD5Unicode(buffer){
-                if (!(buffer instanceof Uint8Array)) {
-                    buffer = new TextEncoder().encode(typeof buffer==='string' ? buffer : JSON.stringify(buffer));
-                }
-                var binary = [];
-                var bytes = new Uint8Array(buffer);
-                for (var i = 0, il = bytes.byteLength; i < il; i++) {
-                    binary.push(String.fromCharCode(bytes[i]));
-                }
-                return MD5(binary.join(''));
-            }
-            return MD5Unicode;
-        })();
-
-        // *********************************************************************
         // Login form
         document.getElementById("loginForm").addEventListener("submit", function (e) {
             e.preventDefault();
@@ -91,11 +13,10 @@
             document.getElementById("loginButton").disabled = true;
 
             // Show notifications
-            showNotification("Error", "Wrong username or password", 6000);
+            showNotification("Log in failed", "Wrong username or password", 7000);
 
             // Trigger shake animation for lock
             document.getElementById("lockGroup").classList.add("shake");
-            // Remove shake class after animation completes to allow re-triggering
             setTimeout(() => {
                 document.getElementById("lockGroup").classList.remove("shake");
             }, 350);
@@ -111,18 +32,16 @@
         // Notification popup
         let notificationTimeout = null;
         function showNotification(title, message, timeoutMs = 5000) {
-            const notification = document.querySelector("#notification");
-
             // Update content
-            notification.querySelector(".notification-title").textContent = title;
-            notification.querySelector("#notificationMessage").textContent = message;
+            document.getElementById("notificationTitle").textContent = title;
+            document.getElementById("notificationMessage").textContent = message;
 
             // Clear existing timeout if notification is already visible
             if (notificationTimeout)
                 clearTimeout(notificationTimeout);
 
             // Show notification
-            notification.classList.add("show");
+            document.getElementById("notification").classList.add("show");
 
             // Set new timeout for auto-hide
             notificationTimeout = setTimeout(() => {
@@ -138,12 +57,13 @@
             }
 
             // Hide notification
-            document.querySelector("#notification").classList.remove("show");
+            document.getElementById("notification").classList.remove("show");
         }
 
-        // Attach click event to close button
-        document.querySelector(".notification-close").addEventListener("click", hideNotification);
+        // Attach click event to notification close button
+        document.getElementById("notificationCloseButton").addEventListener("click", hideNotification);
 
+        // *********************************************************************
         // Query info about PrettyOTA (version, URLs)
         async function queryPrettyOTAInfo(maxRetries = 5, delayMs = 1000, timeoutMs = 5000) {
             for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -384,7 +304,9 @@
     <style>
         * {
             box-sizing: border-box;
-            font-family: 'Helvetica Neue';
+            /* font-family: 'Helvetica Neue'; */
+            /* font-family: 'Inter', sans-serif; */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         body {
             background: radial-gradient(circle at center, hsl(224, 57%, 9%), #000);
@@ -403,13 +325,14 @@
             z-index: -1;
         }
 
+        /* Card */
         .card {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 390px;
             min-width: 330px;
-            background-color: rgba(25, 25, 28, 0.65);
+            background-color: rgba(20, 20, 20, 0.65);
             border-radius: 20px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -437,6 +360,7 @@
             height: 105px;
             margin-bottom: 25px;
             animation: fadeInZoomIn 1.2s ease-in-out forwards;
+            will-change: stroke-dashoffset, opacity, transform;
         }
         .icon-container svg {
             width: 100%;
@@ -459,9 +383,8 @@
             stroke-linejoin: round;
             stroke-dasharray: 150;
             stroke-dashoffset: 150;
-            animation: fadeIn 0.7s ease-in-out 0.2s forwards,
-                       drawPath 2.8s cubic-bezier(0.2, 0.8, 0.2, 0.94) 0.3s forwards;
-            will-change: stroke-dashoffset, opacity;
+            animation: fadeIn 0.7s ease-in-out 0.0s forwards,
+                       drawPath 2.8s cubic-bezier(0.2, 0.8, 0.2, 0.94) 0.1s forwards;
         }
         .lock-path:nth-child(2) {
             stroke-dasharray: 220;
@@ -507,7 +430,7 @@
             background: rgba(35, 35, 35, 0.8);
         }
         .form-input.wrong-credential {
-            border-color: rgb(255, 0, 70);
+            border-color: #DC143C;
         }
 
         /* Login button */
@@ -528,7 +451,7 @@
             overflow: hidden;
             position: relative;
             z-index: 1;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
         }
         .login-button::before {
             content: '';
@@ -547,7 +470,7 @@
             opacity: 1;
         }
         .login-button:active {
-            transform: scale(0.98);
+            transform: scale(1);
         }
         .login-button:active::before {
             opacity: 0;
@@ -556,67 +479,100 @@
         /* Notification */
         .notification {
             position: fixed;
-            top: -100px;
+            top: -180px;
             left: 50%;
             transform: translateX(-50%);
-            min-width: 330px;
-            max-width: 390px;
-            min-height: 65px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            padding: 14px 20px 14px 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            width: fit-content;
+            min-width: 390px;
+            max-width: min(90vw, 480px);
+            background: rgba(32, 32, 32, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #e57373;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
             z-index: 10;
-            color: #fff;
-            font-size: 0.95rem;
-            font-weight: 500;
+            color: #f5f5f5;
             display: flex;
             align-items: center;
-            gap: 15px;
             opacity: 0;
-            transition: all 0.4s cubic-bezier(0.42, 0, 0.58, 1);
+            transition: top 0.5s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+            box-sizing: border-box;
+            overflow: hidden;
         }
         .notification.show {
             top: 20px;
             opacity: 1;
-            transition: all 0.45s cubic-bezier(0.42, 0, 0.58, 1);
         }
-        .notification-icon {
-            width: 24px;
-            height: 24px;
-            min-width: 24px;
-            min-height: 24px;
-            border-radius: 50%;
-            background: rgba(255, 75, 75, 0.8);
+        .notification-main-area {
+            display: flex;
+            align-items: center;
+            padding: 12px 10px;
+            flex-grow: 1;
+            gap: 14px;
+        }
+        .notification-icon-area {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 17px;
-            font-weight: 800;
-            cursor: default;
+        }
+        .notification-icon-area svg {
+            width: 100%;
+            height: 100%;
         }
         .notification-content {
+            flex: 1;
             display: flex;
             flex-direction: column;
             gap: 2px;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            padding-right: 10px;
+            letter-spacing: 0.02em;
         }
         .notification-title {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: #fff;
-            letter-spacing: 0.02em;
-            color: hsl(0, 0%, 100%);
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.3;
         }
-        .notification-close {
-            background: none;
+        .notification-message {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #dcdcdc;
+        }
+        .notification-separator {
+            width: 1px;
+            background-color: rgba(255, 255, 255, 0.12);
+            align-self: stretch;
+        }
+        .notification-ok-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 65px;
+            flex-shrink: 0;
+            padding: 15px 10px;
+            background-color: transparent;
             border: none;
-            color: #fff;
-            font-size: 1.2rem;
+            color: #c0c0c0;
+            font-size: 0.875rem;
+            font-weight: 600;
             cursor: pointer;
-            padding: 0px;
-            margin-left: 10px;
+            transition: background-color 0.25s ease, color 0.25s ease;
+            outline: none;
+            align-self: stretch;
+        }
+        .notification-ok-area:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+        .notification-ok-area:active {
+            background-color: rgba(255, 255, 255, 0.15);
         }
 
         /* Helper classes */
@@ -641,8 +597,6 @@
             from { opacity: 0; transform: translateY(40px); }
             to { opacity: 1; transform: translateY(20px); }
         }
-
-        /* Shake animation for lock icon */
         @keyframes shake {
             0% { transform: translateX(0); }
             25% { transform: translateX(-8px); }
@@ -653,6 +607,7 @@
     </style>
 </head>
 <body>
+    <!-- Background -->
     <canvas id="canvas"></canvas>
 
     <!-- Card -->
@@ -688,8 +643,6 @@
             </div>
 
             <button type="submit" class="login-button" id="loginButton">Log In</button>
-
-            <!-- <div class="loader" id="loader"></div> -->
         </form>
 
         <!-- Card footer -->
@@ -700,12 +653,24 @@
 
     <!-- Notification -->
     <div id="notification" class="notification" role="alert">
-        <div class="notification-icon no-select">!</div>
-        <div class="notification-content">
-            <span class="notification-title"></span>
-            <span id="notificationMessage"></span>
+        <div class="notification-main-area">
+            <div class="notification-icon-area">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Circle outline -->
+                    <circle cx="12" cy="12" r="10" stroke="#e57373" stroke-width="2" fill="none"/>
+                    <!-- Exclamation mark body -->
+                    <rect x="11" y="6.5" width="2" height="7" rx="1" fill="#e57373"/>
+                    <!-- Exclamation mark dot -->
+                    <circle cx="12" cy="16.5" r="1.35" fill="#e57373"/>
+                </svg>
+            </div>
+            <div class="notification-content">
+                <span id="notificationTitle" class="notification-title"></span>
+                <span id="notificationMessage" class="notification-message"></span>
+            </div>
         </div>
-        <button class="notification-close no-select">&times;</button>
+        <div class="notification-separator"></div>
+        <button id="notificationCloseButton" class="notification-ok-area no-select">OK</button>
     </div>
 </body>
 </html>
