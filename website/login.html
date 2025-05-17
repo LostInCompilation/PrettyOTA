@@ -28,6 +28,10 @@
             document.getElementById("loginButton").disabled = false;
         });
 
+        // Add event listeners to remove red border around input fields on focus
+        document.getElementById("username").addEventListener("focus", function() {this.classList.remove("wrong-credential");});
+        document.getElementById("password").addEventListener("focus", function() {this.classList.remove("wrong-credential");});
+
         // *********************************************************************
         // Notification popup
         let notificationTimeout = null;
@@ -119,13 +123,6 @@
             //document.getElementById("versionString").innerText = localStorage.getItem("version_string");
 
             queryPrettyOTAInfo();
-
-            // Add event listeners to remove red border on click
-            document.querySelectorAll(".form-input").forEach(input => {
-                input.addEventListener("focus", function() {
-                    this.classList.remove("wrong-credential");
-                });
-            });
         }
 
         // Publish functions
@@ -513,8 +510,8 @@
             gap: 14px;
         }
         .notification-icon-area {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -530,7 +527,6 @@
             flex-direction: column;
             gap: 2px;
             overflow-wrap: break-word;
-            word-break: break-word;
             padding-right: 10px;
             letter-spacing: 0.02em;
         }
