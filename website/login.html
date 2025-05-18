@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A better looking OTA web updater." />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512px' height='512px' xmlns:v='https://vecta.io/nano'%3E%3Cpath d='M0 0h512v512H0V0z' fill='%23454545'/%3E%3Cpath d='M155.358 89.853l3.371-.022 3.702-.008 3.899-.02 12.826-.041 4.433-.012 20.87-.042 23.966-.077 18.589-.048 11.066-.036C292.726 89.32 320.276 95.427 346 120c11.511 11.857 19.348 26.184 24 42l.965 3.105c5.562 21.043 2.684 44.2-5.965 63.895l-1.305 3.02C353.52 253.952 333.683 272.57 311 281c-18.677 6.795-36.629 7.29-56.312 7.195l-6.927-.009-18.07-.049-18.503-.04L175 288l.008 1.852.147 44.672.071 21.603.056 18.836.035 9.967.023 11.146.033 3.313c-.029 7.064-.542 13.21-5.24 18.853-5.864 4.769-10.089 7.293-17.797 7.063-6.109-.797-10.049-3.552-13.773-8.367-3.032-4.304-3.689-7.59-3.71-12.825l-.022-3.726-.008-4.095-.02-4.307-.041-14.153-.012-4.876-.042-22.912-.077-26.427-.048-20.439-.036-12.201-.017-11.487-.02-4.204c-.077-8.341-.097-15.383 5.902-21.797 4.622-4.136 8.932-5.74 15.055-5.742l3.291-.016 3.581.012 3.796-.011 8.165-.008 12.956-.029 36.842-.077 20.356-.055 10.746-.017c23.798.055 43.383-.912 61.55-18.176 10.626-11.198 16.528-25.929 16.207-41.452-.849-16.206-6.779-30.028-17.957-41.919-13.741-11.13-27.272-15.31-44.812-15.271l-3.802-.016-8.137-.018-12.889-.041-32.003-.101-24.901-.083-12.79-.028-9.852-.042-3.543.014c-7.426-.066-14.612-.496-20.61-5.282-4.68-5.881-7.194-10.13-6.965-17.797.797-6.109 3.552-10.049 8.367-13.773 4.115-2.899 7.286-3.688 12.296-3.71z' fill='%232cb3a6'/%3E%3C/svg%3E" />
     <title>PrettyOTA Login</title>
     <script type="module" crossorigin>
         // *********************************************************************
@@ -10,7 +12,7 @@
         document.getElementById("loginForm").addEventListener("submit", function (e) {
             e.preventDefault();
 
-            document.getElementById("loginButton").disabled = true;
+            //document.getElementById("loginButton").disabled = true;
 
             // Show notifications
             showNotification("Log in failed", "Wrong username or password", 7000);
@@ -25,7 +27,7 @@
             document.getElementById("username").classList.add("wrong-credential");
             document.getElementById("password").classList.add("wrong-credential");
 
-            document.getElementById("loginButton").disabled = false;
+            //document.getElementById("loginButton").disabled = false;
         });
 
         // Add event listeners to remove red border around input fields on focus
@@ -183,8 +185,8 @@
             queryPrettyOTAInfo();
         }
 
-        // Publish functions
-        window.onload = onLoad;
+        // Add event listener for page load
+        window.addEventListener("load", onLoad);
 
         // *********************************************************************
         // Background rendering
@@ -351,6 +353,7 @@
         // Add resize event
         window.addEventListener("resize", resizeCanvas);
     </script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -615,6 +618,21 @@
         .login-button:active::before {
             opacity: 0;
         }
+        /* .login-button:disabled {
+            background: linear-gradient(135deg, hsla(0, 0%, 50%, 0.4), hsla(0, 0%, 40%, 0.4));
+            color: #a0a0a0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+        .login-button:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        .login-button:disabled:hover::before {
+            opacity: 0;
+        } */
 
         /* Notification */
         .notification {
@@ -689,7 +707,7 @@
             background-color: #383838;
             align-self: stretch;
         }
-        .notification-ok-area {
+        .notification-ok-button {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -706,11 +724,11 @@
             outline: none;
             align-self: stretch;
         }
-        .notification-ok-area:hover {
+        .notification-ok-button:hover {
             background-color: #333333;
             color: #ffffff;
         }
-        .notification-ok-area:active {
+        .notification-ok-button:active {
             background-color: #404040;
         }
 
@@ -767,8 +785,7 @@
                 </g>
                 <text class="icon-text no-select" x="50" y="185">Authenticate</text>
                 <defs>
-                    <lineargradient id="lockGradient" x1="20" y1="30" x2="80" y2="55"
-                        gradientUnits="userSpaceOnUse">
+                    <lineargradient id="lockGradient" x1="20" y1="30" x2="80" y2="55" gradientUnits="userSpaceOnUse">
                         <stop offset="0" stop-color="#009CFF" />
                         <stop offset="1" stop-color="#6257FF" />
                     </lineargradient>
@@ -782,7 +799,6 @@
                 <label for="username" class="form-label no-select">Username</label>
                 <input type="text" id="username" class="form-input" placeholder="Enter your username">
             </div>
-
             <div class="form-group">
                 <label for="password" class="form-label no-select">Password</label>
                 <input type="password" id="password" class="form-input" placeholder="Enter your password">
@@ -813,7 +829,7 @@
             </div>
         </div>
         <div class="notification-separator"></div>
-        <button id="notificationCloseButton" class="notification-ok-area no-select">OK</button>
+        <button id="notificationCloseButton" class="notification-ok-button no-select">OK</button>
     </div>
 </body>
 </html>
