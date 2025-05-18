@@ -9,25 +9,54 @@
     <script type="module" crossorigin>
         // *********************************************************************
         // Login form
-        document.getElementById("loginForm").addEventListener("submit", function (e) {
+        document.getElementById("loginForm").addEventListener("submit", async function (e) {
             e.preventDefault();
 
+            const loginURL = localStorage.getItem("login_url");
+            const body = JSON.stringify({
+                userId: document.getElementById("username").value,
+                //password: md5(document.getElementById("password").value)
+            });
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+                const response = await fetch(loginURL, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json; charset=UTF-8"},
+                    body: body,
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (response.ok) { // Success
+                    // Redirect to main URL
+                    const mainURL = localStorage.getItem("main_url");
+                    window.location.replace(mainURL);
+                }
+                else if (response.status === 401) { // Unauthorized
+                    showNotification("Log in failed", response.statusText, 7000);
+
+                    // Trigger shake animation for lock
+                    document.getElementById("lockGroup").classList.add("shake");
+                    setTimeout(() => {
+                        document.getElementById("lockGroup").classList.remove("shake");
+                    }, 350);
+
+                    // Red border on input fields
+                    document.getElementById("username").classList.add("wrong-credential");
+                    document.getElementById("password").classList.add("wrong-credential");
+                }
+                else { // Other error
+                    showNotification("Log in failed", response.status + " " + response.statusText, 7000);
+                }
+            }
+            catch (error) {
+                console.error(error);
+            }
+
             //document.getElementById("loginButton").disabled = true;
-
-            // Show notifications
-            showNotification("Log in failed", "Wrong username or password", 7000);
-
-            // Trigger shake animation for lock
-            document.getElementById("lockGroup").classList.add("shake");
-            setTimeout(() => {
-                document.getElementById("lockGroup").classList.remove("shake");
-            }, 350);
-
-            // Red border on input fields
-            document.getElementById("username").classList.add("wrong-credential");
-            document.getElementById("password").classList.add("wrong-credential");
-
-            //document.getElementById("loginButton").disabled = false;
         });
 
         // Add event listeners to remove red border around input fields on focus
@@ -105,7 +134,7 @@
         // *********************************************************************
         // General functions
         // Query PrettyOTA info
-        async function queryPrettyOTAInfo(maxRetries = 5, delayMs = 1000, timeoutMs = 5000) {
+        async function queryPrettyOTAInfo(maxRetries = 5, delayMs = 1000, timeoutMs = 4000) {
             for (let attempt = 1; attempt <= maxRetries; attempt++) {
                 try {
                     const controller = new AbortController();
@@ -127,7 +156,8 @@
                     localStorage.setItem("main_url", jsonObj.mainURL);
                     localStorage.setItem("login_url", jsonObj.loginURL);
                     return;
-                } catch (error) {
+                }
+                catch (error) {
                     console.warn(error.message);
                     if (attempt >= maxRetries) {
                         console.error("All retry attempts to get PrettyOTA info failed.");
