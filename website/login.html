@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
+    <title>PrettyOTA Login</title>
     <script type="module" crossorigin>
         // *********************************************************************
         // Login form
@@ -31,6 +31,38 @@
         // Add event listeners to remove red border around input fields on focus
         document.getElementById("username").addEventListener("focus", function() {this.classList.remove("wrong-credential");});
         document.getElementById("password").addEventListener("focus", function() {this.classList.remove("wrong-credential");});
+
+        // *********************************************************************
+        // Connection Status Indicator
+        let connectionStatus = false;
+        function setConnectionStatus(connected) {
+            // Only update if status has changed
+            if (connected === connectionStatus)
+                return;
+
+            connectionStatus = connected;
+
+            // Update status indicator
+            document.getElementById("connectionStatusIndicator").classList.remove("connected", "disconnected");
+            document.getElementById("connectionStatusIndicator").classList.add(connected ? "connected" : "disconnected");
+
+            // Update text content and tooltip text
+            if (connected) {
+                document.getElementById("connectionStatusText").textContent = "Connected";
+                document.getElementById("connectionTooltip").textContent = "Connected to server";
+            } else {
+                document.getElementById("connectionStatusText").textContent = "Offline";
+                document.getElementById("connectionTooltip").textContent = "Could not connect to server";
+            }
+        }
+
+        // Show/hide tooltip on hover
+        document.getElementById("connectionStatusIndicator").addEventListener("mouseenter", () => {
+            document.getElementById("connectionTooltip").classList.add("visible");
+        });
+        document.getElementById("connectionStatusIndicator").addEventListener("mouseleave", () => {
+            document.getElementById("connectionTooltip").classList.remove("visible");
+        });
 
         // *********************************************************************
         // Notification popup
@@ -68,7 +100,7 @@
         document.getElementById("notificationCloseButton").addEventListener("click", hideNotification);
 
         // *********************************************************************
-        // Query info about PrettyOTA (version, URLs)
+        // General functions
         async function queryPrettyOTAInfo(maxRetries = 5, delayMs = 1000, timeoutMs = 5000) {
             for (let attempt = 1; attempt <= maxRetries; attempt++) {
                 try {
@@ -120,8 +152,10 @@
             if (!("login_url" in localStorage))
                 localStorage.setItem("login_url", "/login");
 
-            //document.getElementById("versionString").innerText = localStorage.getItem("version_string");
+            // Set connection status to connected
+            setConnectionStatus(true);
 
+            // Query PrettyOTA info
             queryPrettyOTAInfo();
         }
 
@@ -193,7 +227,7 @@
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(170, 190, 255, 0.75)';
+                ctx.fillStyle = "rgba(170, 190, 255, 0.75)";
                 ctx.fill();
             }
         }
@@ -254,7 +288,7 @@
 
                 // Draw nodes (with glow using shadow)
                 ctx.shadowBlur = 7;
-                ctx.shadowColor = 'rgba(255, 255, 255, 1.0)';
+                ctx.shadowColor = "rgba(255, 255, 255, 1.0)";
                 nodes.forEach(node => {
                     node.update(canvas.width, canvas.height);
                     node.draw();
@@ -297,12 +331,9 @@
         // Add resize event
         window.addEventListener("resize", resizeCanvas);
     </script>
-
     <style>
         * {
             box-sizing: border-box;
-            /* font-family: 'Helvetica Neue'; */
-            /* font-family: 'Inter', sans-serif; */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         body {
@@ -312,7 +343,6 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            color: #000;
         }
         canvas {
             position: absolute;
@@ -329,13 +359,13 @@
             align-items: center;
             width: 390px;
             min-width: 330px;
-            background-color: rgba(20, 20, 20, 0.65);
+            background-color: #141414a6;
             border-radius: 20px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             padding: 30px 40px 25px 40px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px #0000004d;
+            border: 1px solid #282828;
             animation: fadeInZoomIn 0.5s cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
             gap: 20px;
         }
@@ -344,8 +374,101 @@
             justify-content: center;
             margin-top: 20px;
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.4);
+            color: #6f7073;
             cursor: default;
+        }
+
+        /* Connection status indicator */
+        .connection-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            gap: 7px;
+            cursor: default;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background-color: #202020;
+            border: 1px solid #383838;
+            transition: opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+            color: #dfdfdf;
+            opacity: 0.8;
+        }
+        .connection-indicator:hover {
+            opacity: 1;
+        }
+        .connection-indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .connection-indicator.connected {
+            border-color: rgba(63, 194, 68, 0.4);
+        }
+        .connection-indicator.connected .connection-indicator-dot {
+            background-color: #4CAF50;
+            box-shadow: 0 0 6px #4CAF50;
+        }
+        .connection-indicator.disconnected {
+            border-color: rgba(244, 67, 54, 0.4);
+        }
+        .connection-indicator.disconnected .connection-indicator-dot {
+            background-color: #F44336;
+            box-shadow: 0 0 6px #F44336;
+        }
+
+        /* Tooltip */
+        .indicator-tooltip {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(8px) scale(0.95);
+            transform-origin: top center;
+            background: #202020;
+            color: #ffffff;
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #383838;
+            box-shadow: 0 4px 12px #00000033;
+            white-space: nowrap;
+            opacity: 0;
+            z-index: 10;
+            pointer-events: none;
+            transition:
+                opacity 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                box-shadow 0.3s ease;
+        }
+        .indicator-tooltip.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1);
+            transition:
+                opacity 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                box-shadow 0.3s ease;
+        }
+        .indicator-tooltip::before,
+        .indicator-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+        }
+        .indicator-tooltip::before {
+            border: 7px solid transparent;
+            border-bottom-color: #383838;
+            margin-left: -7px;
+        }
+        .indicator-tooltip::after {
+            border: 6px solid transparent;
+            border-bottom-color: #202020;
+            margin-left: -6px;
+            margin-bottom: -1px;
         }
 
         /* Lock icon */
@@ -355,7 +478,7 @@
             align-items: center;
             width: 84px;
             height: 105px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             animation: fadeInZoomIn 1.2s ease-in-out forwards;
             will-change: stroke-dashoffset, opacity, transform;
         }
@@ -407,13 +530,13 @@
         .form-label {
             margin-bottom: 8px;
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
+            color: #9fa0a2;
             font-weight: 500;
         }
         .form-input {
             width: 100%;
-            background: rgba(20, 20, 20, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #141414cc;
+            border: 1px solid #2b2b2b;
             border-radius: 12px;
             padding: 14px 16px;
             color: white;
@@ -422,9 +545,9 @@
             transition: all 0.3s ease;
         }
         .form-input:focus {
-            border-color: rgba(64, 156, 255, 0.8);
-            box-shadow: 0 0 0 2px rgba(64, 156, 255, 0.25);
-            background: rgba(35, 35, 35, 0.8);
+            border-color: #409cffcc;
+            box-shadow: 0 0 0 2px #409cff40;
+            background: #232323cc;
         }
         .form-input.wrong-credential {
             border-color: #DC143C;
@@ -451,7 +574,7 @@
             transition: transform 0.2s ease, box-shadow 0.3s ease;
         }
         .login-button::before {
-            content: '';
+            content: "";
             position: absolute;
             inset: 0;
             background: linear-gradient(135deg, hsl(207, 100%, 64%), hsl(244, 100%, 70%));
@@ -461,7 +584,7 @@
         }
         .login-button:hover {
             transform: scale(1.01);
-            box-shadow: 0 0 20px rgba(64, 156, 255, 0.4);
+            box-shadow: 0 0 20px #409cff66;
         }
         .login-button:hover::before {
             opacity: 1;
@@ -482,13 +605,13 @@
             width: fit-content;
             min-width: 390px;
             max-width: min(90vw, 480px);
-            background: rgba(32, 32, 32, 0.85);
+            background: #202020d9;
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #333333;
             border-left: 4px solid #e57373;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+            box-shadow: 0 10px 30px #00000066, 0 0 0 1px #ffffff14 inset;
             z-index: 10;
             color: #f5f5f5;
             display: flex;
@@ -543,7 +666,7 @@
         }
         .notification-separator {
             width: 1px;
-            background-color: rgba(255, 255, 255, 0.12);
+            background-color: #383838;
             align-self: stretch;
         }
         .notification-ok-area {
@@ -564,11 +687,11 @@
             align-self: stretch;
         }
         .notification-ok-area:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: #333333;
             color: #ffffff;
         }
         .notification-ok-area:active {
-            background-color: rgba(255, 255, 255, 0.15);
+            background-color: #404040;
         }
 
         /* Helper classes */
@@ -608,6 +731,13 @@
 
     <!-- Card -->
     <div class="card">
+        <!-- Connection status indicator -->
+        <div id="connectionStatusIndicator" class="connection-indicator no-select">
+            <span id="connectionStatusDot" class="connection-indicator-dot"></span>
+            <span id="connectionStatusText"></span>
+            <span id="connectionTooltip" class="indicator-tooltip"></span>
+       </div>
+
         <!-- Lock icon -->
         <div class="icon-container">
             <svg viewBox="0 0 100 190">
@@ -652,11 +782,8 @@
         <div class="notification-main-area">
             <div class="notification-icon-area">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Circle outline -->
                     <circle cx="12" cy="12" r="10" stroke="#e57373" stroke-width="2" fill="none"/>
-                    <!-- Exclamation mark body -->
                     <rect x="11" y="6.5" width="2" height="7" rx="1" fill="#e57373"/>
-                    <!-- Exclamation mark dot -->
                     <circle cx="12" cy="16.5" r="1.35" fill="#e57373"/>
                 </svg>
             </div>
