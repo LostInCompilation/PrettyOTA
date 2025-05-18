@@ -73,9 +73,18 @@ def formatAsCppArray(compressedContent, arrayName, valuesPerLine=35):
     result.append(arrayDecl)
 
     # Array content
-    for i in range(0, len(compressedContent), valuesPerLine):
-        chunk = compressedContent[i : i + valuesPerLine]
+    linesCount = (len(compressedContent) + valuesPerLine - 1) // valuesPerLine
+    for i in range(linesCount):
+        startIdx = i * valuesPerLine
+        endIdx = min(startIdx + valuesPerLine, len(compressedContent))
+        chunk = compressedContent[startIdx:endIdx]
+
         line = ", ".join([str(b) for b in chunk])
+
+        # Add trailing comma for all lines except the last one
+        if i < linesCount - 1:
+            line += ","
+
         line = "    " + line
         result.append(line)
 
@@ -127,8 +136,7 @@ def compressHTML(inputFilename, outputFilename, isMainMode):
     except FileNotFoundError:
         console.print(
             Panel(
-                f"[bold red]ERROR[/bold red]\n\n"
-                + f"[bold red]File not found:[/bold red] [highlight]'{inputFilename}'[/highlight]",
+                f"[bold red]ERROR[/bold red]\n\n" + f"[bold red]File not found:[/bold red] [highlight]'{inputFilename}'[/highlight]",
                 border_style="red",
                 padding=(1),
             )
