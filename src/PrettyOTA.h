@@ -47,13 +47,18 @@ Description:
 
 // ********************************************************
 // Library configuration options
+// Enable/disable new design (default: enabled)
+#ifndef PRETTY_OTA_ENABLE_NEW_DESIGN
+    #define PRETTY_OTA_ENABLE_NEW_DESIGN 1
+#endif
+
+// Enable/disable ArduinoOTA support (default: enabled)
 #ifndef PRETTY_OTA_ENABLE_ARDUINO_OTA
     #define PRETTY_OTA_ENABLE_ARDUINO_OTA 1
 #endif
 
 // Development features (not for public use)
 #define DEV_PRETTY_OTA_ENABLE_FIRMWARE_PULLING 0 // Work in progress feature
-
 
 // ********************************************************
 // Standard library includes
@@ -127,8 +132,13 @@ private:
     static const uint8_t    MAX_NUM_LOGGED_IN_CLIENTS = 5;
 
     // Embedded web resources
+#if (PRETTY_OTA_ENABLE_NEW_DESIGN == 1)
+    static const uint8_t    PRETTY_OTA_WEBSITE_DATA[12706];
+    static const uint8_t    PRETTY_OTA_LOGIN_DATA[9702];
+#else
     static const uint8_t    PRETTY_OTA_WEBSITE_DATA[12706];
     static const uint8_t    PRETTY_OTA_LOGIN_DATA[6208];
+#endif
 
 private:
     // UUID type definition and helper methods

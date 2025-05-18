@@ -314,7 +314,7 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
 
             // Save sessionIDs to NVS
             if(!SaveSessionIDsToNVS())
-                P_LOG_W("Could not save this log in to NVS storage. Client must log in again after reboot or update");
+                P_LOG_W("Could not save this session to NVS storage. Client must log in again after reboot or update");
 
             // Send response and set session ID cookie
             AsyncWebServerResponse* response = request->beginResponse(200);
@@ -633,8 +633,8 @@ bool PrettyOTA::Begin(AsyncWebServer* const server, const char* const username, 
     });
 
     // ********************************************************
-    // Page "/prettyota/rebootCheck": For checking if server rebooted
-    server->on("/prettyota/rebootCheck", HTTP_GET, [&](AsyncWebServerRequest* request)
+    // Page "/prettyota/rebootCheck": For checking if server is online
+    server->on("/prettyota/rebootCheck", HTTP_GET | HTTP_HEAD, [&](AsyncWebServerRequest* request)
     {
         return request->send(200, "text/plain", "Server is running");
     });
