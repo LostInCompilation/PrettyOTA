@@ -45,17 +45,15 @@
 
         // *********************************************************************
         // Login form
+        const loginBtn = document.getElementById("loginButton");
+        const username = document.getElementById("username");
+        const password = document.getElementById("password");
+
         document.getElementById("loginForm").addEventListener("submit", async function (e) {
             e.preventDefault();
 
             // Disable login button
-            document.getElementById("loginButton").disabled = true;
-
-            // Prepare request body
-            const body = JSON.stringify({
-                userId: document.getElementById("username").value,
-                password: md5(document.getElementById("password").value)
-            });
+            loginBtn.disabled = true;
 
             try {
                 // Set up request timeout
@@ -63,11 +61,13 @@
                 const timeoutId = setTimeout(() => controller.abort(), 4000);
 
                 // Send request
-                const loginURL = localStorage.getItem("login_url");
-                const response = await fetch(loginURL, {
+                const response = await fetch(localStorage.getItem("login_url"), {
                     method: "POST",
                     headers: {"Content-Type": "application/json; charset=UTF-8"},
-                    body: body,
+                    body: JSON.stringify({
+                        userId: username.value,
+                        password: md5(password.value)
+                    }),
                     signal: controller.signal
                 });
                 clearTimeout(timeoutId);
@@ -75,28 +75,25 @@
                 // Handle response
                 if (response.ok) {
                     // Redirect to main URL
-                    const mainURL = localStorage.getItem("main_url");
-                    window.location.replace(mainURL);
+                    window.location.replace(localStorage.getItem("main_url"));
+                    return;
+                }
+
+                const errorText = await response.text();
+
+                if (response.status === 401) {
+                    showNotification("Log in failed", errorText, 7000);
+
+                    // Trigger shake animation for lock
+                    document.getElementById("lockGroup").classList.add("shake");
+                    setTimeout(() => document.getElementById("lockGroup").classList.remove("shake"), 350);
+
+                    // Red border on input fields
+                    username.classList.add("wrong-credential");
+                    password.classList.add("wrong-credential");
                 }
                 else {
-                    const errorText = await response.text();
-
-                    if (response.status === 401) {
-                        showNotification("Log in failed", errorText, 7000);
-
-                        // Trigger shake animation for lock
-                        document.getElementById("lockGroup").classList.add("shake");
-                        setTimeout(() => {
-                            document.getElementById("lockGroup").classList.remove("shake");
-                        }, 350);
-
-                        // Red border on input fields
-                        document.getElementById("username").classList.add("wrong-credential");
-                        document.getElementById("password").classList.add("wrong-credential");
-                    }
-                    else {
-                        showNotification("Log in failed", `Server response: ${response.status} ${errorText}`, 7000);
-                    }
+                    showNotification("Log in failed", `Server response: ${response.status} - ${response.statusText}`, 7000);
                 }
             }
             catch (error) {
@@ -107,16 +104,18 @@
             }
             finally {
                 // Enable login button
-                document.getElementById("loginButton").disabled = false;
+                loginBtn.disabled = false;
             }
         });
 
         // Add event listeners to remove red border around input fields on focus
-        document.getElementById("username").addEventListener("focus", function() {this.classList.remove("wrong-credential");});
-        document.getElementById("password").addEventListener("focus", function() {this.classList.remove("wrong-credential");});
+        username.addEventListener("focus", function() {this.classList.remove("wrong-credential");});
+        password.addEventListener("focus", function() {this.classList.remove("wrong-credential");});
 
         // *********************************************************************
         // Connection status indicator
+        const connectionIndicator = document.getElementById("connectionIndicator");
+
         let connectionStatus = false;
         function updateConnectionStatus(connected) {
             // Only update if status has changed
@@ -124,10 +123,11 @@
                 return;
 
             connectionStatus = connected;
+            //loginBtn.disabled = !connected;
 
             // Update status indicator
-            document.getElementById("connectionIndicator").classList.remove("connected", "disconnected");
-            document.getElementById("connectionIndicator").classList.add(connected ? "connected" : "disconnected");
+            connectionIndicator.classList.remove("connected", "disconnected");
+            connectionIndicator.classList.add(connected ? "connected" : "disconnected");
 
             // Update text and tooltip
             if (connected) {
@@ -141,10 +141,10 @@
         }
 
         // Show/hide tooltip on hover
-        document.getElementById("connectionIndicator").addEventListener("mouseenter", () => {
+        connectionIndicator.addEventListener("mouseenter", () => {
             document.getElementById("connectionIndicatorTooltip").classList.add("visible");
         });
-        document.getElementById("connectionIndicator").addEventListener("mouseleave", () => {
+        connectionIndicator.addEventListener("mouseleave", () => {
             document.getElementById("connectionIndicatorTooltip").classList.remove("visible");
         });
 
