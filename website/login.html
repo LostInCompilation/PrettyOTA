@@ -33,9 +33,9 @@
         document.getElementById("password").addEventListener("focus", function() {this.classList.remove("wrong-credential");});
 
         // *********************************************************************
-        // Connection Status Indicator
+        // Connection status indicator
         let connectionStatus = false;
-        function setConnectionStatus(connected) {
+        function updateConnectionStatus(connected) {
             // Only update if status has changed
             if (connected === connectionStatus)
                 return;
@@ -43,25 +43,26 @@
             connectionStatus = connected;
 
             // Update status indicator
-            document.getElementById("connectionStatusIndicator").classList.remove("connected", "disconnected");
-            document.getElementById("connectionStatusIndicator").classList.add(connected ? "connected" : "disconnected");
+            document.getElementById("connectionIndicator").classList.remove("connected", "disconnected");
+            document.getElementById("connectionIndicator").classList.add(connected ? "connected" : "disconnected");
 
-            // Update text content and tooltip text
+            // Update text and tooltip
             if (connected) {
-                document.getElementById("connectionStatusText").textContent = "Connected";
-                document.getElementById("connectionTooltip").textContent = "Connected to server";
-            } else {
-                document.getElementById("connectionStatusText").textContent = "Offline";
-                document.getElementById("connectionTooltip").textContent = "Could not connect to server";
+                document.getElementById("connectionIndicatorText").textContent = "Connected";
+                document.getElementById("connectionIndicatorTooltip").textContent = "Connected to server";
+            }
+            else {
+                document.getElementById("connectionIndicatorText").textContent = "Offline";
+                document.getElementById("connectionIndicatorTooltip").textContent = "Could not connect to server";
             }
         }
 
         // Show/hide tooltip on hover
-        document.getElementById("connectionStatusIndicator").addEventListener("mouseenter", () => {
-            document.getElementById("connectionTooltip").classList.add("visible");
+        document.getElementById("connectionIndicator").addEventListener("mouseenter", () => {
+            document.getElementById("connectionIndicatorTooltip").classList.add("visible");
         });
-        document.getElementById("connectionStatusIndicator").addEventListener("mouseleave", () => {
-            document.getElementById("connectionTooltip").classList.remove("visible");
+        document.getElementById("connectionIndicator").addEventListener("mouseleave", () => {
+            document.getElementById("connectionIndicatorTooltip").classList.remove("visible");
         });
 
         // *********************************************************************
@@ -101,6 +102,7 @@
 
         // *********************************************************************
         // General functions
+        // Query PrettyOTA info
         async function queryPrettyOTAInfo(maxRetries = 5, delayMs = 1000, timeoutMs = 5000) {
             for (let attempt = 1; attempt <= maxRetries; attempt++) {
                 try {
@@ -136,14 +138,32 @@
             }
         }
 
+        // Check server connection periodically
+        async function startConnectionMonitoring(intervalMs = 2000, timeoutMs = 4000) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+                const response = await fetch("/prettyota/rebootCheck", {
+                    method: "HEAD",
+                    signal: controller.signal,
+                    cache: "no-store"
+                });
+
+                clearTimeout(timeoutId);
+                updateConnectionStatus(response.ok);
+            }
+            catch (error) {
+                updateConnectionStatus(false);
+            }
+            finally {
+                // Schedule the next check 2 seconds after this one completes
+                setTimeout(startConnectionMonitoring, intervalMs);
+            }
+        }
+
         // On page load
         function onLoad() {
-            // Setup background rendering
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            createNodes();
-            requestAnimationFrame(animate);
-
             // Set default values if not set
             if (!("version_string" in localStorage))
                 localStorage.setItem("version_string", "1.0.0");
@@ -152,8 +172,12 @@
             if (!("login_url" in localStorage))
                 localStorage.setItem("login_url", "/login");
 
-            // Set connection status to connected
-            setConnectionStatus(true);
+            // Setup background rendering
+            setupBackgroundRendering();
+
+            // Set initial connection status and start periodic connection checks
+            updateConnectionStatus(true);
+            startConnectionMonitoring();
 
             // Query PrettyOTA info
             queryPrettyOTAInfo();
@@ -166,6 +190,8 @@
         // Background rendering
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
+        const frameInterval = 1000 / 60; // 60 FPS (fixed frame rate)
+        let lastFrameTime = 0;
         let nodes = [];
 
         function lerp(x1, y1, x2, y2, x) {
@@ -203,7 +229,7 @@
                 this.vx = (Math.random() - 0.5) * speedFactor;
                 this.vy = (Math.random() - 0.5) * speedFactor;
 
-                this.cluster = Math.floor(Math.random() * 4);
+                this.cluster = Math.floor(Math.random() * 3);
             }
 
             update(width, height) {
@@ -232,13 +258,7 @@
             }
         }
 
-        // Create nodes
-        function createNodes() {
-            const nodeCount = calculateNodeDensity(canvas.width, canvas.height);
-            nodes = Array(nodeCount).fill().map(() => new Node(canvas.width, canvas.height));
-        }
-
-        // Resize canvas to fit window and adjusting nodes
+        // Resize canvas and adjust node count
         function resizeCanvas() {
             const oldWidth = canvas.width;
             const oldHeight = canvas.height;
@@ -258,28 +278,15 @@
                 }
             });
 
-            // Adjust node count based on new canvas size
+            // Update node count (remove and add nodes as needed)
             const idealNodeCount = calculateNodeDensity(canvas.width, canvas.height);
-
-            if (idealNodeCount > nodes.length) {
-                // Add nodes if needed
-                for (let i = 0; i < idealNodeCount - nodes.length; i++) {
-                    nodes.push(new Node(canvas.width, canvas.height));
-                }
-            }
-            else if (idealNodeCount < nodes.length) {
-                // Remove nodes if needed
-                nodes = nodes.slice(0, idealNodeCount);
-            }
+            nodes = Array.from({ length: idealNodeCount }, (_, i) => i < nodes.length ? nodes[i] : new Node(canvas.width, canvas.height));
         }
-
-        // Limit FPS
-        const frameInterval = 1000 / 60; // 60 FPS
-        let lastFrameTime = 0;
 
         // Animation loop
         function animate(time) {
             requestAnimationFrame(animate);
+
             if (time - lastFrameTime >= frameInterval) {
                 lastFrameTime = time;
 
@@ -326,6 +333,19 @@
                     }
                 }
             }
+        }
+
+        // Setup background rendering
+        function setupBackgroundRendering() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            // Create nodes
+            const nodeCount = calculateNodeDensity(canvas.width, canvas.height);
+            nodes = Array(nodeCount).fill().map(() => new Node(canvas.width, canvas.height));
+
+            // Start animation loop
+            requestAnimationFrame(animate);
         }
 
         // Add resize event
@@ -422,7 +442,7 @@
         }
 
         /* Tooltip */
-        .indicator-tooltip {
+        .connection-indicator-tooltip {
             position: absolute;
             top: calc(100% + 8px);
             left: 50%;
@@ -444,7 +464,7 @@
                 transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                 box-shadow 0.3s ease;
         }
-        .indicator-tooltip.visible {
+        .connection-indicator-tooltip.visible {
             opacity: 1;
             transform: translateX(-50%) translateY(0) scale(1);
             transition:
@@ -452,19 +472,19 @@
                 transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                 box-shadow 0.3s ease;
         }
-        .indicator-tooltip::before,
-        .indicator-tooltip::after {
+        .connection-indicator-tooltip::before,
+        .connection-indicator-tooltip::after {
             content: '';
             position: absolute;
             bottom: 100%;
             left: 50%;
         }
-        .indicator-tooltip::before {
+        .connection-indicator-tooltip::before {
             border: 7px solid transparent;
             border-bottom-color: #383838;
             margin-left: -7px;
         }
-        .indicator-tooltip::after {
+        .connection-indicator-tooltip::after {
             border: 6px solid transparent;
             border-bottom-color: #202020;
             margin-left: -6px;
@@ -732,10 +752,10 @@
     <!-- Card -->
     <div class="card">
         <!-- Connection status indicator -->
-        <div id="connectionStatusIndicator" class="connection-indicator no-select">
-            <span id="connectionStatusDot" class="connection-indicator-dot"></span>
-            <span id="connectionStatusText"></span>
-            <span id="connectionTooltip" class="indicator-tooltip"></span>
+        <div id="connectionIndicator" class="connection-indicator no-select">
+            <span class="connection-indicator-dot"></span>
+            <span id="connectionIndicatorText"></span>
+            <span id="connectionIndicatorTooltip" class="connection-indicator-tooltip"></span>
        </div>
 
         <!-- Lock icon -->
