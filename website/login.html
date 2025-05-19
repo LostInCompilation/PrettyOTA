@@ -468,7 +468,8 @@
             border-radius: 20px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            padding: 30px 40px 25px 40px;
+            padding: 30px 33px 25px 33px;
+            margin: 20px;
             box-shadow: 0 8px 32px #0000004d;
             border: 1px solid #282828;
             animation: fadeInZoomIn 0.5s cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
@@ -627,6 +628,7 @@
             width: 100%;
         }
         .form-group {
+            position: relative;
             display: flex;
             flex-direction: column;
             width: 100%;
@@ -643,7 +645,7 @@
             background: #141414cc;
             border: 1px solid #2b2b2b;
             border-radius: 12px;
-            padding: 14px 16px;
+            padding: 14px 16px 14px 44px;
             color: white;
             font-size: 16px;
             outline: none;
@@ -656,6 +658,29 @@
         }
         .form-input.wrong-credential {
             border-color: #DC143C;
+        }
+
+        /* Input icons */
+        .input-icon {
+            position: absolute;
+            color: #6f7073;
+            transition: color 0.3s ease;
+            pointer-events: none;
+        }
+        .input-icon.username {
+            left: 12px;
+            top: 37px;
+            width: 24px;
+            height: 24px;
+        }
+        .input-icon.password {
+            left: 15px;
+            top: 39px;
+            width: 20px;
+            height: 20px;
+        }
+        .form-input:focus ~ .input-icon {
+            color: #409cff;
         }
 
         /* Login button */
@@ -675,7 +700,6 @@
             cursor: pointer;
             overflow: hidden;
             position: relative;
-            z-index: 1;
             transition: transform 0.2s ease, box-shadow 0.3s ease;
         }
         .login-button::before {
@@ -683,7 +707,7 @@
             position: absolute;
             inset: 0;
             background: linear-gradient(135deg, hsl(207, 100%, 64%), hsl(244, 100%, 70%));
-            z-index: -1;
+            z-index: -10;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -880,10 +904,17 @@
             <div class="form-group">
                 <label for="username" class="form-label no-select">Username</label>
                 <input type="text" id="username" class="form-input" placeholder="Enter your username">
+                <svg class="input-icon username" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M5.33788 17.3206C5.99897 14.5269 8.77173 13 11.6426 13H12.3574C15.2283 13 18.001 14.5269 18.6621 17.3206C18.79 17.8611 18.8917 18.4268 18.9489 19.0016C19.0036 19.5512 18.5523 20 18 20H6C5.44772 20 4.99642 19.5512 5.0511 19.0016C5.1083 18.4268 5.20997 17.8611 5.33788 17.3206Z"/>
+                </svg>
             </div>
             <div class="form-group">
                 <label for="password" class="form-label no-select">Password</label>
                 <input type="password" id="password" class="form-input" placeholder="Enter your password">
+                <svg class="input-icon password" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 2C9.238 2 7 4.238 7 7v3h-.4c-.88 0-1.6.72-1.6 1.6v7C5 19.92 6.08 21 7.4 21h9.2c1.32 0 2.4-1.08 2.4-2.4v-7c0-.88-.72-1.6-1.6-1.6H17V7c0-2.762-2.238-5-5-5Zm3 8V7c0-1.658-1.342-3-3-3S9 5.342 9 7v3h6Z"/>
+                </svg>
             </div>
 
             <button type="submit" class="login-button" id="loginButton">Log In</button>
@@ -899,7 +930,7 @@
     <div id="notification" class="notification" role="alert">
         <div class="notification-main-area">
             <div class="notification-icon-area">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="10" stroke="#e57373" stroke-width="2" fill="none"/>
                     <rect x="11" y="6.5" width="2" height="7" rx="1" fill="#e57373"/>
                     <circle cx="12" cy="16.5" r="1.35" fill="#e57373"/>
