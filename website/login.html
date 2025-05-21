@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A better looking OTA web updater." />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A better looking OTA web updater for embedded devices." />
+    <meta name="author" content="Marc Schöndorf">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg fill='%234063ff' width='250px' height='250px' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 3h8a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zm0 2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H6zm2 2h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1zm1 2v2h2V9H9zM6 0a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1zM1 5h2a1 1 0 1 1 0 2H1a1 1 0 1 1 0-2zm16 0h2a1 1 0 0 1 0 2h-2a1 1 0 0 1 0-2zM1 9h2a1 1 0 1 1 0 2H1a1 1 0 0 1 0-2zm16 0h2a1 1 0 0 1 0 2h-2a1 1 0 0 1 0-2zM1 13h2a1 1 0 0 1 0 2H1a1 1 0 0 1 0-2zm16 0h2a1 1 0 0 1 0 2h-2a1 1 0 0 1 0-2zM6 16a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 1-1zm8-16a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V1a1 1 0 0 1 1-1zm0 16a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 1-1zM10 0a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V1a1 1 0 0 1 1-1zm0 16a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 1-1z'/%3E%3C/svg%3E" />
     <title>PrettyOTA Login</title>
     <script type="module" crossorigin>
@@ -286,7 +287,6 @@
                 clearTimeout(timeoutId);
                 updateConnectionStatusIndicator(response.ok);
 
-                // Disable login button if response is not ok or not yet got PrettyOTA info
                 // Only update the disabled state if a login attempt is not running
                 if (!loginAttemptRunning)
                     document.getElementById("loginButton").disabled = !queryPrettyOTAInfoSucceeded || !response.ok;
@@ -502,10 +502,11 @@
         }
         body {
             background: radial-gradient(circle at center, hsl(224, 57%, 9%), #000);
-            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+            margin: 0;
             overflow: hidden;
         }
         canvas {
@@ -514,6 +515,12 @@
             width: 100vw;
             height: 100vh;
             z-index: -1;
+        }
+
+        /* Helper classes */
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         /* Fade overlay (fade to black) */
@@ -537,20 +544,20 @@
             align-items: center;
             width: 390px;
             min-width: 330px;
+            padding: 30px 33px 25px;
+            margin: 20px;
+            gap: 20px;
             background-color: #141414a6;
+            border: 1px solid #282828;
             border-radius: 20px;
+            box-shadow: 0 8px 32px #0000004d;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            padding: 30px 33px 25px 33px;
-            margin: 20px;
-            box-shadow: 0 8px 32px #0000004d;
-            border: 1px solid #282828;
-            animation: fadeInZoomIn 0.5s cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
-            gap: 20px;
             z-index: 1;
+            animation: fadeInZoomIn 0.5s cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
         }
         .card.disappear {
-            animation: cardDisappear 0.8s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+            animation: cardDisappear 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
         .card-footer {
             display: flex;
@@ -567,16 +574,16 @@
             right: 15px;
             display: flex;
             align-items: center;
-            font-size: 12px;
             gap: 7px;
-            cursor: default;
             padding: 4px 8px;
-            border-radius: 12px;
+            font-size: 12px;
+            color: #dfdfdf;
             background-color: #202020;
             border: 1px solid #383838;
+            border-radius: 12px;
             transition: opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
-            color: #dfdfdf;
             opacity: 0.8;
+            cursor: default;
         }
         .connection-indicator:hover {
             opacity: 1;
@@ -608,19 +615,19 @@
             position: absolute;
             top: calc(100% + 8px);
             left: 50%;
-            transform: translateX(-50%) translateY(8px) scale(0.95);
-            transform-origin: top center;
-            background: #202020;
-            color: #ffffff;
-            font-size: 12px;
+            z-index: 10;
             padding: 6px 12px;
-            border-radius: 8px;
+            font-size: 12px;
+            color: #ffffff;
+            background: #202020;
             border: 1px solid #383838;
+            border-radius: 8px;
             box-shadow: 0 4px 12px #00000033;
             white-space: nowrap;
             opacity: 0;
-            z-index: 10;
             pointer-events: none;
+            transform: translateX(-50%) translateY(8px) scale(0.95);
+            transform-origin: top center;
             transition:
                 opacity 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                 transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
@@ -678,13 +685,13 @@
             animation: slideUp 1.2s ease-in-out forwards;
         }
         .lock-path {
-            opacity: 0;
             fill: none;
             stroke-width: 6.5;
             stroke-linecap: round;
             stroke-linejoin: round;
             stroke-dasharray: 150;
             stroke-dashoffset: 150;
+            opacity: 0;
             animation: fadeIn 0.7s ease-in-out 0.0s forwards,
                        drawPath 2.8s cubic-bezier(0.2, 0.8, 0.2, 0.94) 0.1s forwards;
         }
@@ -713,17 +720,17 @@
         .form-label {
             margin-bottom: 8px;
             font-size: 14px;
-            color: #9fa0a2;
             font-weight: 500;
+            color: #9fa0a2;
         }
         .form-input {
             width: 100%;
+            padding: 14px 16px 14px 44px;
+            font-size: 16px;
+            color: white;
             background: #141414cc;
             border: 1px solid #2b2b2b;
             border-radius: 12px;
-            padding: 14px 16px 14px 44px;
-            color: white;
-            font-size: 16px;
             outline: none;
             transition: all 0.3s ease;
         }
@@ -740,8 +747,8 @@
         .input-icon {
             position: absolute;
             color: #6f7073;
-            transition: color 0.3s ease;
             pointer-events: none;
+            transition: color 0.3s ease;
         }
         .input-icon.username {
             left: 12px;
@@ -764,26 +771,26 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
             width: 100%;
-            background: linear-gradient(135deg, hsla(211, 100%, 63%, 0.9), hsla(244, 100%, 67%, 0.9));
-            color: white;
-            border: none;
-            border-radius: 12px;
             padding: 14px;
             margin-top: 12px;
             font-size: 16px;
             font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, hsla(211, 100%, 63%, 0.9), hsla(244, 100%, 67%, 0.9));
+            border: none;
+            border-radius: 12px;
             cursor: pointer;
             overflow: hidden;
-            position: relative;
             transition: transform 0.2s ease, box-shadow 0.3s ease;
         }
         .login-button::before {
             content: "";
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, hsl(207, 100%, 64%), hsl(244, 100%, 70%));
             z-index: -10;
+            background: linear-gradient(135deg, hsl(207, 100%, 64%), hsl(244, 100%, 70%));
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -803,10 +810,10 @@
         .login-button:disabled {
             background: linear-gradient(135deg, hsla(0, 0%, 50%, 0.4), hsla(0, 0%, 40%, 0.4));
             color: #a0a0a0;
+            opacity: 0.7;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
-            opacity: 0.7;
         }
         .login-button:disabled:hover::before {
             opacity: 0;
@@ -817,12 +824,12 @@
             position: relative;
             height: 4px;
             width: 100%;
-            border-radius: 2px;
-            background: rgba(255, 255, 255, 0.05);
-            overflow: hidden;
             margin-top: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
             display: block;
             visibility: hidden;
+            overflow: hidden;
         }
         .loader-bar {
             position: absolute;
@@ -841,35 +848,29 @@
             width: 100%;
             background: linear-gradient(90deg, rgba(72, 187, 120, 0.7), rgba(72, 187, 120, 0.9));
         }
-        @keyframes loading {
-            0% { left: -30%; }
-            100% { left: 100%; }
-        }
 
         /* Notification */
         .notification {
             position: fixed;
             top: -180px;
             left: 50%;
-            transform: translateX(-50%);
-            width: fit-content;
-            min-width: 390px;
-            max-width: min(90vw, 480px);
-            background: #202020d9;
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 14px;
-            border: 1px solid #333333;
-            border-left: 4px solid #e57373;
-            box-shadow: 0 10px 30px #00000066, 0 0 0 1px #ffffff14 inset;
             z-index: 10;
-            color: #f5f5f5;
             display: flex;
             align-items: center;
+            min-width: 390px;
+            max-width: min(90vw, 480px);
+            color: #f5f5f5;
+            background: #202020d9;
+            border: 1px solid #333333;
+            border-left: 4px solid #e57373;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px #00000066, 0 0 0 1px #ffffff14 inset;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             opacity: 0;
-            transition: top 0.5s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
-            box-sizing: border-box;
             overflow: hidden;
+            transform: translateX(-50%);
+            transition: top 0.5s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
         .notification.show {
             top: 20px;
@@ -883,31 +884,31 @@
             gap: 14px;
         }
         .notification-icon-area {
-            width: 30px;
-            height: 30px;
-            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
         }
         .notification-icon-area svg {
             width: 100%;
             height: 100%;
         }
         .notification-content {
-            flex: 1;
             display: flex;
             flex-direction: column;
+            flex: 1;
             gap: 2px;
-            overflow-wrap: break-word;
             padding-right: 10px;
             letter-spacing: 0.02em;
+            overflow-wrap: break-word;
         }
         .notification-title {
             font-size: 1rem;
             font-weight: 700;
-            color: #ffffff;
             line-height: 1.3;
+            color: #ffffff;
         }
         .notification-message {
             font-size: 0.875rem;
@@ -924,17 +925,17 @@
             align-items: center;
             justify-content: center;
             width: 65px;
-            flex-shrink: 0;
             padding: 15px 10px;
-            background-color: transparent;
-            border: none;
-            color: #c0c0c0;
             font-size: 0.875rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.25s ease, color 0.25s ease;
+            color: #c0c0c0;
+            background-color: transparent;
+            border: none;
             outline: none;
+            cursor: pointer;
+            flex-shrink: 0;
             align-self: stretch;
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
         .notification-ok-button:hover {
             background-color: #333333;
@@ -942,12 +943,6 @@
         }
         .notification-ok-button:active {
             background-color: #404040;
-        }
-
-        /* Helper classes */
-        .no-select {
-            user-select: none;
-            -webkit-user-select: none;
         }
 
         /* Animations */
