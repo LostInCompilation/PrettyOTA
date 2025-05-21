@@ -134,7 +134,7 @@ private:
     // Embedded web resources
 #if (PRETTY_OTA_ENABLE_NEW_DESIGN == 1)
     static const uint8_t    PRETTY_OTA_WEBSITE_DATA[12706];
-    static const uint8_t    PRETTY_OTA_LOGIN_DATA[9702];
+    static const uint8_t    PRETTY_OTA_LOGIN_DATA[10445];
 #else
     static const uint8_t    PRETTY_OTA_WEBSITE_DATA[12706];
     static const uint8_t    PRETTY_OTA_LOGIN_DATA[6208];
