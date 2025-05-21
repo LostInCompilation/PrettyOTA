@@ -45,7 +45,10 @@
 
         // *********************************************************************
         // Login form
+        let loginAttemptRunning = false;
         document.getElementById("loginForm").addEventListener("submit", async function (e) {
+            loginAttemptRunning = true;
+
             e.preventDefault();
 
             const loginBtn = document.getElementById("loginButton");
@@ -58,32 +61,6 @@
             loginBtn.disabled = true;
             loaderContainer.style.visibility = "visible";
             loaderBar.classList.add("animate");
-
-            // Let the normal loader animation run
-            setTimeout(() => {
-                // Stop the animation at its current position
-                const currentLeft = window.getComputedStyle(loaderBar).getPropertyValue("left");
-                loaderBar.classList.remove("animate");
-                loaderBar.style.left = currentLeft;
-
-                // Apply the completed class which will expand the bar
-                loaderBar.classList.add("completed");
-
-                // Scale the bar to fill the container
-                loaderBar.style.transform = "scaleX(4)";
-            }, 1950);
-
-            // Disappear animation
-            //document.querySelector(".card").classList.add("disappear");
-            //document.getElementById("fadeOverlay").classList.add("fade-to-black");
-            // Delay redirect to allow animations to complete
-            // setTimeout(() => {
-            //     window.location.replace(localStorage.getItem("main_url"));
-            // }, 1200); // Matches animation duration
-
-            return;
-
-
 
             try {
                 // Set up request timeout
@@ -100,30 +77,59 @@
                     }),
                     signal: controller.signal
                 });
+
                 clearTimeout(timeoutId);
 
-                // Handle response
+                // Keep the normal loader animation running for (at least) 700ms
+                await new Promise(resolve => setTimeout(resolve, 700));
+
+                // Was login successful?
                 if (response.ok) {
+                    // Hide notification
+                    hideNotification();
+
+                    // Switch loader to success state
+                    const currentLeft = window.getComputedStyle(loaderBar).getPropertyValue("left");
+                    loaderBar.classList.remove("animate");
+                    loaderBar.style.left = currentLeft;
+                    loaderBar.classList.add("completed");
+                    loaderBar.style.transform = "scaleX(4)";
+
+                    // Keep showing success loader bar for a short time
+                    await new Promise(resolve => setTimeout(resolve, 400));
+
+                    // Fade out page
+                    document.querySelector(".card").classList.add("disappear");
+                    document.getElementById("fadeOverlay").classList.add("fade-to-black");
+
+                    // Delay redirect to allow disapper animation to complete
+                    await new Promise(resolve => setTimeout(resolve, 800));
+
                     // Redirect to main URL
                     window.location.replace(localStorage.getItem("main_url"));
+
                     return;
                 }
-
-                const errorText = await response.text();
-
-                if (response.status === 401) {
-                    showNotification("Log in failed", errorText, 7000);
-
-                    // Trigger shake animation for lock
-                    document.getElementById("lockGroup").classList.add("shake");
-                    setTimeout(() => document.getElementById("lockGroup").classList.remove("shake"), 350);
-
-                    // Red border on input fields
-                    username.classList.add("wrong-credential");
-                    password.classList.add("wrong-credential");
-                }
                 else {
-                    showNotification("Log in failed", `Server response: ${response.status} - ${response.statusText}`, 7000);
+                    // Log in failed
+                    const errorText = await response.text();
+
+                    if (response.status === 401) {
+                        // Wrong credentials
+                        showNotification("Log in failed", errorText, 7000);
+
+                        // Trigger shake animation for lock
+                        document.getElementById("lockGroup").classList.add("shake");
+                        setTimeout(() => document.getElementById("lockGroup").classList.remove("shake"), 350);
+
+                        // Red border on input fields
+                        username.classList.add("wrong-credential");
+                        password.classList.add("wrong-credential");
+                    }
+                    else {
+                        // Other error
+                        showNotification("Log in failed", `Server response: ${response.status} - ${response.statusText}`, 7000);
+                    }
                 }
             }
             catch (error) {
@@ -132,10 +138,15 @@
                 else
                     showNotification("Log in failed", "Network or server error", 7000);
             }
-            finally {
-                // Enable login button
-                loginBtn.disabled = false;
-            }
+
+            // Enable login button
+            loginBtn.disabled = false;
+
+            // Hide loader
+            loaderContainer.style.visibility = "hidden";
+            loaderBar.classList.remove("animate");
+
+            loginAttemptRunning = false;
         });
 
         // Add event listeners to remove red border around input fields on focus
@@ -144,20 +155,17 @@
 
         // *********************************************************************
         // Connection status indicator
-        const connectionIndicator = document.getElementById("connectionIndicator");
-
-        let connectionStatus = false;
-        function updateConnectionStatus(connected) {
+        let connectionIndicatorStatus = false;
+        function updateConnectionStatusIndicator(connected) {
             // Only update if status has changed
-            if (connected === connectionStatus)
+            if (connected === connectionIndicatorStatus)
                 return;
 
-            connectionStatus = connected;
-            //loginBtn.disabled = !connected;
+            connectionIndicatorStatus = connected;
 
             // Update status indicator
-            connectionIndicator.classList.remove("connected", "disconnected");
-            connectionIndicator.classList.add(connected ? "connected" : "disconnected");
+            document.getElementById("connectionIndicator").classList.remove("connected", "disconnected");
+            document.getElementById("connectionIndicator").classList.add(connected ? "connected" : "disconnected");
 
             // Update text and tooltip
             if (connected) {
@@ -171,32 +179,36 @@
         }
 
         // Show/hide tooltip on hover
-        connectionIndicator.addEventListener("mouseenter", () => {
+        document.getElementById("connectionIndicator").addEventListener("mouseenter", () => {
             document.getElementById("connectionIndicatorTooltip").classList.add("visible");
         });
-        connectionIndicator.addEventListener("mouseleave", () => {
+        document.getElementById("connectionIndicator").addEventListener("mouseleave", () => {
             document.getElementById("connectionIndicatorTooltip").classList.remove("visible");
         });
 
         // *********************************************************************
         // Notification popup
         let notificationTimeout = null;
-        function showNotification(title, message, timeoutMs = 5000) {
+        function showNotification(title, message, timeoutMs = 7000) {
             // Update content
             document.getElementById("notificationTitle").textContent = title;
             document.getElementById("notificationMessage").textContent = message;
 
             // Clear existing timeout if notification is already visible
-            if (notificationTimeout)
+            if (notificationTimeout) {
                 clearTimeout(notificationTimeout);
+                notificationTimeout = null;
+            }
 
             // Show notification
             document.getElementById("notification").classList.add("show");
 
             // Set new timeout for auto-hide
-            notificationTimeout = setTimeout(() => {
-                hideNotification();
-            }, timeoutMs);
+            if (timeoutMs > 0) {
+                notificationTimeout = setTimeout(() => {
+                    hideNotification();
+                }, timeoutMs);
+            }
         }
 
         function hideNotification() {
@@ -216,6 +228,7 @@
         // *********************************************************************
         // General functions
         // Query PrettyOTA info
+        let queryPrettyOTAInfoSucceeded = false;
         async function queryPrettyOTAInfo(maxRetries = 5, delayMs = 1000, timeoutMs = 4000) {
             for (let attempt = 1; attempt <= maxRetries; attempt++) {
                 try {
@@ -237,23 +250,29 @@
                     localStorage.setItem("version_string", jsonObj.prettyotaVersion);
                     localStorage.setItem("main_url", jsonObj.mainURL);
                     localStorage.setItem("login_url", jsonObj.loginURL);
+
+                    queryPrettyOTAInfoSucceeded = true;
+
                     return;
                 }
                 catch (error) {
                     console.warn(error.message);
+
                     if (attempt >= maxRetries) {
                         console.error("All retry attempts to get PrettyOTA info failed.");
+                        showNotification("Connection or server issue", "There seems to be an issue with the connection to the server. Please try again and refresh the page.", 0);
+
                         return;
                     }
 
                     // Wait before retry
-                    await new Promise(resolve => setTimeout(resolve, delayMs)); // Wait before retry
+                    await new Promise(resolve => setTimeout(resolve, delayMs));
                 }
             }
         }
 
         // Check server connection periodically
-        async function startConnectionMonitoring(intervalMs = 2000, timeoutMs = 4000) {
+        async function runConnectionMonitoring(intervalMs = 2000, timeoutMs = 4000) {
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -265,14 +284,22 @@
                 });
 
                 clearTimeout(timeoutId);
-                updateConnectionStatus(response.ok);
+                updateConnectionStatusIndicator(response.ok);
+
+                // Disable login button if response is not ok or not yet got PrettyOTA info
+                // Only update the disabled state if a login attempt is not running
+                if (!loginAttemptRunning)
+                    document.getElementById("loginButton").disabled = !queryPrettyOTAInfoSucceeded || !response.ok;
             }
             catch (error) {
-                updateConnectionStatus(false);
+                updateConnectionStatusIndicator(false);
+
+                // Disable login button
+                document.getElementById("loginButton").disabled = true;
             }
             finally {
                 // Schedule the next check 2 seconds after this one completes
-                setTimeout(startConnectionMonitoring, intervalMs);
+                setTimeout(runConnectionMonitoring, intervalMs);
             }
         }
 
@@ -289,12 +316,15 @@
             // Setup background rendering
             setupBackgroundRendering();
 
-            // Set initial connection status and start periodic connection checks
-            updateConnectionStatus(true);
-            startConnectionMonitoring();
-
             // Query PrettyOTA info
             queryPrettyOTAInfo();
+
+            // Set initial connection status and start periodic connection checks after 2 seconds
+            // This is to wait for getting the PrettyOTA info
+            updateConnectionStatusIndicator(true);
+            setTimeout(() => {
+                runConnectionMonitoring();
+            }, 2000);
         }
 
         // Add event listener for page load
@@ -465,7 +495,6 @@
         // Add resize event
         window.addEventListener("resize", resizeCanvas);
     </script>
-
     <style>
         * {
             box-sizing: border-box;
@@ -487,6 +516,7 @@
             z-index: -1;
         }
 
+        /* Fade overlay (fade to black) */
         #fadeOverlay {
             position: fixed;
             inset: 0;
@@ -496,7 +526,6 @@
             z-index: 0;
             transition: opacity 0.6s ease;
         }
-
         #fadeOverlay.fade-to-black {
             opacity: 1;
         }
@@ -779,10 +808,6 @@
             box-shadow: none;
             opacity: 0.7;
         }
-        .login-button:disabled:hover {
-            transform: none;
-            box-shadow: none;
-        }
         .login-button:disabled:hover::before {
             opacity: 0;
         }
@@ -820,8 +845,6 @@
             0% { left: -30%; }
             100% { left: 100%; }
         }
-
-
 
         /* Notification */
         .notification {
