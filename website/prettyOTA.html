@@ -7,24 +7,1266 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg fill='%234063ff' width='250px' height='250px' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 3h8a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zm0 2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H6zm2 2h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1zm1 2v2h2V9H9zM6 0a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V1a1 1 0 0 1 1-1zM1 5h2a1 1 0 1 1 0 2H1a1 1 0 1 1 0-2zm16 0h2a1 1 0 0 1 0 2h-2a1 1 0 0 1 0-2zM1 9h2a1 1 0 1 1 0 2H1a1 1 0 0 1 0-2zm16 0h2a1 1 0 0 1 0 2h-2a1 1 0 0 1 0-2zM1 13h2a1 1 0 0 1 0 2H1a1 1 0 0 1 0-2zm16 0h2a1 1 0 0 1 0 2h-2a1 1 0 0 1 0-2zM6 16a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 1-1zm8-16a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V1a1 1 0 0 1 1-1zm0 16a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 1-1zM10 0a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0V1a1 1 0 0 1 1-1zm0 16a1 1 0 0 1 1 1v2a1 1 0 0 1-2 0v-2a1 1 0 0 1 1-1z'/%3E%3C/svg%3E" />
     <title>PrettyOTA</title>
     <script type="module" crossorigin>
+        function updateDateDisplay() {
+            const dateDisplay = document.querySelector('.date-display');
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date();
+            dateDisplay.textContent = today.toLocaleDateString('en-US', options);
+        }
 
+        // Initial date update
+        updateDateDisplay();
     </script>
     <style>
+        :root {
+            --bg-primary: #19191b;
+            --bg-secondary: #29292b;
+            --accent: #0a84ff;
+            --accent-secondary: #0a84ff1a;
+            --text-primary: #ffffff;
+            --text-secondary: #98989f;
+            --text-tertiary: #636366;
+            --border: rgba(255, 255, 255, 0.1);
+            --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            --success: #30d158;
+            --warning: #ffd60a;
+            --error: #ff453a;
+        }
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         body {
-            background: radial-gradient(circle at center, hsl(224, 57%, 9%), #000);
+            background-color: #000;
+            color: var(--text-primary);
             height: 100vh;
+            line-height: 1.5;
+            overflow: hidden;
+            padding: 18px;
             display: flex;
             justify-content: center;
             align-items: center;
+            min-width: 470px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: auto 1fr;
+            height: calc(100vh - 36px); /* Set height to fill available space minus body padding */
+            background-color: var(--bg-primary);
+            border-radius: 20px;
             overflow: hidden;
+            box-shadow: 0px 0px 16px rgba(10, 132, 255, 0.35);
+            border: 1px solid var(--border);
+            max-width: 1600px;
+            width: 100%;
+            transition: grid-template-columns 0.3s ease;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background-color: var(--bg-primary);
+            border-right: 1px solid var(--border);
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            grid-row: 1 / span 2;
+            /* transition: padding 0.3s ease; */
+        }
+        .sidebar-scrollable-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+            margin-right: -0.5rem;
+
+            /* Firefox */
+            scrollbar-width: thin;
+            scrollbar-color: var(--text-tertiary) var(--bg-primary);
+        }
+        .sidebar-scrollable-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .sidebar-scrollable-content::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+            border-radius: 4px;
+        }
+        .sidebar-scrollable-content::-webkit-scrollbar-thumb {
+            background: var(--text-tertiary);
+            border-radius: 4px;
+        }
+
+        /* Sidebar Info (Date and Version) */
+        .sidebar-info {
+            margin-bottom: 30px; /* Space between info and nav groups */
+            padding-left: 12px; /* Align with nav titles */
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-info .date-display,
+        .sidebar-info .website-version {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            white-space: nowrap;
+        }
+
+        /* Logo */
+        .logo {
+            display: flex;
+            margin-left: 5px;
+            margin-bottom: 20px;
+            /* transition: justify-content 0.3s ease; */
+        }
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            color: var(--accent);
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .logo-text {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            /* transition: opacity 0.3s ease; */
+        }
+        .logo-text span {
+            color: var(--accent);
+        }
+
+        /* Menu */
+        .nav-group {
+            margin-bottom: 40px;
+        }
+        .nav-title {
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            padding-left: 12px;
+            transition: opacity 0.3s ease;
+        }
+        .nav-menu {
+            list-style: none;
+        }
+        .nav-item {
+            margin-bottom: 4px;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 15px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: color 0.2s ease, background-color 0.2s ease, padding 0.2s ease;
+        }
+        .nav-link.active {
+            background-color: var(--accent-secondary);
+            color: var(--accent);
+        }
+        .nav-link:hover:not(.active) {
+            background-color: #ffffff0d;
+            color: var(--text-primary);
+        }
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .nav-link span {
+            transition: opacity 0.3s ease;
+        }
+
+        /* Header */
+        /* .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 40px 40px 24px 40px;
+            border-bottom: 1px solid var(--border);
+            background-color: var(--bg-primary);
+            grid-column: 2;
+            grid-row: 1;
+            z-index: 1;
+        }
+        .header-title-container {
+            display: flex;
+            align-items: center;
+        }
+        .header-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-right: 10px;
+        }
+        .header-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--accent);
+            margin-right: 0.75rem;
+        }
+        .header-date-display {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        } */
+
+        /* Header styles */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Space between left section and device ID */
+            padding: 2.5rem 2.5rem 1.5rem 2.5rem;
+            border-bottom: 1px solid var(--border);
+            background-color: var(--bg-primary);
+            grid-column: 2;
+            grid-row: 1;
+            z-index: 1;
+        }
+
+        .header-left-section { /* Renamed from header-title-and-device-id */
+            display: flex;
+            align-items: center; /* Align title and date vertically */
+            gap: 1.5rem; /* Space between title and date */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        .header-title-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            padding-right: 10px;
+        }
+
+        .header-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--accent);
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        /* Device ID Bar in Header (now on right) */
+        .header-device-id {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: var(--bg-secondary); /* Distinct background */
+            border-radius: 0.75rem; /* Rounded corners */
+            border: 1px solid var(--border); /* Subtle border */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+
+        .header-device-id-icon {
+            width: 20px; /* Slightly smaller icon */
+            height: 20px;
+            color: var(--accent);
+            margin-right: 0.75rem;
+        }
+
+        .header-device-id-label {
+            font-size: 0.9rem; /* Smaller label */
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-right: 0.25rem; /* Closer to value */
+        }
+
+        .header-device-id-value {
+            font-size: 1rem; /* Smaller value */
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: 0.25px;
+        }
+
+
+
+
+
+
+
+
+
+
+        .system-info {
+            margin-top: auto;
+            /* Push to the bottom */
+            padding: 1rem;
+            background-color: var(--bg-secondary);
+            border-radius: 0.8rem;
+            font-size: 0.85rem;
+            box-shadow: var(--card-shadow);
+            flex-shrink: 0;
+            /* Prevent shrinking */
+            transition: padding 0.3s ease, opacity 0.3s ease;
+            /* Smooth transition for padding and opacity */
+        }
+
+        .system-info-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-tertiary);
+            margin-bottom: 0.5rem;
+            transition: opacity 0.3s ease;
+            /* Smooth transition for title opacity */
+        }
+
+        .system-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+        }
+
+        .system-info-label {
+            color: var(--text-secondary);
+            transition: opacity 0.3s ease;
+            /* Smooth transition for label opacity */
+        }
+
+        .system-info-value {
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+            /* Smooth transition for value opacity */
+        }
+
+        /* Action Links Group (for Logout) */
+        .nav-group.actions {
+            margin-bottom: 1.5rem;
+            /* Add space between actions and system info */
+            flex-shrink: 0;
+            /* Prevent shrinking */
+        }
+
+        /* Main content area styles - now applied to the main element */
+        main {
+            background-color: var(--bg-primary);
+            /* Match outer container background */
+            margin: 0;
+            /* Remove margin */
+            padding: 2.5rem;
+            /* Keep padding inside the main area */
+            overflow-y: auto;
+            /* Enable vertical scrolling */
+            grid-column: 2;
+            /* Place in the second column */
+            grid-row: 2;
+            /* Place in the second row */
+            display: flex;
+            /* Use flex to manage content inside */
+            flex-direction: column;
+            /* Stack content vertically */
+        }
+
+        /* Custom Scrollbar for main content area */
+        main::-webkit-scrollbar {
+            width: 8px;
+            /* Width of the scrollbar */
+        }
+
+        main::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+            /* Background of the scrollbar track */
+            border-radius: 4px;
+        }
+
+        main::-webkit-scrollbar-thumb {
+            background: var(--text-tertiary);
+            /* Color of the scrollbar thumb */
+            border-radius: 4px;
+        }
+
+        main::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+            /* Color on hover */
+        }
+
+        /* For Firefox */
+        main {
+            scrollbar-width: thin;
+            /* "auto" or "thin" */
+            scrollbar-color: var(--text-tertiary) var(--bg-primary);
+            /* thumb track */
+        }
+
+        /* Content sections - initially hide all but the active one */
+        .content-section {
+            display: none;
+            flex-direction: column;
+            /* Ensure content inside sections stacks vertically */
+            flex-grow: 1;
+            /* Allow content sections to grow within main */
+        }
+
+        .content-section.active {
+            display: flex;
+            /* Show the active section */
+        }
+
+
+        /* Prominent Stats Section */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            /* Responsive grid for stats */
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            margin-top: 0;
+            /* Ensure no extra margin at the top */
+        }
+
+        .info-tile {
+            /* background-color: var(--bg-secondary); */
+            background: linear-gradient(145deg, var(--accent-secondary) 0%, rgba(10, 132, 255, 0.05) 100%);
+
+            /* Use tertiary background for cards */
+            border-radius: 1rem;
+            padding: 1.5rem;
+            /* Increased padding */
+            border: 1px solid var(--border);
+            box-shadow: var(--card-shadow);
+            /* Added shadow */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .info-tile-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            /* Slightly larger font */
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+            /* Increased margin */
+        }
+
+        .info-tile-value {
+            font-size: 1.8rem;
+            /* Larger value font */
+            font-weight: 700;
+            /* Bolder font */
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            /* Default color */
+        }
+
+        .info-tile-value.success {
+            color: var(--success);
+        }
+
+        /* Main Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            /* Flexible grid for cards */
+            gap: 1.5rem;
+            flex-grow: 1;
+            /* Allow the grid to grow */
+        }
+
+        .card {
+            background-color: var(--bg-secondary);
+            /* Use tertiary background for cards */
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            /* Ensure content stacks vertically */
+        }
+
+        .card.full-width {
+            grid-column: 1 / -1;
+            /* Span across all columns */
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            background-color: var(--bg-primary);
+            /* Slightly different header background */
+        }
+
+        .card-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--accent);
+            margin-right: 0.75rem;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            /* Slightly larger title */
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            /* Allow body to take up remaining space */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Upload zone */
+        .upload-zone {
+            background: linear-gradient(145deg, rgba(10, 132, 255, 0.05) 0%, rgba(10, 132, 255, 0.1) 100%);
+            border: 2px dashed rgba(10, 132, 255, 0.3);
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 1.5rem;
+            /* Added margin below upload zone */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            /* Allow upload zone to grow */
+        }
+
+        .upload-zone:hover {
+            border-color: var(--accent);
+            background: linear-gradient(145deg, rgba(10, 132, 255, 0.1) 0%, rgba(10, 132, 255, 0.15) 100%);
+        }
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            margin-top: auto;
+            /* Push to the bottom */
+            width: 100%;
+            height: 6px;
+            background-color: var(--bg-primary);
+            /* Use secondary background for progress track */
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--accent);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .progress-status {
+            color: var(--text-secondary);
+        }
+
+        .progress-percentage {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* Settings */
+        .settings-list {
+            list-style: none;
+            flex-grow: 1;
+            /* Allow settings list to grow */
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .settings-item:first-child {
+            padding-top: 0;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .settings-label {
+            font-size: 0.95rem;
+        }
+
+        .settings-control {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Select dropdown */
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select {
+            appearance: none;
+            background-color: var(--bg-primary);
+            /* Use secondary background for select */
+            border: none;
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            padding: 0.5rem 2rem 0.5rem 1rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .select-arrow {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            width: 16px;
+            height: 16px;
+            color: var(--text-secondary);
+        }
+
+        /* Toggle switch */
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 51px;
+            height: 31px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-primary);
+            /* Use secondary background for toggle track */
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked+.toggle-slider {
+            background-color: var(--success);
+            /* Use success color for active toggle */
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Buttons */
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.875rem;
+            border-radius: 0.8rem;
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+            margin-right: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0071e3;
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #3c3c3e;
+        }
+
+
+        /* Responsive adjustments 1024px */
+        @media (max-width: 1px) {
+            .container {
+                grid-template-columns: 240px 1fr;
+                /* Adjust sidebar width */
+            }
+
+            .sidebar {
+                padding: 2rem 1rem;
+                /* Adjust padding */
+            }
+
+            .sidebar-scrollable-content {
+                padding-right: 0.25rem;
+                /* Adjust padding for scrollbar space */
+                margin-right: -0.25rem;
+                /* Adjust negative margin */
+            }
+
+            main {
+                /* Apply adjustments to main */
+                padding: 2rem;
+                /* Adjust padding */
+            }
+
+            .dashboard-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                /* Adjust min width for cards */
+            }
+        }
+
+        /* Small screen adjustments - sidebar shrinks */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                /* Remove body padding */
+                display: block;
+                /* Revert to block display */
+            }
+
+            .container {
+                grid-template-columns: 80px 1fr;
+                /* Shrink sidebar width */
+                /* Keep padding and border-radius */
+                grid-template-rows: auto 1fr;
+                /* Stack header and content */
+                height: 100vh;
+                /* Full height on small screens */
+                box-shadow: none;
+                /* Remove outer shadow */
+            }
+
+            .sidebar {
+                /* Sidebar remains visible, but shrinks */
+                padding: 1.5rem 0.5rem;
+                /* Adjust padding for shrunk state */
+            }
+
+            .sidebar-scrollable-content {
+                padding-right: 0;
+                /* Remove padding when shrunk */
+                margin-right: 0;
+                /* Remove negative margin when shrunk */
+            }
+
+            .sidebar-info {
+                opacity: 0;
+                height: 0;
+                overflow: hidden;
+                margin-bottom: 0;
+            }
+
+            .logo {
+                justify-content: center;
+                /* Center logo icon */
+                margin-bottom: 2rem;
+                /* Adjust margin */
+            }
+
+            .logo-text {
+                display: none;
+                /* Hide logo text */
+            }
+
+            .nav-group {
+                margin-bottom: 1.5rem;
+                /* Adjust margin */
+            }
+
+            .nav-title {
+                text-align: center;
+                /* Center nav title */
+                padding-left: 0;
+                /* Remove padding */
+                opacity: 0;
+                /* Hide nav title */
+                height: 0;
+                /* Collapse height */
+                overflow: hidden;
+                /* Hide overflow */
+                margin-bottom: 0;
+                /* Remove margin */
+            }
+
+            .nav-link {
+                justify-content: center;
+                /* Center nav icons */
+                padding: 0.75rem 0.5rem;
+                /* Adjust padding for icons only */
+            }
+
+            .nav-link svg {
+                margin-right: 0;
+                /* Remove margin next to icon */
+            }
+
+            .nav-link span {
+                display: none;
+                /* Hide link text */
+            }
+
+            .system-info {
+                padding: 0.75rem 0.5rem;
+                /* Adjust padding for shrunk state */
+                opacity: 0;
+                /* Hide system info content */
+                height: 0;
+                /* Collapse height */
+                overflow: hidden;
+                /* Hide overflow */
+                margin-bottom: 0;
+                /* Remove margin */
+            }
+
+            .system-info-title,
+            .system-info-label,
+            .system-info-value {
+                opacity: 0;
+                /* Ensure all text is hidden */
+            }
+
+
+            .nav-group.actions {
+                margin-bottom: 0;
+                /* Remove margin */
+            }
+
+
+            /* .header {
+                grid-column: 2;
+                grid-row: 1;
+                padding: 1.5rem 1.5rem 1rem 1.5rem;
+                background-color: var(--bg-primary);
+            } */
+            .header {
+                grid-column: 2;
+                grid-row: 1;
+                padding: 1.5rem 1.5rem 1rem 1.5rem;
+                background-color: var(--bg-primary);
+                flex-direction: column; /* Stack items vertically on small screens */
+                align-items: flex-start; /* Align to start when stacked */
+                gap: 0.5rem; /* Reduce gap when stacked */
+            }
+
+            .header-left-section { /* Now contains title and date */
+                flex-direction: column; /* Stack title and date */
+                align-items: flex-start; /* Align to start when stacked */
+                gap: 0.5rem; /* Reduce gap when stacked */
+            }
+
+            .header-device-id {
+                margin-top: 0; /* Remove top margin when stacked */
+                width: 100%; /* Full width when stacked */
+                justify-content: center; /* Center content in the pill */
+            }
+
+            main {
+                /* Apply adjustments to main */
+                margin: 0;
+                /* Remove margin */
+                padding: 1.5rem;
+                /* Adjust padding for smaller screens */
+                border-radius: 0;
+                /* Remove inner border radius */
+                box-shadow: none;
+                /* Remove inner shadow */
+                background-color: var(--bg-primary);
+                /* Use outer background color */
+                height: 100%;
+                /* Fill height on small screens */
+                grid-column: 2;
+                /* Place in the second column */
+                grid-row: 2;
+                /* Place in the second row */
+            }
+
+            .stats-section {
+                grid-template-columns: 1fr;
+                /* Stack stats */
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                /* Stack cards */
+            }
+
+            .card.full-width {
+                grid-column: span 1;
+                /* Ensure full-width cards stack */
+            }
+
+            .device-id-header {
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            .device-id-icon {
+                width: 24px;
+                height: 24px;
+            }
+            .device-id-label {
+                font-size: 0.8rem;
+            }
+            .device-id-value {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Logo -->
+            <div class="logo">
+                <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L6.04,7.5L12,10.85L17.96,7.5L12,4.15Z" />
+                </svg>
+                <div class="logo-text">
+                    <span>Pretty</span>OTA
+                </div>
+            </div>
 
+            <!-- Info (Version, Date) -->
+            <div class="sidebar-info">
+                <div class="date-display">DATE</div>
+                <div class="website-version">v1.0.0</div>
+            </div>
+
+            <!-- Menu -->
+            <div class="sidebar-scrollable-content">
+                <!-- Firmware -->
+                <div class="nav-group">
+                    <div class="nav-title">Firmware</div>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active" data-page="dashboard">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z" />
+                                </svg>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-page="update">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z" />
+                                </svg>
+                                <span>Automatic Updates</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-page="history">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z" />
+                                </svg>
+                                <span>History</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- System -->
+                <div class="nav-group">
+                    <div class="nav-title">System</div>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-page="settings">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" />
+                                </svg>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-page="diagnostics">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M13 3C16.88 3 20 6.14 20 10C20 12.8 18.37 15.19 16 16.31V21H9V18H8C6.89 18 6 17.11 6 16V13H4.5C4.08 13 3.84 12.5 4.08 12.19L6 9.66C6.19 5.95 9.23 3 13 3M13 5C10.41 5 8.26 6.84 8.04 9.33L8 9.67L5.97 12.5H8V17C8 17.55 8.45 18 9 18H11V19H14V17.56C16.62 16.68 18.5 13.65 18.5 10.29C18.5 7.05 16.04 5 13 5M14 8V10H17V12H14V14H12V12H9V10H12V8H14Z" />
+                                </svg>
+                                <span>Diagnostics</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Actions -->
+                <div class="nav-group actions">
+                    <div class="nav-title">Actions</div>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-page="logout">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H9C7.89,4 7,4.89 7,6V18A2,2 0 0,1 9,20H14V18H16V20A2,2 0 0,1 14,22H9A2,2 0 0,1 7,20V6C7,4.89 7.89,4 9,4H14V2Z" />
+                                </svg>
+                                <span>Log Out</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="system-info">
+                <div class="system-info-title">Connection</div>
+                <div class="system-info-row">
+                    <div class="system-info-label">Status</div>
+                    <div class="system-info-value">Connected</div>
+                </div>
+                <div class="system-info-row">
+                    <div class="system-info-label">Device ID</div>
+                    <div class="system-info-value">PO-82F49A</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left-section">
+                <div class="header-title-container">
+                    <svg class="header-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M13,3V9H21V3M13,21H21V11H13M3,21H11V15H3M3,13H11V3H3V13Z" />
+                    </svg>
+                    <h1 class="header-title">Main Dashboard</h1>
+                </div>
+            </div>
+            <div class="header-device-id">
+                <svg class="header-device-id-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12,1C10.89,1 10,1.89 10,3V4H14V3C14,1.89 13.11,1 12,1M19,1H17V3H19C20.11,3 21,3.89 21,5V19C21,20.11 20.11,21 19,21H5C3.89,21 3,20.11 3,19V5C3,3.89 3.89,3 5,3H7V1H5C2.79,1 1,2.79 1,5V19C1,21.21 2.79,23 5,23H19C21.21,23 23,21.21 23,19V5C23,2.79 21.21,1 19,1M12,19C9.24,19 7,16.76 7,14C7,11.24 9.24,9 12,9C14.76,9 17,11.24 17,14C17,16.76 14.76,19 12,19M12,11C10.34,11 9,12.34 9,14C9,15.66 10.34,17 12,17C13.66,17 15,15.66 15,14C15,12.34 13.66,11 12,11Z" />
+                </svg>
+                <span class="header-device-id-label">Device ID:</span>
+                <span class="header-device-id-value">DEV-A1B2C3D4E5F6</span>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main>
+            <div id="dashboard-content" class="content-section active">
+                <section class="stats-section">
+                    <div class="info-tile">
+                        <div class="info-tile-label">Firmware Version</div>
+                        <div class="info-tile-value">1.1.3</div>
+                    </div>
+
+                    <div class="info-tile">
+                        <div class="info-tile-label">Build Date</div>
+                        <div class="info-tile-value">Mar 31 2025</div>
+                    </div>
+
+                    <div class="info-tile">
+                        <div class="info-tile-label">Build Time</div>
+                        <div class="info-tile-value">02:21:21</div>
+                    </div>
+
+                    <div class="info-tile">
+                        <div class="info-tile-label">Rollback Possible</div>
+                        <div class="info-tile-value success">Yes</div>
+                    </div>
+                </section>
+
+                <section class="dashboard-grid">
+                    <div class="card upload-card full-width">
+                        <div class="card-header">
+                            <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path d="M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z" />
+                            </svg>
+                            <h2 class="card-title">Firmware Upload</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="upload-zone" id="upload-zone">
+                                <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path d="M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z" />
+                                </svg>
+                                <div class="upload-title">Drag and drop firmware file here</div>
+                                <div class="upload-subtitle">or click to select (.bin) file</div>
+                            </div>
+
+                            <div class="progress-container">
+                                <div class="progress-bar" id="progress-bar"></div>
+                            </div>
+                            <div class="progress-info">
+                                <div class="progress-status" id="progress-status">Ready for upload</div>
+                                <div class="progress-percentage" id="progress-percentage">0%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card settings-card">
+                        <div class="card-header">
+                            <svg class="card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path
+                                    d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" />
+                            </svg>
+                            <h2 class="card-title">Update Settings</h2>
+                        </div>
+                        <div class="card-body">
+                            <ul class="settings-list">
+                                <li class="settings-item">
+                                    <div class="settings-label">OTA Mode</div>
+                                    <div class="settings-control">
+                                        <div class="select-wrapper">
+                                            <select class="select" id="ota-mode">
+                                                <option value="firmware" selected>Firmware</option>
+                                                <option value="application">Application</option>
+                                                <option value="full">Full System</option>
+                                            </select>
+                                            <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M7,10L12,15L17,10H7Z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="settings-item">
+                                    <div class="settings-label">Auto Update</div>
+                                    <div class="settings-control">
+                                        <label class="toggle">
+                                            <input type="checkbox" id="auto-update">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </li>
+                                <li class="settings-item">
+                                    <div class="settings-label">Notification Settings</div>
+                                    <div class="settings-control">
+                                        <div class="select-wrapper">
+                                            <select class="select" id="notification-settings">
+                                                <option value="all" selected>All Updates</option>
+                                                <option value="critical">Critical Only</option>
+                                                <option value="none">None</option>
+                                            </select>
+                                            <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M7,10L12,15L17,10H7Z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <div class="button-group">
+                                <button class="btn btn-primary" id="apply-settings-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                                    </svg>
+                                    Apply Settings
+                                </button>
+                                <button class="btn btn-secondary" id="cancel-settings-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+                                    </svg>
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div id="settings-content" class="content-section">
+                <div class="settings-page-content">
+                    <p>Test</p>
+                </div>
+            </div>
+
+            <div id="update-content" class="content-section">
+                <p>Update Page Content</p>
+            </div>
+            <div id="history-content" class="content-section">
+                <p>History Page Content</p>
+            </div>
+            <div id="diagnostics-content" class="content-section">
+                <p>Diagnostics Page Content</p>
+            </div>
+
+            <div id="logout-content" class="content-section">
+                <p>Logging out...</p>
+            </div>
+        </main>
+    </div>
 </body>
 </html>
